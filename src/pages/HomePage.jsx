@@ -68,6 +68,7 @@ const stackGroups = [
       { label: 'React', tone: 'cyan' },
       { label: 'Flutter & Dart', tone: 'sky' },
       { label: 'ASP.NET Core', tone: 'violet' },
+      { label: 'Python', tone: 'sky' },
       { label: 'GenAI', tone: 'fuchsia' },
       { label: 'MS SQL', tone: 'emerald' },
       { label: 'PostgreSQL', tone: 'sky' },

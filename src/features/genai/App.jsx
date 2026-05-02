@@ -164,10 +164,12 @@ export default function App() {
             </button>
             <Link
               to="/courses/genai"
-              className="hidden md:inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md border border-slate-800 hover:border-slate-700"
+              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md border border-slate-800 hover:border-slate-700"
+              title="Back to course"
+              aria-label="Back to course"
             >
               <ArrowLeft className="w-3.5 h-3.5" />
-              Back to course
+              <span className="hidden md:inline">Back to course</span>
             </Link>
             <div className="flex-1 flex justify-end md:justify-start">
               <SearchBar onJump={(mid, tid) => goModule(mid, tid)} />
