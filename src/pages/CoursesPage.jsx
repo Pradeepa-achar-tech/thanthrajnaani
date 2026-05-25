@@ -3,6 +3,7 @@ import { ArrowRight, BookOpen, Clock, BookmarkCheck, Bookmark, Languages } from 
 import { courses } from '../data/courses.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useStudyList } from '../contexts/StudyListContext.jsx'
+import Reveal from '../components/Reveal.jsx'
 
 export default function CoursesPage() {
   const { user } = useAuth()
@@ -13,23 +14,25 @@ export default function CoursesPage() {
       <div className="mb-8 md:mb-10">
         <div className="flex items-center gap-2 mb-3">
           <BookOpen className="w-4 h-4 text-accent-400" />
-          <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">
+          <h2 className="text-sm uppercase tracking-[0.15em] text-slate-400 font-semibold">
             Courses
           </h2>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-3">
-          Pick a course. Add it to your study list. Start learning.
+        <h1 className="font-display text-3xl md:text-5xl font-extrabold mb-4 tracking-tight leading-[1.05]">
+          Pick a course. Add it to your study list.{' '}
+          <span className="text-aurora text-aurora-animate">Start learning.</span>
         </h1>
-        <p className="text-slate-400 max-w-2xl mb-5">
+        <p className="text-slate-400 max-w-2xl mb-6 leading-relaxed">
           All courses are free. Sign in with Google to add a course to your study list and unlock
           the lessons. Your progress syncs automatically across devices.
         </p>
 
-        <div className="rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/10 via-emerald-500/5 to-transparent p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
-          <div className="flex-shrink-0 w-12 h-12 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center">
+        <div className="relative overflow-hidden rounded-2xl border border-emerald-500/30 bg-gradient-to-br from-emerald-500/15 via-emerald-500/5 to-transparent p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6">
+          <div className="pointer-events-none absolute -right-16 -top-16 w-48 h-48 rounded-full bg-emerald-500/20 blur-3xl" />
+          <div className="relative flex-shrink-0 w-12 h-12 rounded-xl border border-emerald-500/40 bg-emerald-500/10 flex items-center justify-center shadow-[0_0_30px_-8px_rgba(16,185,129,0.6)]">
             <Languages className="w-6 h-6 text-emerald-300" />
           </div>
-          <div className="flex-1 min-w-0">
+          <div className="relative flex-1 min-w-0">
             <h3 className="text-base md:text-lg font-bold text-emerald-100 mb-1">
               Learn in your language · ನಿಮ್ಮ ಭಾಷೆಯಲ್ಲಿ ಕಲಿಯಿರಿ
             </h3>
@@ -39,7 +42,7 @@ export default function CoursesPage() {
               language switcher in the top bar — your progress is preserved.
             </p>
           </div>
-          <div className="flex-shrink-0 flex items-center gap-0.5 rounded-lg border border-emerald-500/40 bg-slate-950/60 p-0.5 text-xs font-semibold select-none">
+          <div className="relative flex-shrink-0 flex items-center gap-0.5 rounded-lg border border-emerald-500/40 bg-slate-950/60 p-0.5 text-xs font-semibold select-none">
             <span className="px-2.5 py-1 rounded-md text-slate-400">EN</span>
             <span className="px-2.5 py-1 rounded-md bg-accent-500 text-white shadow-[0_0_20px_-6px_rgba(249,115,22,0.6)]">
               ಕನ್ನಡ
@@ -49,13 +52,14 @@ export default function CoursesPage() {
       </div>
 
       <div className="grid md:grid-cols-2 gap-5">
-        {courses.map((c) => (
-          <CourseCard
-            key={c.id}
-            course={c}
-            signedIn={Boolean(user)}
-            enrolled={isEnrolled(c.id)}
-          />
+        {courses.map((c, i) => (
+          <Reveal key={c.id} delay={i * 90}>
+            <CourseCard
+              course={c}
+              signedIn={Boolean(user)}
+              enrolled={isEnrolled(c.id)}
+            />
+          </Reveal>
         ))}
       </div>
     </div>
@@ -67,13 +71,13 @@ function CourseCard({ course, signedIn, enrolled }) {
   return (
     <Link
       to={`/courses/${course.id}`}
-      className={`group relative rounded-2xl overflow-hidden border ${course.accentBorder} bg-gradient-to-br ${course.accent} hover:-translate-y-0.5 transition-all`}
+      className={`group relative rounded-2xl overflow-hidden border ${course.accentBorder} bg-gradient-to-br ${course.accent} transition-all duration-300 hover:-translate-y-1 ${course.glow} h-full block`}
     >
       <div className="absolute inset-0 bg-slate-950/60" />
 
-      <div className="relative p-6 md:p-7">
+      <div className="relative p-6 md:p-7 flex flex-col h-full">
         <div className="flex items-start justify-between mb-5">
-          <div className={`w-12 h-12 rounded-xl border ${course.accentBorder} bg-slate-950/60 flex items-center justify-center`}>
+          <div className={`w-12 h-12 rounded-xl border ${course.accentBorder} bg-slate-950/60 flex items-center justify-center transition-transform group-hover:scale-105`}>
             <Icon className={`w-6 h-6 ${course.accentText}`} />
           </div>
           {signedIn && enrolled && (
@@ -90,7 +94,7 @@ function CourseCard({ course, signedIn, enrolled }) {
           )}
         </div>
 
-        <h3 className="text-2xl md:text-[28px] font-bold mb-2 leading-tight">{course.title}</h3>
+        <h3 className="font-display text-2xl md:text-[28px] font-bold mb-2 leading-tight tracking-tight">{course.title}</h3>
         <p className={`text-sm font-medium mb-3 ${course.accentText}`}>{course.tagline}</p>
         <p className="text-sm text-slate-400 leading-relaxed mb-5">{course.description}</p>
 
@@ -123,9 +127,9 @@ function CourseCard({ course, signedIn, enrolled }) {
           ))}
         </div>
 
-        <span className="inline-flex items-center gap-1.5 text-sm font-medium text-slate-100">
+        <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-slate-100">
           View course
-          <ArrowRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+          <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
         </span>
       </div>
     </Link>

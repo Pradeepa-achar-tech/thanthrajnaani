@@ -23,6 +23,7 @@ import { useStudyList } from '../contexts/StudyListContext.jsx'
 const curriculumLoaders = {
   flutter: () => import('../features/flutter/data/curriculum.js'),
   genai: () => import('../features/genai/data/curriculum.js'),
+  catering: () => import('../features/catering/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {
@@ -115,7 +116,7 @@ export default function CourseDetailPage() {
           <button
             onClick={handleSignIn}
             disabled={busy}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-medium hover:bg-slate-100 disabled:opacity-60"
+            className="btn-aurora w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold disabled:opacity-60"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
             Sign in with Google
@@ -127,7 +128,7 @@ export default function CourseDetailPage() {
     if (!enrolled) {
       return (
         <div className="space-y-3">
-          <div className="rounded-xl border border-slate-700 bg-slate-900/60 p-4 text-sm text-slate-300">
+          <div className="glass rounded-xl p-4 text-sm text-slate-300">
             <span className="font-semibold text-slate-100">You're signed in.</span>{' '}
             <span className="text-slate-400">
               Add this course to your study list to start learning. You can drop it any time.
@@ -136,7 +137,7 @@ export default function CourseDetailPage() {
           <button
             onClick={handleEnroll}
             disabled={busy}
-            className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-accent-500 text-white font-medium hover:bg-accent-400 disabled:opacity-60"
+            className="btn-aurora w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold disabled:opacity-60"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookmarkPlus className="w-4 h-4" />}
             Add to My Study List
@@ -157,7 +158,7 @@ export default function CourseDetailPage() {
         <button
           onClick={handleStart}
           disabled={busy}
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-medium hover:bg-slate-100 disabled:opacity-60"
+          className="btn-aurora w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-xl font-semibold disabled:opacity-60"
         >
           {busy ? (
             <Loader2 className="w-4 h-4 animate-spin" />
@@ -183,14 +184,14 @@ export default function CourseDetailPage() {
         Back to courses
       </Link>
 
-      <div className={`rounded-3xl border ${course.accentBorder} bg-gradient-to-br ${course.accent} relative overflow-hidden mb-8`}>
+      <div className={`rounded-3xl border ${course.accentBorder} bg-gradient-to-br ${course.accent} relative overflow-hidden mb-8 shadow-2xl shadow-black/40`}>
         <div className="absolute inset-0 bg-slate-950/60" />
         <div className="relative p-6 md:p-10 grid md:grid-cols-[auto_1fr] gap-6 md:gap-8 items-start">
           <div className={`w-16 h-16 rounded-2xl border ${course.accentBorder} bg-slate-950/60 flex items-center justify-center`}>
             <Icon className={`w-8 h-8 ${course.accentText}`} />
           </div>
           <div>
-            <h1 className="text-3xl md:text-5xl font-extrabold leading-tight mb-3">
+            <h1 className="font-display text-3xl md:text-5xl font-extrabold leading-[1.08] tracking-tight mb-3">
               {course.title}
             </h1>
             <p className={`text-base md:text-lg font-medium mb-4 ${course.accentText}`}>
@@ -223,7 +224,7 @@ export default function CourseDetailPage() {
       <div className="grid md:grid-cols-3 gap-8">
         <div className="md:col-span-2 space-y-8">
           <section>
-            <h2 className="text-xl font-bold mb-3">What you'll learn</h2>
+            <h2 className="font-display text-xl md:text-2xl font-bold mb-4 tracking-tight">What you'll learn</h2>
             <ul className="grid sm:grid-cols-2 gap-2">
               {course.skills.map((s) => (
                 <li key={s} className="flex items-start gap-2 text-sm text-slate-300">
@@ -241,18 +242,18 @@ export default function CourseDetailPage() {
 
           {!user && (
             <section>
-              <h2 className="text-xl font-bold mb-3">How it works</h2>
+              <h2 className="font-display text-xl md:text-2xl font-bold mb-4 tracking-tight">How it works</h2>
               <ol className="space-y-3 text-sm text-slate-300 leading-relaxed">
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs flex items-center justify-center flex-shrink-0">1</span>
+                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-500 to-aurora-fuchsia text-white font-semibold text-xs flex items-center justify-center flex-shrink-0">1</span>
                   Sign in with Google. (Used only to save your progress.)
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs flex items-center justify-center flex-shrink-0">2</span>
+                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-500 to-aurora-fuchsia text-white font-semibold text-xs flex items-center justify-center flex-shrink-0">2</span>
                   Add the course to <span className="text-slate-100 font-medium">My Study List</span> to unlock the lessons.
                 </li>
                 <li className="flex gap-3">
-                  <span className="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs flex items-center justify-center flex-shrink-0">3</span>
+                  <span className="w-6 h-6 rounded-full bg-gradient-to-br from-accent-500 to-aurora-fuchsia text-white font-semibold text-xs flex items-center justify-center flex-shrink-0">3</span>
                   Hit <span className="text-slate-100 font-medium">Start course</span> and learn at your own pace. Notes, quizzes, and progress sync automatically.
                 </li>
               </ol>
@@ -276,8 +277,8 @@ function CurriculumPreview({ curriculum, accent }) {
   if (!curriculum) {
     return (
       <section>
-        <h2 className="text-xl font-bold mb-3">Course curriculum</h2>
-        <div className="rounded-xl border border-slate-800 bg-slate-900/40 p-5 flex items-center gap-2 text-sm text-slate-500">
+        <h2 className="font-display text-xl md:text-2xl font-bold mb-4 tracking-tight">Course curriculum</h2>
+        <div className="glass rounded-xl p-5 flex items-center gap-2 text-sm text-slate-500">
           <Loader2 className="w-4 h-4 animate-spin" />
           Loading curriculum…
         </div>
@@ -295,8 +296,8 @@ function CurriculumPreview({ curriculum, accent }) {
 
   return (
     <section>
-      <div className="flex items-end justify-between flex-wrap gap-2 mb-3">
-        <h2 className="text-xl font-bold">Course curriculum</h2>
+      <div className="flex items-end justify-between flex-wrap gap-2 mb-4">
+        <h2 className="font-display text-xl md:text-2xl font-bold tracking-tight">Course curriculum</h2>
         <span className="text-xs text-slate-500">
           {curriculum.modules.length} modules · {totalSections} sections · {totalTopics} topics
         </span>
@@ -313,13 +314,13 @@ function CurriculumPreview({ curriculum, accent }) {
           return (
             <div
               key={m.id}
-              className="rounded-xl border border-slate-800 bg-slate-900/40 overflow-hidden"
+              className={`rounded-xl border overflow-hidden transition-colors ${isOpen ? 'border-white/20 bg-white/[0.04]' : 'border-white/10 bg-white/[0.02] hover:border-white/20'}`}
             >
               <button
                 onClick={() => toggle(m.id)}
-                className="w-full flex items-start gap-3 p-4 text-left hover:bg-slate-900/70 transition-colors"
+                className="w-full flex items-start gap-3 p-4 text-left hover:bg-white/[0.03] transition-colors"
               >
-                <span className={`mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg bg-slate-800 border border-slate-700 text-xs font-semibold flex items-center justify-center ${accent || 'text-slate-300'}`}>
+                <span className={`mt-0.5 flex-shrink-0 w-7 h-7 rounded-lg bg-slate-900/80 border border-white/10 text-xs font-semibold flex items-center justify-center ${accent || 'text-slate-300'}`}>
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
@@ -354,7 +355,7 @@ function CurriculumPreview({ curriculum, accent }) {
               </button>
 
               {isOpen && sectionCount > 0 && (
-                <div className="border-t border-slate-800 bg-slate-950/40 p-4 space-y-3">
+                <div className="border-t border-white/10 bg-black/20 p-4 space-y-3">
                   {m.sections.map((sec) => (
                     <div key={sec.id}>
                       <div className="text-xs font-semibold uppercase tracking-wider text-slate-400 mb-1.5">

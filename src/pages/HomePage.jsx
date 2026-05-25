@@ -11,6 +11,7 @@ import {
   Smartphone,
   GraduationCap,
 } from 'lucide-react'
+import Reveal from '../components/Reveal.jsx'
 
 const HERO_PHRASES = [
   'build full-stack web and mobile products.',
@@ -132,29 +133,24 @@ const projects = [
 export default function HomePage() {
   return (
     <div className="relative">
-      <div className="pointer-events-none absolute -top-40 -left-40 w-[520px] h-[520px] rounded-full bg-fuchsia-600/10 blur-3xl" />
-      <div className="pointer-events-none absolute -top-32 -right-40 w-[520px] h-[520px] rounded-full bg-accent-500/10 blur-3xl" />
+      {/* localized hero glow on top of the global aurora */}
+      <div className="pointer-events-none absolute -top-24 left-1/2 -translate-x-1/2 w-[680px] h-[420px] rounded-full bg-aurora-fuchsia/15 blur-[120px]" />
 
-      <section className="relative max-w-6xl mx-auto px-4 md:px-6 pt-12 md:pt-20 pb-12 md:pb-16">
-        <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full border border-accent-500/30 bg-accent-500/10 text-[11px] uppercase tracking-wider text-accent-300 mb-6">
-          <Sparkles className="w-3.5 h-3.5" />
+      <section className="relative max-w-6xl mx-auto px-4 md:px-6 pt-14 md:pt-24 pb-12 md:pb-16">
+        <div className="animate-fade-in inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full glass text-[11px] uppercase tracking-[0.15em] text-slate-200 mb-7">
+          <Sparkles className="w-3.5 h-3.5 text-accent-300" />
           Builder · Educator · Indie shipper
         </div>
 
-        <h1 className="text-4xl md:text-6xl font-extrabold leading-[1.05] tracking-tight mb-6">
+        <h1 className="font-display text-4xl md:text-6xl lg:text-7xl font-extrabold leading-[1.04] tracking-tight mb-6">
           Hi, I'm{' '}
-          <span className="bg-gradient-to-r from-accent-300 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
-            Thanthrajnaani
-          </span>
-          .<br />
-          <span className="text-slate-200">I </span>
-          <Typewriter
-            phrases={HERO_PHRASES}
-            className="bg-gradient-to-r from-accent-300 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent"
-          />
+          <span className="text-aurora text-aurora-animate">Thanthrajnaani</span>.
+          <br />
+          <span className="text-slate-100">I </span>
+          <Typewriter phrases={HERO_PHRASES} className="text-aurora text-aurora-animate" />
         </h1>
 
-        <p className="max-w-2xl text-base md:text-lg text-slate-400 leading-relaxed mb-8">
+        <p className="max-w-2xl text-base md:text-lg text-slate-400 leading-relaxed mb-9">
           Software engineer based in Kundapura, India. I build and ship full-stack web and mobile
           products, lead the teams behind them, and turn everything I learn into free, hands-on
           courses — in English and Kannada — for the next person walking the same path.
@@ -163,56 +159,51 @@ export default function HomePage() {
         <div className="flex flex-wrap gap-3 mb-10">
           <Link
             to="/courses"
-            className="group inline-flex items-center gap-2 px-5 py-2.5 rounded-xl bg-white text-slate-900 font-medium hover:bg-slate-100 transition-colors"
+            className="btn-aurora group inline-flex items-center gap-2 px-6 py-3 rounded-xl font-semibold"
           >
             <GraduationCap className="w-4 h-4" />
             Explore courses
-            <ArrowRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-4 h-4 opacity-80 group-hover:translate-x-0.5 transition-transform" />
           </Link>
           <a
             href="mailto:thanthrajnaani@gmail.com"
-            className="inline-flex items-center gap-2 px-5 py-2.5 rounded-xl border border-slate-700 text-slate-200 hover:bg-slate-800/60 transition-colors"
+            className="glass inline-flex items-center gap-2 px-6 py-3 rounded-xl text-slate-100 font-medium hover:bg-white/10 transition-colors"
           >
             <Mail className="w-4 h-4" />
             Get in touch
           </a>
         </div>
 
-        <div className="flex items-center gap-4 text-slate-400">
-          <a
-            href="https://www.youtube.com/@thanthrajnaani"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-rose-400"
-            aria-label="YouTube"
-          >
-            <Youtube className="w-5 h-5" />
-          </a>
-          <a
-            href="https://www.instagram.com/thanthrajnaani"
-            target="_blank"
-            rel="noreferrer"
-            className="hover:text-fuchsia-400"
-            aria-label="Instagram"
-          >
-            <Instagram className="w-5 h-5" />
-          </a>
-          <a href="mailto:thanthrajnaani@gmail.com" className="hover:text-white" aria-label="Email">
-            <Mail className="w-5 h-5" />
-          </a>
+        <div className="flex items-center gap-3 text-slate-400">
+          {[
+            { href: 'https://www.youtube.com/@thanthrajnaani', label: 'YouTube', Icon: Youtube, hover: 'hover:text-rose-400 hover:border-rose-500/40' },
+            { href: 'https://www.instagram.com/thanthrajnaani', label: 'Instagram', Icon: Instagram, hover: 'hover:text-fuchsia-400 hover:border-fuchsia-500/40' },
+            { href: 'mailto:thanthrajnaani@gmail.com', label: 'Email', Icon: Mail, hover: 'hover:text-white hover:border-white/30' },
+          ].map(({ href, label, Icon, hover }) => (
+            <a
+              key={label}
+              href={href}
+              target={href.startsWith('http') ? '_blank' : undefined}
+              rel={href.startsWith('http') ? 'noreferrer' : undefined}
+              aria-label={label}
+              className={`w-10 h-10 rounded-xl glass flex items-center justify-center transition-colors ${hover}`}
+            >
+              <Icon className="w-5 h-5" />
+            </a>
+          ))}
         </div>
       </section>
 
-      <section className="relative max-w-6xl mx-auto px-4 md:px-6 py-10 border-t border-slate-900">
+      <section className="relative max-w-6xl mx-auto px-4 md:px-6 py-12 border-t border-white/5">
         <div className="grid md:grid-cols-2 gap-10 items-start">
-          <div>
+          <Reveal>
             <div className="flex items-center gap-2 mb-3">
               <Code2 className="w-4 h-4 text-accent-400" />
-              <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">
+              <h2 className="text-sm uppercase tracking-[0.15em] text-slate-400 font-semibold">
                 About
               </h2>
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold mb-4">
+            <h3 className="font-display text-2xl md:text-3xl font-bold mb-4 tracking-tight">
               I write code, ship products, and document the journey.
             </h3>
             <p className="text-slate-400 leading-relaxed mb-4">
@@ -228,26 +219,26 @@ export default function HomePage() {
               built around projects you'd actually ship. If a problem you're working on overlaps with
               what I cover here, my inbox is open — happy to chat.
             </p>
-          </div>
+          </Reveal>
 
-          <div>
+          <Reveal delay={120}>
             <div className="flex items-center gap-2 mb-3">
               <Sparkles className="w-4 h-4 text-fuchsia-400" />
-              <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">
+              <h2 className="text-sm uppercase tracking-[0.15em] text-slate-400 font-semibold">
                 Stack
               </h2>
             </div>
             <div className="space-y-4">
               {stackGroups.map((group) => (
                 <div key={group.title}>
-                  <h3 className="text-[11px] uppercase tracking-wider text-slate-500 font-semibold mb-2">
+                  <h3 className="text-[11px] uppercase tracking-[0.15em] text-slate-500 font-semibold mb-2">
                     {group.title}
                   </h3>
                   <div className="flex flex-wrap gap-2">
                     {group.items.map((s) => (
                       <span
                         key={s.label}
-                        className={`px-3 py-1.5 rounded-lg border text-sm ${TONE_CLASSES[s.tone]}`}
+                        className={`px-3 py-1.5 rounded-lg border text-sm transition-transform hover:-translate-y-0.5 ${TONE_CLASSES[s.tone]}`}
                       >
                         {s.label}
                       </span>
@@ -256,28 +247,30 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
-          </div>
+          </Reveal>
         </div>
       </section>
 
-      <section className="relative max-w-6xl mx-auto px-4 md:px-6 py-12 border-t border-slate-900">
-        <div className="flex items-end justify-between mb-6">
+      <section className="relative max-w-6xl mx-auto px-4 md:px-6 py-12 border-t border-white/5">
+        <Reveal className="flex items-end justify-between mb-7">
           <div>
             <div className="flex items-center gap-2 mb-2">
               <Rocket className="w-4 h-4 text-cyan-400" />
-              <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">
+              <h2 className="text-sm uppercase tracking-[0.15em] text-slate-400 font-semibold">
                 Work & projects
               </h2>
             </div>
-            <h3 className="text-2xl md:text-3xl font-bold">
+            <h3 className="font-display text-2xl md:text-3xl font-bold tracking-tight">
               Things I'm building right now.
             </h3>
           </div>
-        </div>
+        </Reveal>
 
         <div className="grid md:grid-cols-3 gap-4">
-          {projects.map((p) => (
-            <ProjectCard key={p.title} {...p} />
+          {projects.map((p, i) => (
+            <Reveal key={p.title} delay={i * 110}>
+              <ProjectCard {...p} />
+            </Reveal>
           ))}
         </div>
       </section>
@@ -289,16 +282,16 @@ function ProjectCard({ icon: Icon, title, body, href, cta, tone }) {
   return (
     <Link
       to={href}
-      className={`group rounded-2xl border bg-slate-900/40 backdrop-blur p-5 hover:bg-slate-900/70 transition-all hover:-translate-y-0.5 ${TONE_CLASSES[tone]}`}
+      className="card-grad group rounded-2xl p-5 h-full flex flex-col"
     >
-      <div className={`w-10 h-10 rounded-xl flex items-center justify-center mb-4 ${TONE_CLASSES[tone]}`}>
+      <div className={`w-11 h-11 rounded-xl border flex items-center justify-center mb-4 ${TONE_CLASSES[tone]}`}>
         <Icon className="w-5 h-5" />
       </div>
-      <h4 className="text-lg font-semibold text-slate-100 mb-2">{title}</h4>
-      <p className="text-sm text-slate-400 leading-relaxed mb-4">{body}</p>
-      <span className="text-sm font-medium inline-flex items-center gap-1.5">
+      <h4 className="font-display text-lg font-semibold text-slate-100 mb-2">{title}</h4>
+      <p className="text-sm text-slate-400 leading-relaxed mb-4 flex-1">{body}</p>
+      <span className="text-sm font-medium inline-flex items-center gap-1.5 text-slate-100">
         {cta}
-        <ArrowRight className="w-4 h-4 opacity-60 group-hover:translate-x-0.5 transition-transform" />
+        <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
       </span>
     </Link>
   )

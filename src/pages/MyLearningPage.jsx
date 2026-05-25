@@ -36,11 +36,11 @@ export default function MyLearningPage() {
       <div className="mb-8">
         <div className="flex items-center gap-2 mb-3">
           <BookmarkCheck className="w-4 h-4 text-emerald-400" />
-          <h2 className="text-sm uppercase tracking-wider text-slate-400 font-semibold">
+          <h2 className="text-sm uppercase tracking-[0.15em] text-slate-400 font-semibold">
             My Study List
           </h2>
         </div>
-        <h1 className="text-3xl md:text-4xl font-extrabold mb-2">
+        <h1 className="font-display text-3xl md:text-5xl font-extrabold mb-2 tracking-tight leading-[1.05]">
           {enrolledList.length > 0
             ? `${enrolledList.length} course${enrolledList.length > 1 ? 's' : ''} on your plate.`
             : 'Your study list is empty.'}
@@ -59,7 +59,7 @@ export default function MyLearningPage() {
       ) : enrolledList.length === 0 ? (
         <Link
           to="/courses"
-          className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-white text-slate-900 font-medium hover:bg-slate-100"
+          className="btn-aurora inline-flex items-center gap-2 px-5 py-3 rounded-xl font-semibold"
         >
           Browse courses
           <ArrowRight className="w-4 h-4" />
@@ -73,14 +73,14 @@ export default function MyLearningPage() {
             return (
               <div
                 key={c.id}
-                className={`rounded-2xl border ${c.accentBorder} bg-slate-900/40 backdrop-blur p-5 flex flex-col`}
+                className={`rounded-2xl border ${c.accentBorder} bg-slate-900/40 backdrop-blur p-5 flex flex-col transition-all duration-300 hover:-translate-y-1 ${c.glow}`}
               >
                 <div className="flex items-start gap-3 mb-4">
                   <div className={`w-10 h-10 rounded-xl border ${c.accentBorder} bg-slate-950/60 flex items-center justify-center`}>
                     <Icon className={`w-5 h-5 ${c.accentText}`} />
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="text-lg font-bold leading-tight">{c.title}</h3>
+                    <h3 className="font-display text-lg font-bold leading-tight tracking-tight">{c.title}</h3>
                     <p className={`text-xs ${c.accentText}`}>{c.tagline}</p>
                   </div>
                   <button
@@ -114,7 +114,7 @@ export default function MyLearningPage() {
                   </span>
                   <Link
                     to={c.routePlay}
-                    className="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white text-slate-900 text-sm font-medium hover:bg-slate-100"
+                    className="btn-aurora inline-flex items-center gap-1.5 px-4 py-2 rounded-lg text-sm font-semibold"
                   >
                     {started ? 'Resume' : 'Start'}
                     <ArrowRight className="w-4 h-4" />

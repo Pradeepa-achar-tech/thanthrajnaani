@@ -3,6 +3,7 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-do
 import { Loader2 } from 'lucide-react'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
+import AuroraBackground from './components/AuroraBackground.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import HomePage from './pages/HomePage.jsx'
 import CoursesPage from './pages/CoursesPage.jsx'
@@ -40,10 +41,24 @@ const GenAIPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const CateringPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/catering/App.jsx'),
+    import('./features/catering/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
   if (courseId === 'flutter') return <FlutterPlayer />
   if (courseId === 'genai') return <GenAIPlayer />
+  if (courseId === 'catering') return <CateringPlayer />
   return <Navigate to="/courses" replace />
 }
 
@@ -84,8 +99,9 @@ export default function App() {
   const isPlayer = /^\/courses\/[^/]+\/learn$/.test(pathname)
 
   return (
-    <div className="min-h-screen flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex flex-col text-slate-100">
       <ScrollToTop />
+      {!isPlayer && <AuroraBackground />}
       {!isPlayer && <Navbar />}
 
       <main className="flex-1">
