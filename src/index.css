@@ -14,153 +14,102 @@ body {
   font-family: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
-  background: #06070f;
-  color: #f1f5f9;
+  background: #ffffff;
+  color: #18181b; /* zinc-900 */
   text-rendering: optimizeLegibility;
 }
 
-/* Tighter, more confident headings */
-.font-display {
-  font-family: 'Sora', 'Inter', system-ui, sans-serif;
-  letter-spacing: -0.02em;
-}
-
 ::selection {
-  background: rgba(217, 70, 239, 0.3);
-  color: #fff;
+  background: #fed7aa; /* accent-200 */
+  color: #7c2d12;      /* accent-900 */
 }
 
-::-webkit-scrollbar { width: 10px; height: 10px; }
-::-webkit-scrollbar-track { background: #06070f; }
+::-webkit-scrollbar { width: 12px; height: 12px; }
+::-webkit-scrollbar-track { background: #ffffff; }
 ::-webkit-scrollbar-thumb {
-  background: linear-gradient(#3b2a44, #1e293b);
-  border-radius: 6px;
-  border: 2px solid #06070f;
+  background: #d4d4d8; /* zinc-300 */
+  border-radius: 8px;
+  border: 3px solid #ffffff;
 }
-::-webkit-scrollbar-thumb:hover { background: linear-gradient(#5b3a6b, #334155); }
+::-webkit-scrollbar-thumb:hover { background: #a1a1aa; } /* zinc-400 */
 
 /* ============================================================
-   Aurora background
+   Typographic helpers
    ============================================================ */
-.aurora-blob {
-  position: absolute;
-  border-radius: 9999px;
-  filter: blur(90px);
-  will-change: transform;
-  pointer-events: none;
-}
-
-/* Faint grid that fades out toward the edges */
-.bg-grid {
-  background-image:
-    linear-gradient(rgba(148, 163, 184, 0.05) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(148, 163, 184, 0.05) 1px, transparent 1px);
-  background-size: 60px 60px;
-  -webkit-mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
-  mask-image: radial-gradient(ellipse 80% 60% at 50% 30%, #000 30%, transparent 80%);
-}
-
-/* Subtle film grain for premium texture */
-.grain {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='0.55'/%3E%3C/svg%3E");
-  opacity: 0.025;
+/* Small, tracked label used above section headings.
+   Color is set per-use in markup (orange for brand accent, zinc for muted). */
+.eyebrow {
+  font-size: 0.75rem;
+  line-height: 1rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
 }
 
 /* ============================================================
-   Aurora text gradient
+   Buttons — flat, crisp, no glow
    ============================================================ */
-.text-aurora {
-  background-image: linear-gradient(110deg, #fdba74 0%, #f472b6 32%, #c084fc 58%, #67e8f9 88%);
-  background-size: 200% auto;
-  -webkit-background-clip: text;
-  background-clip: text;
-  color: transparent;
-  -webkit-text-fill-color: transparent;
+.btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #18181b; /* zinc-900 */
+  color: #ffffff;
+  font-weight: 500;
+  border-radius: 0.625rem;
+  border: 1px solid #18181b;
+  transition: background-color 0.18s ease, transform 0.18s ease, box-shadow 0.18s ease;
+  box-shadow: 0 1px 2px rgba(24, 24, 27, 0.08);
 }
-.text-aurora-animate { animation: gradient-pan 6s linear infinite; }
+.btn-primary:hover { background: #27272a; border-color: #27272a; }
+.btn-primary:active { transform: translateY(0.5px); }
+.btn-primary:disabled { opacity: 0.55; cursor: default; }
+
+.btn-secondary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  background: #ffffff;
+  color: #18181b;
+  font-weight: 500;
+  border-radius: 0.625rem;
+  border: 1px solid #e4e4e7; /* zinc-200 */
+  transition: background-color 0.18s ease, border-color 0.18s ease;
+}
+.btn-secondary:hover { background: #fafafa; border-color: #d4d4d8; }
+.btn-secondary:disabled { opacity: 0.55; cursor: default; }
 
 /* ============================================================
-   Surfaces
+   Card surface
    ============================================================ */
-/* Frosted glass */
-.glass {
-  background: rgba(255, 255, 255, 0.035);
-  backdrop-filter: blur(14px) saturate(140%);
-  -webkit-backdrop-filter: blur(14px) saturate(140%);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+.card {
+  background: #ffffff;
+  border: 1px solid #e4e4e7; /* zinc-200 */
+  border-radius: 1rem;
+  transition: border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
 }
-
-/* Gradient-border card (aurora). Layer the surface over a gradient border. */
-.card-grad {
-  position: relative;
-  border: 1px solid transparent;
-  background:
-    linear-gradient(180deg, rgba(15, 17, 28, 0.85), rgba(9, 10, 20, 0.85)) padding-box,
-    linear-gradient(135deg, rgba(249, 115, 22, 0.4), rgba(217, 70, 239, 0.35) 50%, rgba(34, 211, 238, 0.35)) border-box;
-  transition: box-shadow 0.4s ease, transform 0.3s cubic-bezier(0.2, 0.7, 0.2, 1), border-color 0.3s ease;
-}
-.card-grad:hover {
-  transform: translateY(-4px);
-  box-shadow: 0 24px 60px -24px rgba(217, 70, 239, 0.45);
+.card-hover:hover {
+  border-color: #d4d4d8; /* zinc-300 */
+  box-shadow: 0 10px 30px -16px rgba(24, 24, 27, 0.25);
+  transform: translateY(-3px);
 }
 
 /* ============================================================
-   Aurora button (gradient fill, animated sheen on hover)
-   ============================================================ */
-.btn-aurora {
-  background-image: linear-gradient(110deg, #f97316 0%, #ec4899 45%, #8b5cf6 100%);
-  background-size: 200% auto;
-  color: #fff;
-  box-shadow: 0 10px 34px -12px rgba(236, 72, 153, 0.6);
-  transition: background-position 0.5s ease, box-shadow 0.35s ease, transform 0.2s ease;
-}
-.btn-aurora:hover {
-  background-position: right center;
-  box-shadow: 0 14px 44px -10px rgba(236, 72, 153, 0.75);
-  transform: translateY(-1px);
-}
-.btn-aurora:active { transform: translateY(0); }
-
-/* ============================================================
-   Scroll reveal
+   Scroll reveal — subtle fade + rise
    ============================================================ */
 .reveal {
   opacity: 0;
-  transform: translateY(20px);
+  transform: translateY(16px);
 }
 .reveal.in-view {
   opacity: 1;
   transform: none;
-  transition: opacity 0.7s ease, transform 0.7s cubic-bezier(0.2, 0.7, 0.2, 1);
+  transition: opacity 0.6s ease, transform 0.6s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 
-/* ============================================================
-   Animations / keyframes that live outside Tailwind
-   ============================================================ */
-@keyframes fade-in {
-  from { opacity: 0; transform: translateY(8px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.animate-fade-in { animation: fade-in 0.35s ease-out both; }
-
-@keyframes cursor-blink {
-  0%, 49%   { opacity: 1; }
-  50%, 100% { opacity: 0; }
-}
-.animate-cursor-blink { animation: cursor-blink 1s steps(1) infinite; }
-
-/* ============================================================
-   Respect reduced-motion preferences
-   ============================================================ */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .aurora-blob,
-  .text-aurora-animate,
-  .animate-cursor-blink {
-    animation: none !important;
-  }
-  .reveal {
-    opacity: 1 !important;
-    transform: none !important;
-  }
+  .reveal { opacity: 1 !important; transform: none !important; }
 }

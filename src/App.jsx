@@ -3,7 +3,6 @@ import { Navigate, Route, Routes, useLocation, useParams } from 'react-router-do
 import { Loader2 } from 'lucide-react'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
-import AuroraBackground from './components/AuroraBackground.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
 import HomePage from './pages/HomePage.jsx'
 import CoursesPage from './pages/CoursesPage.jsx'
@@ -99,9 +98,8 @@ export default function App() {
   const isPlayer = /^\/courses\/[^/]+\/learn$/.test(pathname)
 
   return (
-    <div className="min-h-screen flex flex-col text-slate-100">
+    <div className="min-h-screen flex flex-col bg-white text-zinc-900">
       <ScrollToTop />
-      {!isPlayer && <AuroraBackground />}
       {!isPlayer && <Navbar />}
 
       <main className="flex-1">
