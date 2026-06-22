@@ -8,6 +8,7 @@ import {
   Rocket,
   Sparkles,
   Smartphone,
+  ReceiptText,
   GraduationCap,
   MapPin,
 } from 'lucide-react'
@@ -48,11 +49,11 @@ const projects = [
     cta: 'Open course',
   },
   {
-    icon: Rocket,
-    title: 'Indie tooling & side-projects',
-    body: 'Small utilities, learning tools, and experiments — usually built with Vite + React + Firebase. Always shipping; always learning.',
-    href: '/courses',
-    cta: 'See more',
+    icon: ReceiptText,
+    title: 'Restaurant Billing App (POS)',
+    body: 'A 10-module build of a production Flutter + Firebase restaurant POS — Google Sign-In, Firestore menu & orders, GST math, Bluetooth thermal printing, PDF invoices, and admin analytics.',
+    href: '/courses/billing',
+    cta: 'Open course',
   },
 ]
 

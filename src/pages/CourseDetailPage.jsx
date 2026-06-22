@@ -24,6 +24,7 @@ const curriculumLoaders = {
   flutter: () => import('../features/flutter/data/curriculum.js'),
   genai: () => import('../features/genai/data/curriculum.js'),
   billing: () => import('../features/billing/data/curriculum.js'),
+  resort: () => import('../features/resort/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {
