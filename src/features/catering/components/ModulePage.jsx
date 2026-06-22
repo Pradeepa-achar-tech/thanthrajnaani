@@ -84,45 +84,45 @@ export default function ModulePage({
     <div className="animate-fade-in">
       <button
         onClick={onBack}
-        className="inline-flex items-center gap-1.5 text-sm text-slate-400 hover:text-white mb-4"
+        className="inline-flex items-center gap-1.5 text-sm text-zinc-500 hover:text-zinc-900 mb-5 transition-colors"
       >
         <ArrowLeft className="w-4 h-4" />
         {L.backToDashboard}
       </button>
 
-      <header
-        className={`relative overflow-hidden rounded-2xl border border-slate-800 bg-gradient-to-br ${module.color} p-6 md:p-7 mb-6`}
-      >
+      {/* Module header — clean light card */}
+      <header className="rounded-2xl border border-zinc-200 bg-zinc-50 p-6 md:p-7 mb-6">
         <div className="flex flex-wrap items-start justify-between gap-3 mb-2">
           <div>
-            <h1 className="text-2xl md:text-3xl font-bold text-white">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight text-zinc-900">
               {moduleCopy.title}
             </h1>
-            <p className="text-slate-400 mt-2 max-w-3xl">{moduleCopy.description}</p>
+            <p className="text-zinc-600 mt-2 max-w-3xl leading-relaxed">{moduleCopy.description}</p>
           </div>
-          <span className="badge bg-slate-900/70 text-slate-200 border border-slate-700">
-            <Clock className="w-3.5 h-3.5 mr-1" />
+          <span className="badge bg-white border border-zinc-200 text-zinc-700">
+            <Clock className="w-3.5 h-3.5 mr-1 text-zinc-500" />
             {module.hours} hrs
           </span>
         </div>
 
-        <div className="mt-4">
-          <div className="flex items-center justify-between text-xs text-slate-400 mb-1.5">
-            <span>{L.moduleProgress}</span>
-            <span className="font-semibold text-accent-300">
+        <div className="mt-5">
+          <div className="flex items-center justify-between text-xs text-zinc-500 mb-2">
+            <span className="font-medium">{L.moduleProgress}</span>
+            <span className="font-semibold text-zinc-900">
               {prog.done} / {prog.total} ({prog.pct}%)
             </span>
           </div>
-          <div className="h-2 w-full bg-slate-800 rounded-full overflow-hidden">
+          <div className="h-2 w-full bg-zinc-200 rounded-full overflow-hidden">
             <div
-              className="h-full bg-gradient-to-r from-accent-500 to-amber-400 transition-all duration-500"
+              className="h-full bg-accent-500 transition-all duration-500"
               style={{ width: `${prog.pct}%` }}
             />
           </div>
         </div>
       </header>
 
-      <div className="flex flex-wrap gap-1 mb-5 border-b border-slate-800">
+      {/* Tabs */}
+      <div className="flex flex-wrap gap-1 mb-6 border-b border-zinc-200">
         {tabs.map(({ id, labelKey, icon: Icon }) => {
           const active = tab === id
           const label = L[labelKey]
@@ -132,19 +132,19 @@ export default function ModulePage({
               onClick={() => setTab(id)}
               className={`flex items-center gap-1.5 px-4 py-2.5 text-sm font-medium transition-colors border-b-2 -mb-px ${
                 active
-                  ? 'border-accent-500 text-white'
-                  : 'border-transparent text-slate-400 hover:text-slate-200'
+                  ? 'border-accent-600 text-zinc-900'
+                  : 'border-transparent text-zinc-500 hover:text-zinc-900'
               }`}
             >
               <Icon className="w-4 h-4" />
               {label}
               {id === 'projects' && (
-                <span className="ml-1 text-xs text-slate-500">
+                <span className="ml-1 text-xs text-zinc-400">
                   ({module.projects.length})
                 </span>
               )}
               {id === 'quiz' && quizResult && (
-                <span className="ml-1 text-[11px] px-1.5 py-0.5 rounded bg-accent-500/15 text-accent-300">
+                <span className="ml-1 text-[11px] px-1.5 py-0.5 rounded-md bg-accent-50 text-accent-700 font-semibold">
                   {quizResult.score}/{quizResult.total}
                 </span>
               )}
@@ -156,8 +156,8 @@ export default function ModulePage({
       {tab === 'topics' && (
         <div className="space-y-3">
           {module.sections.length === 0 && (
-            <div className="card p-8 text-center text-sm text-slate-500">
-              Topics for this module are coming soon. Run "implement module {module.id.slice(1)}" in a fresh session to fill it in.
+            <div className="card p-8 text-center text-sm text-zinc-500">
+              Topics for this module are coming soon.
             </div>
           )}
           {module.sections.map((section) => {
@@ -166,29 +166,29 @@ export default function ModulePage({
               isTopicDone(t.id)
             ).length
             return (
-              <section key={section.id} className="card">
+              <section key={section.id} className="card overflow-hidden">
                 <button
                   onClick={() =>
                     setOpenSections((p) => ({ ...p, [section.id]: !p[section.id] }))
                   }
-                  className="w-full flex items-center justify-between gap-3 px-4 py-3 hover:bg-slate-800/40 transition-colors rounded-xl"
+                  className="w-full flex items-center justify-between gap-3 px-4 py-3.5 hover:bg-zinc-50 transition-colors"
                 >
-                  <div className="flex items-center gap-2 min-w-0">
+                  <div className="flex items-center gap-2.5 min-w-0">
                     {isOpen ? (
-                      <ChevronDown className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <ChevronDown className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                     ) : (
-                      <ChevronRight className="w-4 h-4 text-slate-500 flex-shrink-0" />
+                      <ChevronRight className="w-4 h-4 text-zinc-400 flex-shrink-0" />
                     )}
-                    <h3 className="text-sm md:text-base font-semibold text-slate-100 truncate">
+                    <h3 className="text-sm md:text-base font-semibold text-zinc-900 truncate">
                       {getSectionTitle(section, isKannada)}
                     </h3>
                   </div>
-                  <span className="text-xs text-slate-500 flex-shrink-0">
+                  <span className="text-xs text-zinc-500 font-medium flex-shrink-0">
                     {sectionDone} / {section.topics.length}
                   </span>
                 </button>
                 {isOpen && (
-                  <ul className="px-2 pb-3 pt-1 space-y-0.5 animate-slide-down">
+                  <ul className="px-2 pb-3 pt-1 space-y-0.5 animate-slide-down border-t border-zinc-100">
                     {section.topics.map((t) => (
                       <li key={t.id} id={`topic-${t.id}`}>
                         <TopicItem
@@ -209,7 +209,7 @@ export default function ModulePage({
       {tab === 'projects' && (
         <div className="grid md:grid-cols-2 gap-4">
           {module.projects.length === 0 && (
-            <div className="card p-8 text-center text-sm text-slate-500 md:col-span-2">
+            <div className="card p-8 text-center text-sm text-zinc-500 md:col-span-2">
               No projects yet for this module.
             </div>
           )}
@@ -221,7 +221,7 @@ export default function ModulePage({
 
       {tab === 'quiz' && (
         module.quiz.length === 0 ? (
-          <div className="card p-8 text-center text-sm text-slate-500">
+          <div className="card p-8 text-center text-sm text-zinc-500">
             Quiz coming with this module's tutorials.
           </div>
         ) : (
@@ -236,16 +236,16 @@ export default function ModulePage({
 
       {tab === 'notes' && (
         <div className="card p-5 animate-fade-in">
-          <label className="text-sm font-medium text-slate-300 mb-2 block">
+          <label className="text-sm font-medium text-zinc-700 mb-2 block">
             {L.notesFor} {moduleCopy.title}
           </label>
           <textarea
             value={note}
             onChange={(e) => setNote(module.id, e.target.value)}
             placeholder={L.notesPlaceholder}
-            className="w-full min-h-[260px] bg-slate-950 border border-slate-800 focus:border-accent-500 outline-none rounded-lg p-3 text-sm text-slate-100 placeholder-slate-500 resize-y transition-colors"
+            className="w-full min-h-[260px] bg-white border border-zinc-200 focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20 outline-none rounded-lg p-3 text-sm text-zinc-900 placeholder-zinc-400 resize-y transition-all"
           />
-          <p className="text-xs text-slate-500 mt-2">
+          <p className="text-xs text-zinc-500 mt-2">
             {L.notesSaved}
           </p>
         </div>

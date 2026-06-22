@@ -55,7 +55,7 @@ export default function MyLearningPage() {
           <Loader2 className="w-5 h-5 animate-spin" />
         </div>
       ) : enrolledList.length === 0 ? (
-        <Link to="/courses" className="btn-primary px-5 py-3 text-sm">
+        <Link to="/courses" className="pf-btn-primary px-5 py-3 text-sm">
           Browse courses
           <ArrowRight className="w-4 h-4" />
         </Link>
@@ -66,7 +66,7 @@ export default function MyLearningPage() {
             const Icon = c.icon
             const started = Boolean(item?.started)
             return (
-              <div key={c.id} className="card p-5 flex flex-col">
+              <div key={c.id} className="pf-card p-5 flex flex-col">
                 <div className="flex items-start gap-3 mb-4">
                   <div className="w-10 h-10 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-700">
                     <Icon className="w-5 h-5" />
@@ -102,7 +102,7 @@ export default function MyLearningPage() {
 
                 <div className="mt-auto flex items-center justify-between gap-3 pt-2">
                   <span className="text-xs text-zinc-400">{started ? 'Started' : 'Not started'}</span>
-                  <Link to={c.routePlay} className="btn-primary px-4 py-2 text-sm">
+                  <Link to={c.routePlay} className="pf-btn-primary px-4 py-2 text-sm">
                     {started ? 'Resume' : 'Start'}
                     <ArrowRight className="w-4 h-4" />
                   </Link>

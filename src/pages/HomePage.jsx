@@ -80,12 +80,12 @@ export default function HomePage() {
           </p>
 
           <div className="flex flex-wrap gap-3 mb-10">
-            <Link to="/courses" className="btn-primary group px-5 py-3 text-sm">
+            <Link to="/courses" className="pf-btn-primary group px-5 py-3 text-sm">
               <GraduationCap className="w-4 h-4" />
               Explore courses
               <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
             </Link>
-            <a href="mailto:thanthrajnaani@gmail.com" className="btn-secondary px-5 py-3 text-sm">
+            <a href="mailto:thanthrajnaani@gmail.com" className="pf-btn-secondary px-5 py-3 text-sm">
               <Mail className="w-4 h-4" />
               Get in touch
             </a>
@@ -194,7 +194,7 @@ export default function HomePage() {
 
 function ProjectCard({ icon: Icon, title, body, href, cta }) {
   return (
-    <Link to={href} className="card card-hover group p-6 h-full flex flex-col">
+    <Link to={href} className="pf-card pf-card-hover group p-6 h-full flex flex-col">
       <div className="w-10 h-10 rounded-lg bg-zinc-100 flex items-center justify-center mb-5 text-zinc-700 transition-colors group-hover:bg-accent-50 group-hover:text-accent-600">
         <Icon className="w-5 h-5" />
       </div>

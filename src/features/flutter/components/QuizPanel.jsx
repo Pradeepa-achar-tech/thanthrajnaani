@@ -40,18 +40,18 @@ export default function QuizPanel({ moduleId, questions, savedResult, onSubmit }
     <div className="space-y-6 animate-fade-in">
       <div className="card p-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3">
         <div>
-          <h3 className="text-lg font-semibold text-white flex items-center gap-2">
-            <Trophy className="w-5 h-5 text-accent-500" />
+          <h3 className="text-lg font-semibold text-zinc-900 flex items-center gap-2">
+            <Trophy className="w-5 h-5 text-accent-600" />
             {L.moduleQuiz}
           </h3>
-          <p className="text-sm text-slate-400 mt-1">
+          <p className="text-sm text-zinc-600 mt-1">
             {questions.length} questions • {L.pickBestAnswer}
           </p>
         </div>
         {savedResult && !submitted && (
-          <div className="text-sm text-slate-400">
+          <div className="text-sm text-zinc-500">
             {L.lastAttempt}:{' '}
-            <span className="text-accent-400 font-medium">
+            <span className="text-zinc-900 font-semibold">
               {savedResult.score} / {savedResult.total}
             </span>
           </div>
@@ -62,30 +62,28 @@ export default function QuizPanel({ moduleId, questions, savedResult, onSubmit }
         {questions.map((q, idx) => (
           <li key={q.id} className="card p-5">
             <div className="flex items-start gap-3 mb-3">
-              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-accent-500/15 text-accent-400 text-sm font-semibold flex items-center justify-center">
+              <span className="flex-shrink-0 w-7 h-7 rounded-full bg-accent-50 text-accent-700 text-sm font-semibold flex items-center justify-center">
                 {idx + 1}
               </span>
-              <p className="text-slate-100 font-medium leading-relaxed">{q.q}</p>
+              <p className="text-zinc-900 font-medium leading-relaxed">{q.q}</p>
             </div>
             <div className="space-y-2 pl-10">
               {q.options.map((opt, optIdx) => {
                 const selected = answers[q.id] === optIdx
                 const correct = q.answer === optIdx
                 let stateClass =
-                  'border-slate-700 bg-slate-900 hover:border-slate-500 text-slate-300'
+                  'border-zinc-200 bg-white hover:border-zinc-400 text-zinc-700'
 
                 if (submitted) {
                   if (correct) {
-                    stateClass =
-                      'border-emerald-500/60 bg-emerald-500/10 text-emerald-200'
+                    stateClass = 'border-emerald-300 bg-emerald-50 text-emerald-900'
                   } else if (selected && !correct) {
-                    stateClass = 'border-rose-500/60 bg-rose-500/10 text-rose-200'
+                    stateClass = 'border-rose-300 bg-rose-50 text-rose-900'
                   } else {
-                    stateClass = 'border-slate-800 bg-slate-900/50 text-slate-400'
+                    stateClass = 'border-zinc-200 bg-zinc-50 text-zinc-500'
                   }
                 } else if (selected) {
-                  stateClass =
-                    'border-accent-500 bg-accent-500/10 text-white'
+                  stateClass = 'border-accent-500 bg-accent-50 text-zinc-900'
                 }
 
                 return (
@@ -97,10 +95,10 @@ export default function QuizPanel({ moduleId, questions, savedResult, onSubmit }
                   >
                     <span className="inline-flex items-center gap-2">
                       {submitted && correct && (
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600" />
                       )}
                       {submitted && selected && !correct && (
-                        <XCircle className="w-4 h-4 text-rose-400" />
+                        <XCircle className="w-4 h-4 text-rose-600" />
                       )}
                       {opt}
                     </span>
@@ -123,10 +121,10 @@ export default function QuizPanel({ moduleId, questions, savedResult, onSubmit }
       ) : (
         <div className="card p-5 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
           <div>
-            <p className="text-2xl font-bold text-white">
-              {score} <span className="text-slate-400 text-lg">/ {questions.length}</span>
+            <p className="text-2xl font-bold text-zinc-900">
+              {score} <span className="text-zinc-400 text-lg font-normal">/ {questions.length}</span>
             </p>
-            <p className="text-sm text-slate-400">
+            <p className="text-sm text-zinc-600">
               {score === questions.length
                 ? L.perfectScore
                 : score >= Math.ceil(questions.length * 0.7)
@@ -134,7 +132,7 @@ export default function QuizPanel({ moduleId, questions, savedResult, onSubmit }
                 : L.reviewScore}
             </p>
           </div>
-          <button onClick={handleReset} className="btn-ghost border border-slate-700">
+          <button onClick={handleReset} className="btn-ghost border border-zinc-200">
             <RotateCw className="w-4 h-4 inline mr-1.5" />
             {L.retake}
           </button>

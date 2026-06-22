@@ -129,7 +129,7 @@ export default function SearchBar({ onJump }) {
     return (
       <>
         {text.slice(0, idx)}
-        <mark className="bg-accent-500/30 text-accent-100 rounded px-0.5">
+        <mark className="bg-accent-100 text-accent-800 rounded px-0.5">
           {text.slice(idx, idx + q.length)}
         </mark>
         {text.slice(idx + q.length)}
@@ -140,7 +140,7 @@ export default function SearchBar({ onJump }) {
   return (
     <div ref={wrapRef} className="relative w-full max-w-xl">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-500" />
+        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-400" />
         <input
           ref={inputRef}
           type="text"
@@ -152,7 +152,7 @@ export default function SearchBar({ onJump }) {
           }}
           onFocus={() => setOpen(true)}
           onKeyDown={handleKeyDown}
-          className="w-full bg-slate-900 border border-slate-800 focus:border-accent-500 outline-none rounded-lg pl-9 pr-20 py-2 text-sm text-slate-100 placeholder-slate-500 transition-colors"
+          className="w-full bg-zinc-50 border border-zinc-200 focus:bg-white focus:border-accent-500 focus:ring-2 focus:ring-accent-500/20 outline-none rounded-lg pl-9 pr-20 py-2 text-sm text-zinc-900 placeholder-zinc-400 transition-all"
         />
         {query ? (
           <button
@@ -161,13 +161,13 @@ export default function SearchBar({ onJump }) {
               setOpen(false)
               inputRef.current?.focus()
             }}
-            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-slate-500 hover:text-slate-300"
+            className="absolute right-2 top-1/2 -translate-y-1/2 p-1 text-zinc-400 hover:text-zinc-700"
             aria-label={L.clearSearch}
           >
             <X className="w-4 h-4" />
           </button>
         ) : (
-          <kbd className="hidden sm:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 h-5 rounded border border-slate-700 bg-slate-800/60 text-[10px] font-mono text-slate-400 select-none pointer-events-none">
+          <kbd className="hidden sm:inline-flex absolute right-2 top-1/2 -translate-y-1/2 items-center gap-0.5 px-1.5 h-5 rounded border border-zinc-200 bg-white text-[10px] font-mono text-zinc-500 select-none pointer-events-none">
             {isMac ? '⌘' : 'Ctrl'}K
           </kbd>
         )}
@@ -176,10 +176,10 @@ export default function SearchBar({ onJump }) {
       {open && query && (
         <div
           ref={listRef}
-          className="absolute z-30 mt-2 w-full bg-slate-900 border border-slate-800 rounded-lg shadow-xl max-h-96 overflow-y-auto animate-slide-down"
+          className="absolute z-30 mt-2 w-full bg-white border border-zinc-200 rounded-lg shadow-lg shadow-zinc-900/5 max-h-96 overflow-y-auto animate-slide-down"
         >
           {results.length === 0 ? (
-            <div className="px-4 py-6 text-sm text-slate-500 text-center">
+            <div className="px-4 py-6 text-sm text-zinc-500 text-center">
               {L.noMatchingTopics}
             </div>
           ) : (
@@ -194,18 +194,18 @@ export default function SearchBar({ onJump }) {
                         onJump?.(r.moduleId, r.id)
                         setOpen(false)
                       }}
-                      className={`w-full text-left px-4 py-2.5 transition-colors border-b border-slate-800/60 last:border-0 ${
-                        i === activeIdx ? 'bg-slate-800' : 'hover:bg-slate-800/60'
+                      className={`w-full text-left px-4 py-2.5 transition-colors border-b border-zinc-100 last:border-0 ${
+                        i === activeIdx ? 'bg-zinc-50' : 'hover:bg-zinc-50/60'
                       }`}
                     >
-                      <div className="text-sm text-slate-100">
+                      <div className="text-sm text-zinc-900 font-medium">
                         {highlight(r.title)}
                       </div>
-                      <div className="text-xs text-slate-500 mt-0.5">
+                      <div className="text-xs text-zinc-500 mt-0.5">
                         {r.moduleTitle} · {r.sectionTitle}
                       </div>
                       {r.snippet && (
-                        <div className="text-xs text-slate-400 mt-1 line-clamp-2">
+                        <div className="text-xs text-zinc-600 mt-1 line-clamp-2">
                           {highlight(r.snippet)}
                         </div>
                       )}
@@ -213,19 +213,19 @@ export default function SearchBar({ onJump }) {
                   </li>
                 ))}
               </ul>
-              <div className="sticky bottom-0 px-4 py-1.5 bg-slate-900/95 border-t border-slate-800 text-[10px] text-slate-500 flex items-center justify-between">
+              <div className="sticky bottom-0 px-4 py-1.5 bg-white/95 border-t border-zinc-100 text-[10px] text-zinc-500 flex items-center justify-between">
                 <span>
                   {results.length} {results.length === 1 ? L.result : L.results}
                 </span>
                 <span className="flex items-center gap-3">
                   <span>
-                    <kbd className="px-1 rounded bg-slate-800 border border-slate-700 font-mono">↑↓</kbd> {L.navigate}
+                    <kbd className="px-1 rounded bg-zinc-100 border border-zinc-200 font-mono">↑↓</kbd> {L.navigate}
                   </span>
                   <span>
-                    <kbd className="px-1 rounded bg-slate-800 border border-slate-700 font-mono">↵</kbd> {L.open}
+                    <kbd className="px-1 rounded bg-zinc-100 border border-zinc-200 font-mono">↵</kbd> {L.open}
                   </span>
                   <span>
-                    <kbd className="px-1 rounded bg-slate-800 border border-slate-700 font-mono">Esc</kbd> {L.close}
+                    <kbd className="px-1 rounded bg-zinc-100 border border-zinc-200 font-mono">Esc</kbd> {L.close}
                   </span>
                 </span>
               </div>

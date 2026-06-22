@@ -94,7 +94,7 @@ export default function CourseDetailPage() {
   const renderCta = () => {
     if (authLoading || (user && !listReady)) {
       return (
-        <button disabled className="btn-secondary w-full px-5 py-3 text-sm">
+        <button disabled className="pf-btn-secondary w-full px-5 py-3 text-sm">
           <Loader2 className="w-4 h-4 animate-spin" />
           Loading…
         </button>
@@ -108,7 +108,7 @@ export default function CourseDetailPage() {
             <span className="font-semibold text-zinc-900">Sign in to access this course.</span>{' '}
             Once signed in, add it to your study list to unlock the lessons.
           </p>
-          <button onClick={handleSignIn} disabled={busy} className="btn-primary w-full px-5 py-3 text-sm">
+          <button onClick={handleSignIn} disabled={busy} className="pf-btn-primary w-full px-5 py-3 text-sm">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
             Sign in with Google
           </button>
@@ -123,7 +123,7 @@ export default function CourseDetailPage() {
             <span className="font-semibold text-zinc-900">You're signed in.</span>{' '}
             Add this course to your study list to start learning. You can drop it any time.
           </p>
-          <button onClick={handleEnroll} disabled={busy} className="btn-primary w-full px-5 py-3 text-sm">
+          <button onClick={handleEnroll} disabled={busy} className="pf-btn-primary w-full px-5 py-3 text-sm">
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <BookmarkPlus className="w-4 h-4" />}
             Add to My Study List
           </button>
@@ -140,7 +140,7 @@ export default function CourseDetailPage() {
             {started ? 'Pick up where you left off.' : 'Ready when you are.'}
           </span>
         </p>
-        <button onClick={handleStart} disabled={busy} className="btn-primary w-full px-5 py-3 text-sm">
+        <button onClick={handleStart} disabled={busy} className="pf-btn-primary w-full px-5 py-3 text-sm">
           {busy ? (
             <Loader2 className="w-4 h-4 animate-spin" />
           ) : started ? (
@@ -234,7 +234,7 @@ export default function CourseDetailPage() {
         </div>
 
         <aside className="md:col-span-1">
-          <div className="md:sticky md:top-24 card p-5">
+          <div className="md:sticky md:top-24 pf-card p-5">
             {renderCta()}
           </div>
         </aside>

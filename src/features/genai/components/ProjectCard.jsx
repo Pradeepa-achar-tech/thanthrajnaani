@@ -16,9 +16,9 @@ import {
 import { useUiText } from '../utils/uiText.js'
 
 const typeStyles = {
-  'Mini Project': 'bg-emerald-500/15 text-emerald-300 border-emerald-500/30',
-  Project: 'bg-sky-500/15 text-sky-300 border-sky-500/30',
-  Capstone: 'bg-accent-500/15 text-accent-300 border-accent-500/30',
+  'Mini Project': 'bg-emerald-50 text-emerald-700 border-emerald-200',
+  Project: 'bg-sky-500/15 text-sky-700 border-sky-200',
+  Capstone: 'bg-accent-50 text-accent-700 border-accent-200',
 }
 
 // Lightweight markdown: **bold** + `code` inline, line breaks preserved.
@@ -45,7 +45,7 @@ function renderInline(line) {
       const end = line.indexOf('**', i + 2)
       if (end !== -1) {
         out.push(
-          <strong key={key++} className="text-white">
+          <strong key={key++} className="text-zinc-900">
             {line.slice(i + 2, end)}
           </strong>
         )
@@ -59,7 +59,7 @@ function renderInline(line) {
         out.push(
           <code
             key={key++}
-            className="px-1 py-0.5 rounded bg-slate-800 text-accent-300 text-[0.85em] font-mono"
+            className="px-1 py-0.5 rounded bg-zinc-100 text-accent-700 text-[0.85em] font-mono"
           >
             {line.slice(i + 1, end)}
           </code>
@@ -105,8 +105,8 @@ function CopyButton({ text, label = 'Copy', size = 'sm' }) {
       onClick={handle}
       className={`inline-flex items-center gap-1 rounded border transition-colors font-medium ${padding} ${
         copied
-          ? 'bg-emerald-500/15 text-emerald-300 border-emerald-500/40'
-          : 'bg-slate-800 text-slate-300 border-slate-700 hover:bg-slate-700 hover:text-white'
+          ? 'bg-emerald-50 text-emerald-700 border-emerald-300'
+          : 'bg-zinc-100 text-zinc-700 border-zinc-200 hover:bg-zinc-100 hover:text-zinc-900'
       }`}
       title={L.copy}
     >
@@ -118,20 +118,20 @@ function CopyButton({ text, label = 'Copy', size = 'sm' }) {
 
 function Section({ icon: Icon, label, color = 'slate', accessory, children }) {
   const ring = {
-    slate: 'border-slate-800',
-    accent: 'border-accent-500/30',
-    blue: 'border-sky-500/30',
-    emerald: 'border-emerald-500/30',
-    amber: 'border-amber-500/30',
-    violet: 'border-violet-500/30',
+    slate: 'border-zinc-200',
+    accent: 'border-accent-200',
+    blue: 'border-sky-200',
+    emerald: 'border-emerald-200',
+    amber: 'border-amber-200',
+    violet: 'border-violet-200',
   }[color]
   const text = {
-    slate: 'text-slate-400',
-    accent: 'text-accent-400',
-    blue: 'text-sky-400',
-    emerald: 'text-emerald-400',
-    amber: 'text-amber-400',
-    violet: 'text-violet-400',
+    slate: 'text-zinc-500',
+    accent: 'text-accent-600',
+    blue: 'text-sky-600',
+    emerald: 'text-emerald-600',
+    amber: 'text-amber-700',
+    violet: 'text-violet-700',
   }[color]
   return (
     <div className={`border-l-2 pl-4 ${ring}`}>
@@ -144,7 +144,7 @@ function Section({ icon: Icon, label, color = 'slate', accessory, children }) {
         </div>
         {accessory}
       </div>
-      <div className="text-sm text-slate-300 leading-relaxed space-y-2">
+      <div className="text-sm text-zinc-700 leading-relaxed space-y-2">
         {children}
       </div>
     </div>
@@ -154,18 +154,18 @@ function Section({ icon: Icon, label, color = 'slate', accessory, children }) {
 function PromptStep({ step, idx }) {
   const number = step.step ?? idx + 1
   return (
-    <div className="rounded-lg border border-slate-800 bg-slate-950/60 overflow-hidden">
-      <div className="flex items-start justify-between gap-2 px-3 py-2 bg-slate-900/60 border-b border-slate-800">
+    <div className="rounded-lg border border-zinc-200 bg-zinc-50 overflow-hidden">
+      <div className="flex items-start justify-between gap-2 px-3 py-2 bg-zinc-50 border-b border-zinc-200">
         <div className="flex items-start gap-2 min-w-0">
-          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-500/15 text-accent-300 text-[11px] font-semibold flex items-center justify-center mt-0.5">
+          <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-50 text-accent-700 text-[11px] font-semibold flex items-center justify-center mt-0.5">
             {number}
           </span>
           <div className="min-w-0">
-            <div className="text-sm font-medium text-slate-100 leading-snug">
+            <div className="text-sm font-medium text-zinc-900 leading-snug">
               {step.label}
             </div>
             {step.outcome && (
-              <div className="text-[11px] text-slate-500 mt-0.5 leading-snug">
+              <div className="text-[11px] text-zinc-400 mt-0.5 leading-snug">
                 <FormattedText text={step.outcome} />
               </div>
             )}
@@ -173,7 +173,7 @@ function PromptStep({ step, idx }) {
         </div>
         <CopyButton text={step.prompt} />
       </div>
-      <pre className="px-3 py-2.5 text-xs text-slate-300 whitespace-pre-wrap font-mono leading-relaxed">
+      <pre className="px-3 py-2.5 text-xs text-zinc-700 whitespace-pre-wrap font-mono leading-relaxed">
         {step.prompt}
       </pre>
     </div>
@@ -184,7 +184,7 @@ export default function ProjectCard({ project }) {
   const L = useUiText()
   const [open, setOpen] = useState(false)
   const typeClass =
-    typeStyles[project.type] || 'bg-slate-700/40 text-slate-300 border-slate-600'
+    typeStyles[project.type] || 'bg-slate-700/40 text-zinc-700 border-zinc-300'
 
   const bp = project.blueprint
   const hasBlueprint =
@@ -217,7 +217,7 @@ export default function ProjectCard({ project }) {
         }`}
       >
         <div className="flex flex-wrap items-start justify-between gap-2">
-          <h3 className="text-base font-semibold text-white pr-2">
+          <h3 className="text-base font-semibold text-zinc-900 pr-2">
             {project.title}
           </h3>
           <span className={`badge border ${typeClass}`}>
@@ -227,22 +227,22 @@ export default function ProjectCard({ project }) {
         </div>
 
         <div className="flex flex-wrap gap-2 text-xs">
-          <span className="badge bg-slate-800 text-slate-300 border border-slate-700">
+          <span className="badge bg-zinc-100 text-zinc-700 border border-zinc-200">
             <Tag className="w-3 h-3 mr-1" />
             {project.domain}
           </span>
-          <span className="badge bg-slate-800 text-slate-300 border border-slate-700">
+          <span className="badge bg-zinc-100 text-zinc-700 border border-zinc-200">
             <Clock className="w-3 h-3 mr-1" />
             {project.duration}
           </span>
         </div>
 
-        <p className="text-sm text-slate-400 leading-relaxed">
+        <p className="text-sm text-zinc-500 leading-relaxed">
           {project.description}
         </p>
 
-        <div className="pt-2 border-t border-slate-800">
-          <div className="flex items-center gap-1.5 text-xs text-slate-500 mb-2">
+        <div className="pt-2 border-t border-zinc-200">
+          <div className="flex items-center gap-1.5 text-xs text-zinc-400 mb-2">
             <Wrench className="w-3 h-3" />
             <span className="uppercase tracking-wide">{L.tools}</span>
           </div>
@@ -250,7 +250,7 @@ export default function ProjectCard({ project }) {
             {project.tools.map((tool) => (
               <span
                 key={tool}
-                className="px-2 py-0.5 text-xs bg-slate-800/80 text-slate-300 rounded border border-slate-700"
+                className="px-2 py-0.5 text-xs bg-zinc-100 text-zinc-700 rounded border border-zinc-200"
               >
                 {tool}
               </span>
@@ -259,16 +259,16 @@ export default function ProjectCard({ project }) {
         </div>
 
         {hasBlueprint && (
-          <div className="flex items-center justify-between pt-3 border-t border-slate-800 -mx-1 mt-1">
-            <span className="text-xs text-accent-300 font-medium flex items-center gap-1">
+          <div className="flex items-center justify-between pt-3 border-t border-zinc-200 -mx-1 mt-1">
+            <span className="text-xs text-accent-700 font-medium flex items-center gap-1">
               <Sparkles className="w-3.5 h-3.5" />
               {L.buildBlueprintAvailable}
             </span>
-            <span className="flex items-center gap-1 text-[11px] text-slate-500">
+            <span className="flex items-center gap-1 text-[11px] text-zinc-400">
               {open ? L.hide : L.open}
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${
-                  open ? 'rotate-180 text-accent-400' : ''
+                  open ? 'rotate-180 text-accent-600' : ''
                 }`}
               />
             </span>
@@ -278,10 +278,10 @@ export default function ProjectCard({ project }) {
 
       {open && hasBlueprint && (
         <div className="px-5 pb-5 -mt-2 animate-slide-down">
-          <div className="space-y-5 pt-3 border-t border-slate-800">
+          <div className="space-y-5 pt-3 border-t border-zinc-200">
             {bp.overview && (
-              <div className="border-l-2 border-accent-500/40 pl-4">
-                <p className="text-sm text-slate-300 leading-relaxed">
+              <div className="border-l-2 border-accent-400 pl-4">
+                <p className="text-sm text-zinc-700 leading-relaxed">
                   <FormattedText text={bp.overview} />
                 </p>
               </div>
@@ -294,7 +294,7 @@ export default function ProjectCard({ project }) {
                     <ul className="space-y-1.5">
                       {bp.functionalRequirements.map((req, idx) => (
                         <li key={idx} className="flex gap-2">
-                          <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0 mt-1" />
+                          <Check className="w-3.5 h-3.5 text-emerald-600 flex-shrink-0 mt-1" />
                           <span><FormattedText text={req} /></span>
                         </li>
                       ))}
@@ -307,7 +307,7 @@ export default function ProjectCard({ project }) {
                     <ul className="space-y-1.5">
                       {bp.technicalImplementation.map((item, idx) => (
                         <li key={idx} className="flex gap-2">
-                          <span className="text-sky-400 flex-shrink-0">›</span>
+                          <span className="text-sky-600 flex-shrink-0">›</span>
                           <span><FormattedText text={item} /></span>
                         </li>
                       ))}
@@ -331,7 +331,7 @@ export default function ProjectCard({ project }) {
                     <PromptStep key={idx} step={p} idx={idx} />
                   ))}
                 </div>
-                <p className="text-[11px] text-slate-500 mt-3 leading-relaxed">
+                <p className="text-[11px] text-zinc-400 mt-3 leading-relaxed">
                   {L.promptHint}
                 </p>
               </Section>

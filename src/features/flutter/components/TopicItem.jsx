@@ -60,7 +60,7 @@ function renderInline(line) {
       const end = line.indexOf('**', i + 2)
       if (end !== -1) {
         out.push(
-          <strong key={key++} className="text-white">
+          <strong key={key++} className="font-semibold text-zinc-900">
             {line.slice(i + 2, end)}
           </strong>
         )
@@ -74,7 +74,7 @@ function renderInline(line) {
         out.push(
           <code
             key={key++}
-            className="px-1 py-0.5 rounded bg-slate-800 text-accent-300 text-[0.85em] font-mono"
+            className="px-1.5 py-0.5 rounded bg-zinc-100 text-accent-700 text-[0.85em] font-mono"
           >
             {line.slice(i + 1, end)}
           </code>
@@ -91,30 +91,34 @@ function renderInline(line) {
   return out
 }
 
+/* Semantic section — kept as colored left-borders + matching label color.
+   The colors carry meaning (emerald = analogy, blue = theory, rose = pitfall,
+   amber = try-it, accent = why-it-matters); on white they read as restrained
+   editorial accents rather than rainbow decoration. */
 function Section({ icon: Icon, label, color = 'slate', children }) {
   const ring = {
-    slate: 'border-slate-800',
-    accent: 'border-accent-500/30',
-    blue: 'border-sky-500/30',
-    rose: 'border-rose-500/30',
-    emerald: 'border-emerald-500/30',
-    amber: 'border-amber-500/30',
+    slate:   'border-zinc-300',
+    accent:  'border-accent-400',
+    blue:    'border-sky-400',
+    rose:    'border-rose-400',
+    emerald: 'border-emerald-400',
+    amber:   'border-amber-400',
   }[color]
   const text = {
-    slate: 'text-slate-400',
-    accent: 'text-accent-400',
-    blue: 'text-sky-400',
-    rose: 'text-rose-400',
-    emerald: 'text-emerald-400',
-    amber: 'text-amber-400',
+    slate:   'text-zinc-500',
+    accent:  'text-accent-700',
+    blue:    'text-sky-700',
+    rose:    'text-rose-700',
+    emerald: 'text-emerald-700',
+    amber:   'text-amber-700',
   }[color]
   return (
     <div className={`border-l-2 pl-4 ${ring}`}>
-      <div className={`flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-wider font-semibold ${text}`}>
+      <div className={`flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-[0.12em] font-semibold ${text}`}>
         <Icon className="w-3.5 h-3.5" />
         {label}
       </div>
-      <div className="text-sm text-slate-300 leading-relaxed space-y-2">
+      <div className="text-sm text-zinc-700 leading-relaxed space-y-2">
         {children}
       </div>
     </div>
@@ -140,17 +144,17 @@ export default function TopicItem({ topic, done, onToggle }) {
   return (
     <div
       className={`group rounded-lg transition-colors ${
-        done ? 'bg-accent-500/10' : 'hover:bg-slate-800/50'
+        done ? 'bg-accent-50/60' : 'hover:bg-zinc-50'
       }`}
     >
-      <div className="flex items-start gap-2 px-2 py-2">
+      <div className="flex items-start gap-2.5 px-2 py-2.5">
         <button
           onClick={() => onToggle(topic.id)}
           aria-label={done ? L.markIncomplete ?? defaultLabels.markIncomplete : L.markComplete ?? defaultLabels.markComplete}
           className={`mt-0.5 flex-shrink-0 w-5 h-5 rounded border flex items-center justify-center transition-colors ${
             done
-              ? 'bg-accent-500 border-accent-500 hover:bg-accent-600'
-              : 'bg-slate-900 border-slate-600 hover:border-accent-400'
+              ? 'bg-accent-600 border-accent-600 hover:bg-accent-700'
+              : 'bg-white border-zinc-300 hover:border-accent-500'
           }`}
         >
           {done && <Check className="w-3.5 h-3.5 text-white" strokeWidth={3} />}
@@ -164,18 +168,18 @@ export default function TopicItem({ topic, done, onToggle }) {
           <span
             className={`text-sm leading-relaxed flex-1 ${
               done
-                ? 'text-slate-200 line-through decoration-accent-500/40'
-                : 'text-slate-200'
+                ? 'text-zinc-500 line-through decoration-accent-500/40'
+                : 'text-zinc-800'
             }`}
           >
             {topic.title}
           </span>
           {hasTutorial && (
-            <span className="flex-shrink-0 flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">
+            <span className="flex-shrink-0 flex items-center gap-1 text-[11px] text-zinc-500 mt-0.5">
               <span className="hidden sm:inline">{open ? L.hide : L.tutorial}</span>
               <ChevronDown
                 className={`w-4 h-4 transition-transform ${
-                  open ? 'rotate-180 text-accent-400' : 'group-hover:text-slate-300'
+                  open ? 'rotate-180 text-accent-600' : 'group-hover:text-zinc-700'
                 }`}
               />
             </span>
@@ -187,8 +191,8 @@ export default function TopicItem({ topic, done, onToggle }) {
         <div className="pl-9 pr-3 pb-5 -mt-1 animate-slide-down">
           <div className="space-y-5">
             {content.explain && (
-              <div className="border-l-2 border-accent-500/40 pl-4">
-                <p className="text-sm text-slate-300 leading-relaxed">
+              <div className="border-l-2 border-accent-400 pl-4">
+                <p className="text-sm text-zinc-700 leading-relaxed">
                   <FormattedText text={content.explain} />
                 </p>
               </div>
@@ -217,10 +221,10 @@ export default function TopicItem({ topic, done, onToggle }) {
                 <ol className="space-y-2">
                   {content.steps.map((step, idx) => (
                     <li key={idx} className="flex gap-3">
-                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-500/15 text-accent-300 text-[11px] font-semibold flex items-center justify-center mt-0.5">
+                      <span className="flex-shrink-0 w-5 h-5 rounded-full bg-accent-50 text-accent-700 text-[11px] font-semibold flex items-center justify-center mt-0.5">
                         {idx + 1}
                       </span>
-                      <span className="text-sm text-slate-300 leading-relaxed">
+                      <span className="text-sm text-zinc-700 leading-relaxed">
                         <FormattedText text={step} />
                       </span>
                     </li>
@@ -230,12 +234,12 @@ export default function TopicItem({ topic, done, onToggle }) {
             )}
 
             {content.code && (
-              <div className="border-l-2 border-slate-800 pl-4">
-                <div className="flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-wider text-slate-400 font-semibold">
+              <div className="border-l-2 border-zinc-300 pl-4">
+                <div className="flex items-center gap-1.5 mb-2 text-[11px] uppercase tracking-[0.12em] text-zinc-500 font-semibold">
                   <Code2 className="w-3.5 h-3.5" />
                   {L.example}
                 </div>
-                <pre className="bg-slate-950 border border-slate-800 rounded-lg p-3 text-xs text-slate-300 overflow-x-auto font-mono leading-relaxed">
+                <pre className="bg-zinc-900 border border-zinc-900 rounded-lg p-3 text-xs text-zinc-100 overflow-x-auto font-mono leading-relaxed">
                   <code>{content.code}</code>
                 </pre>
               </div>
@@ -246,7 +250,7 @@ export default function TopicItem({ topic, done, onToggle }) {
                 <ul className="space-y-1.5">
                   {content.pitfalls.map((p, idx) => (
                     <li key={idx} className="flex gap-2">
-                      <span className="text-rose-400 flex-shrink-0">-</span>
+                      <span className="text-rose-500 flex-shrink-0">-</span>
                       <span><FormattedText text={p} /></span>
                     </li>
                   ))}
@@ -261,13 +265,13 @@ export default function TopicItem({ topic, done, onToggle }) {
             )}
 
             {content.takeaway && (
-              <div className="flex gap-2 items-start bg-accent-500/10 border border-accent-500/20 rounded-lg p-3">
-                <Lightbulb className="w-4 h-4 text-accent-400 flex-shrink-0 mt-0.5" />
+              <div className="flex gap-2 items-start bg-accent-50 border border-accent-200 rounded-lg p-3">
+                <Lightbulb className="w-4 h-4 text-accent-600 flex-shrink-0 mt-0.5" />
                 <div>
-                  <div className="text-[11px] uppercase tracking-wider text-accent-400 font-semibold mb-0.5">
+                  <div className="text-[11px] uppercase tracking-[0.12em] text-accent-700 font-semibold mb-0.5">
                     {L.keyTakeaway}
                   </div>
-                  <p className="text-sm text-slate-200 leading-relaxed">
+                  <p className="text-sm text-zinc-800 leading-relaxed">
                     <FormattedText text={content.takeaway} />
                   </p>
                 </div>

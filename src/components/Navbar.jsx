@@ -79,7 +79,7 @@ export default function Navbar() {
               </div>
               <button
                 onClick={handleSignOut}
-                className="btn-secondary px-3 py-1.5 text-sm"
+                className="pf-btn-secondary px-3 py-1.5 text-sm"
                 title="Sign out"
               >
                 <LogOut className="w-4 h-4" />
@@ -90,7 +90,7 @@ export default function Navbar() {
             <button
               onClick={handleSignIn}
               disabled={busy}
-              className="btn-primary px-4 py-1.5 text-sm"
+              className="pf-btn-primary px-4 py-1.5 text-sm"
             >
               {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
               Sign in
@@ -133,7 +133,7 @@ export default function Navbar() {
                   handleSignIn()
                 }}
                 disabled={busy}
-                className="btn-primary px-3 py-2 text-sm"
+                className="pf-btn-primary px-3 py-2 text-sm"
               >
                 {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
                 Sign in with Google

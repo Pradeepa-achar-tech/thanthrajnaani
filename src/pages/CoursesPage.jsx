@@ -60,7 +60,7 @@ export default function CoursesPage() {
 function CourseCard({ course, signedIn, enrolled }) {
   const Icon = course.icon
   return (
-    <Link to={`/courses/${course.id}`} className="card card-hover group p-6 md:p-7 h-full flex flex-col">
+    <Link to={`/courses/${course.id}`} className="pf-card pf-card-hover group p-6 md:p-7 h-full flex flex-col">
       <div className="flex items-start justify-between mb-5">
         <div className="w-12 h-12 rounded-xl bg-zinc-100 flex items-center justify-center text-zinc-700 transition-colors group-hover:bg-accent-50 group-hover:text-accent-600">
           <Icon className="w-6 h-6" />

@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { ArrowLeft, Menu } from 'lucide-react'
+import './index.css'
 import Sidebar from './components/Sidebar.jsx'
 import Dashboard from './components/Dashboard.jsx'
 import ModulePage from './components/ModulePage.jsx'
@@ -114,10 +115,10 @@ export default function App() {
   // ── Auth / not-signed-in fallback (parent route already gates) ──
   if (authLoading || !user) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-slate-800 border-t-accent-500 rounded-full animate-spin" />
-          <p className="text-sm text-slate-500">{L.loading}</p>
+          <div className="w-10 h-10 border-2 border-zinc-200 border-t-accent-500 rounded-full animate-spin" />
+          <p className="text-sm text-zinc-500">{L.loading}</p>
         </div>
       </div>
     )
@@ -126,17 +127,17 @@ export default function App() {
   // ── Cloud progress loading splash ──
   if (loadingCloud) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-slate-950">
+      <div className="min-h-screen flex items-center justify-center bg-white">
         <div className="flex flex-col items-center gap-4">
-          <div className="w-10 h-10 border-2 border-slate-800 border-t-accent-500 rounded-full animate-spin" />
-          <p className="text-sm text-slate-500">{L.syncingProgress}</p>
+          <div className="w-10 h-10 border-2 border-zinc-200 border-t-accent-500 rounded-full animate-spin" />
+          <p className="text-sm text-zinc-500">{L.syncingProgress}</p>
         </div>
       </div>
     )
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-950">
+    <div className="min-h-screen flex bg-white">
       <Sidebar
         user={user}
         activeView={view}
@@ -154,17 +155,17 @@ export default function App() {
 
       <div className="flex-1 min-w-0 flex flex-col">
         {/* Top bar */}
-        <header className="sticky top-0 z-20 bg-slate-950/80 backdrop-blur border-b border-slate-800">
+        <header className="sticky top-0 z-20 bg-white/85 backdrop-blur-md border-b border-zinc-200">
           <div className="flex items-center gap-3 px-4 md:px-8 h-14">
             <button
               onClick={() => setSidebarOpen(true)}
-              className="md:hidden p-2 -ml-2 text-slate-300 hover:text-white"
+              className="md:hidden p-2 -ml-2 text-zinc-600 hover:text-zinc-900"
             >
               <Menu className="w-5 h-5" />
             </button>
             <Link
               to="/courses/genai"
-              className="inline-flex items-center gap-1.5 text-xs text-slate-400 hover:text-slate-200 px-2 py-1 rounded-md border border-slate-800 hover:border-slate-700"
+              className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 px-2.5 py-1.5 rounded-md border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
               title="Back to course"
               aria-label="Back to course"
             >
@@ -182,15 +183,15 @@ export default function App() {
                 <img
                   src={user.photoURL}
                   alt={user.displayName}
-                  className="w-8 h-8 rounded-full border border-slate-700"
+                  className="w-8 h-8 rounded-full border border-zinc-200"
                   referrerPolicy="no-referrer"
                 />
               ) : (
-                <div className="w-8 h-8 rounded-full bg-accent-500/20 flex items-center justify-center text-xs font-bold text-accent-400">
+                <div className="w-8 h-8 rounded-full bg-accent-100 flex items-center justify-center text-xs font-bold text-accent-700">
                   {user.displayName?.[0] ?? user.email?.[0]}
                 </div>
               )}
-              <span className="text-sm text-slate-300 max-w-[140px] truncate">
+              <span className="text-sm text-zinc-600 max-w-[140px] truncate">
                 {user.displayName ?? user.email}
               </span>
             </div>
@@ -223,11 +224,11 @@ export default function App() {
           )}
         </main>
 
-        <footer className="px-4 md:px-8 py-4 border-t border-slate-900 text-xs text-slate-600 flex flex-col sm:flex-row items-center justify-between gap-2">
+        <footer className="px-4 md:px-8 py-4 border-t border-zinc-200 text-xs text-zinc-500 flex flex-col sm:flex-row items-center justify-between gap-2">
           <span>{L.footerSync}</span>
           <span className="flex items-center gap-1.5">
             {L.builtWith} <span aria-label="love" className="text-rose-500">❤️</span> by{' '}
-            <span className="font-extrabold italic tracking-wide bg-gradient-to-r from-accent-300 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
+            <span className="font-semibold tracking-tight text-zinc-900">
               Thanthrajnaani
             </span>{' '}
             {L.inKundapura}
