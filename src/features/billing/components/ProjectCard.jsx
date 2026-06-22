@@ -158,7 +158,7 @@ function formatList(title, items) {
 function buildPromptText(project, blueprint, step, idx) {
   const number = step.step ?? idx + 1
   return [
-    'You are Claude Code working in a Flutter + Firebase catering management Android project. Implement this step directly in the codebase.',
+    'You are Claude Code working in a Flutter + Firebase restaurant billing (POS) Android project. Implement this step directly in the codebase.',
     '',
     `Project: ${project.title}`,
     project.domain ? `Domain: ${project.domain}` : '',
@@ -180,7 +180,7 @@ function buildPromptText(project, blueprint, step, idx) {
     '- Keep the change scoped to this step; do not rewrite unrelated screens or architecture.',
     '- Use clear file names, small widgets/classes, and beginner-readable code.',
     '- Add friendly empty, loading, and error states when the step touches user-facing flow.',
-    '- Use realistic Kundapura, Udupi, or Karnataka coastal catering sample data (events, halls, menus) when seeding fixtures.',
+    '- Use realistic Kundapura, Udupi, or coastal Karnataka restaurant sample data (menu items like neer dosa, kori rotti, fish thali; tables; bills) when seeding fixtures.',
     '',
     'Acceptance checks before finishing:',
     '- Run `dart format .` for touched Dart files; `npm run lint` (or eslint) for touched Cloud Function files.',

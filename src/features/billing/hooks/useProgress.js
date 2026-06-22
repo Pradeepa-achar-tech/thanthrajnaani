@@ -2,7 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { doc, onSnapshot, serverTimestamp, setDoc } from 'firebase/firestore'
 import { db } from '../firebase.js'
 
-const STORAGE_KEY = 'catering_progress'
+const STORAGE_KEY = 'billing_progress'
 const CLOUD_DEBOUNCE_MS = 500
 
 const defaultState = {
@@ -53,7 +53,7 @@ export default function useProgress(uid) {
 
   const writeCloud = useCallback((targetUid, next) => {
     if (!targetUid) return
-    const ref = doc(db, 'users', targetUid, 'progress', 'catering')
+    const ref = doc(db, 'users', targetUid, 'progress', 'billing')
     setDoc(ref, {
       topics: next.topics,
       notes: next.notes,
@@ -72,7 +72,7 @@ export default function useProgress(uid) {
   // Subscribe to cloud progress doc whenever the signed-in uid changes.
   useEffect(() => {
     if (!uid) return
-    const ref = doc(db, 'users', uid, 'progress', 'catering')
+    const ref = doc(db, 'users', uid, 'progress', 'billing')
     const unsub = onSnapshot(
       ref,
       (snap) => {

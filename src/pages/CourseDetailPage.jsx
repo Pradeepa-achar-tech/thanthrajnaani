@@ -23,7 +23,7 @@ import { useStudyList } from '../contexts/StudyListContext.jsx'
 const curriculumLoaders = {
   flutter: () => import('../features/flutter/data/curriculum.js'),
   genai: () => import('../features/genai/data/curriculum.js'),
-  catering: () => import('../features/catering/data/curriculum.js'),
+  billing: () => import('../features/billing/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {

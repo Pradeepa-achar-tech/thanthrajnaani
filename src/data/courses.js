@@ -1,4 +1,4 @@
-import { Smartphone, Sparkles, ChefHat } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText } from 'lucide-react'
 
 export const courses = [
   {
@@ -28,17 +28,17 @@ export const courses = [
     routePlay: '/courses/genai/learn',
   },
   {
-    id: 'catering',
-    title: 'Build Catering Management app for Local Catering Owners',
-    tagline: 'A real Flutter + Firebase Android app, taught the Kundapura way',
+    id: 'billing',
+    title: 'Build a Restaurant Billing App (POS)',
+    tagline: 'A real Flutter + Firebase POS system, taught the coastal Karnataka way',
     description:
-      'A 10-module deep dive that builds a production catering management Android app from scratch — Dart fundamentals, Firebase Auth, Firestore data layer, event lifecycle, invoicing with PDFs, Cloud Functions, and Play Store publishing. Every topic ships with a Karnataka-flavoured analogy, a Mermaid diagram, and real code from the Chittoor Catering app.',
+      'A 10-module deep dive that builds a production restaurant billing (POS) Android app from scratch — Flutter UI, Google Sign-In with role-based access, a Firestore menu + orders data layer, GST tax math, running orders, Bluetooth thermal printing, PDF invoices, Excel/ZIP exports, and admin analytics. Every topic ships with a coastal Karnataka analogy and real code from the TunMani Cafe billing app.',
     level: 'Beginner → Advanced',
-    durationHours: 85,
+    durationHours: 80,
     modulesCount: 10,
-    icon: ChefHat,
-    skills: ['Dart 3', 'Flutter', 'Firestore', 'Cloud Functions', 'PDF & FCM', 'Play Store'],
-    routePlay: '/courses/catering/learn',
+    icon: ReceiptText,
+    skills: ['Dart 3', 'Flutter', 'Firestore', 'Provider', 'GST & PDF', 'Bluetooth POS'],
+    routePlay: '/courses/billing/learn',
   },
 ]
 

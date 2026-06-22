@@ -56,7 +56,7 @@ export default function App() {
     const stamp = new Date().toISOString().slice(0, 10)
     const a = document.createElement('a')
     a.href = url
-    a.download = `catering-progress-${stamp}.json`
+    a.download = `billing-progress-${stamp}.json`
     document.body.appendChild(a)
     a.click()
     document.body.removeChild(a)
@@ -135,7 +135,7 @@ export default function App() {
               <Menu className="w-5 h-5" />
             </button>
             <Link
-              to="/courses/catering"
+              to="/courses/billing"
               className="inline-flex items-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 px-2.5 py-1.5 rounded-md border border-zinc-200 hover:border-zinc-300 hover:bg-zinc-50 transition-colors"
               title="Back to course"
               aria-label="Back to course"
