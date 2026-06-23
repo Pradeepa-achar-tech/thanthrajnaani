@@ -12,9 +12,11 @@ import {
   Landmark,
   GraduationCap,
   MapPin,
-  Braces,
-  BarChart3,
-  Terminal,
+  Cog,
+  Hash,
+  Play,
+  Search,
+  AlertCircle,
 } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 
@@ -247,64 +249,65 @@ export default function HomePage() {
   )
 }
 
-// Lightweight code-editor illustration for the hero (decorative, desktop only).
-// Built from markup, not images, so it stays crisp and on-brand.
-const K = ({ children }) => <span className="text-accent-600 font-medium">{children}</span>
-const F = ({ children }) => <span className="text-sky-600">{children}</span>
-const S = ({ children }) => <span className="text-emerald-600">{children}</span>
-const V = ({ children }) => <span className="text-zinc-800">{children}</span>
-const P = ({ children }) => <span className="text-zinc-400">{children}</span>
-const C = ({ children }) => <span className="text-zinc-400 italic">{children}</span>
-const Line = ({ n, children }) => (
-  <div className="flex">
-    <span className="w-7 flex-shrink-0 text-right pr-3 text-zinc-300 select-none">{n}</span>
-    <span className="flex-1 whitespace-pre">{children}</span>
-  </div>
-)
+// Decorative "developer workspace" illustration for the hero (desktop only).
+// A dark code window ringed by floating tech-icon badges — built from markup +
+// icons (not a stock image), so it stays crisp, license-free, and on-brand.
+const badgeColor = {
+  sky: 'text-sky-500',
+  accent: 'text-accent-500',
+  violet: 'text-violet-500',
+  emerald: 'text-emerald-500',
+  amber: 'text-amber-500',
+  rose: 'text-rose-500',
+}
+function Badge({ className, color, children }) {
+  return (
+    <div
+      className={`absolute ${className} w-12 h-12 rounded-2xl bg-white shadow-lg ring-1 ring-zinc-100 flex items-center justify-center ${badgeColor[color]}`}
+    >
+      {children}
+    </div>
+  )
+}
+function CodeRow({ widths }) {
+  return (
+    <div className="flex items-center gap-1.5">
+      {widths.map((w, i) => (
+        <span key={i} className={`h-2 rounded-full ${w}`} />
+      ))}
+    </div>
+  )
+}
 
 function HeroArt() {
   return (
-    <div className="relative hidden lg:block select-none" aria-hidden="true">
-      {/* Code editor card */}
-      <div className="pf-card overflow-hidden p-0">
-        <div className="flex items-center gap-2 px-4 h-11 border-b border-zinc-200 bg-zinc-50">
-          <span className="w-3 h-3 rounded-full bg-zinc-300" />
-          <span className="w-3 h-3 rounded-full bg-zinc-300" />
-          <span className="w-3 h-3 rounded-full bg-zinc-300" />
-          <span className="ml-2 inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400">
-            <Terminal className="w-3.5 h-3.5" />
-            learn.ts
-          </span>
+    <div className="relative hidden lg:block select-none px-6" aria-hidden="true">
+      {/* Dark code window */}
+      <div className="relative rounded-2xl bg-zinc-900 shadow-xl ring-1 ring-zinc-800 p-5">
+        <div className="flex items-center gap-1.5 mb-5">
+          <span className="w-3 h-3 rounded-full bg-rose-400" />
+          <span className="w-3 h-3 rounded-full bg-amber-400" />
+          <span className="w-3 h-3 rounded-full bg-emerald-400" />
+          <span className="ml-2 text-[11px] font-mono text-zinc-500">workspace.tsx</span>
         </div>
-        <pre className="p-5 text-[13px] leading-7 font-mono overflow-x-auto">
-          <code className="block text-zinc-700">
-            <Line n={1}><K>const</K> <V>goal</V> <P>=</P> <S>{"'build real apps'"}</S></Line>
-            <Line n={2}>{' '}</Line>
-            <Line n={3}><K>function</K> <F>learn</F><P>(</P><V>you</V><P>{') {'}</P></Line>
-            <Line n={4}>{'  '}<K>const</K> <V>skills</V> <P>=</P> <F>study</F><P>(</P><V>you</V><P>)</P></Line>
-            <Line n={5}>{'  '}<K>return</K> <F>ship</F><P>(</P><V>skills</V><P>)</P> <C>{'// EN + ಕನ್ನಡ'}</C></Line>
-            <Line n={6}><P>{'}'}</P></Line>
-            <Line n={7}>{' '}</Line>
-            <Line n={8}><K>export default</K> <V>learn</V></Line>
-          </code>
-        </pre>
+        <div className="space-y-3">
+          <CodeRow widths={['w-10 bg-violet-400/80', 'w-16 bg-sky-400/80', 'w-12 bg-zinc-700']} />
+          <CodeRow widths={['w-5 bg-zinc-700', 'w-20 bg-accent-400/80', 'w-10 bg-emerald-400/70']} />
+          <CodeRow widths={['w-5 bg-zinc-700', 'w-14 bg-sky-400/70', 'w-24 bg-zinc-700']} />
+          <CodeRow widths={['w-12 bg-accent-400/80', 'w-8 bg-zinc-700', 'w-16 bg-emerald-400/70']} />
+          <CodeRow widths={['w-16 bg-zinc-700', 'w-10 bg-violet-400/70']} />
+          <CodeRow widths={['w-8 bg-emerald-400/70', 'w-20 bg-zinc-700', 'w-6 bg-accent-400/80']} />
+          <CodeRow widths={['w-14 bg-sky-400/70', 'w-10 bg-zinc-700']} />
+        </div>
       </div>
 
-      {/* Floating braces badge */}
-      <div className="absolute -top-4 -right-4 w-14 h-14 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center">
-        <Braces className="w-6 h-6 text-accent-600" />
-      </div>
-
-      {/* Floating stats chip */}
-      <div className="absolute -bottom-5 -left-5 pf-card px-4 py-3 flex items-center gap-3">
-        <div className="w-9 h-9 rounded-lg bg-accent-50 flex items-center justify-center">
-          <BarChart3 className="w-4 h-4 text-accent-600" />
-        </div>
-        <div>
-          <div className="text-sm font-bold text-zinc-900 leading-none">100% free</div>
-          <div className="text-[11px] text-zinc-500 mt-1">project-based</div>
-        </div>
-      </div>
+      {/* Floating tech badges */}
+      <Badge className="-top-5 -left-3" color="sky"><Code2 className="w-5 h-5" /></Badge>
+      <Badge className="-top-6 right-10" color="accent"><Cog className="w-5 h-5" /></Badge>
+      <Badge className="top-12 -right-4" color="violet"><Hash className="w-5 h-5" /></Badge>
+      <Badge className="-bottom-5 right-12" color="emerald"><Play className="w-5 h-5" /></Badge>
+      <Badge className="-bottom-6 left-10" color="amber"><Search className="w-5 h-5" /></Badge>
+      <Badge className="bottom-12 -left-5" color="rose"><AlertCircle className="w-5 h-5" /></Badge>
     </div>
   )
 }
