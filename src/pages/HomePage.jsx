@@ -12,6 +12,9 @@ import {
   Landmark,
   GraduationCap,
   MapPin,
+  Braces,
+  BarChart3,
+  Terminal,
 } from 'lucide-react'
 import Reveal from '../components/Reveal.jsx'
 
@@ -102,7 +105,8 @@ export default function HomePage() {
     <div>
       {/* Hero */}
       <section className="max-w-6xl mx-auto px-4 md:px-6 pt-16 md:pt-28 pb-14 md:pb-20">
-        <div className="max-w-3xl animate-fade-up">
+        <div className="grid lg:grid-cols-[1.05fr_0.95fr] gap-12 lg:gap-10 items-center">
+        <div className="max-w-2xl animate-fade-up">
           <div className="flex items-center gap-2 mb-6">
             <MapPin className="w-3.5 h-3.5 text-accent-600" />
             <span className="eyebrow text-zinc-500">Kundapura, India · Product Owner · Architect · Engineer</span>
@@ -151,6 +155,9 @@ export default function HomePage() {
               </a>
             ))}
           </div>
+        </div>
+
+        <HeroArt />
         </div>
       </section>
 
@@ -236,6 +243,68 @@ export default function HomePage() {
           </div>
         </div>
       </section>
+    </div>
+  )
+}
+
+// Lightweight code-editor illustration for the hero (decorative, desktop only).
+// Built from markup, not images, so it stays crisp and on-brand.
+const K = ({ children }) => <span className="text-accent-600 font-medium">{children}</span>
+const F = ({ children }) => <span className="text-sky-600">{children}</span>
+const S = ({ children }) => <span className="text-emerald-600">{children}</span>
+const V = ({ children }) => <span className="text-zinc-800">{children}</span>
+const P = ({ children }) => <span className="text-zinc-400">{children}</span>
+const C = ({ children }) => <span className="text-zinc-400 italic">{children}</span>
+const Line = ({ n, children }) => (
+  <div className="flex">
+    <span className="w-7 flex-shrink-0 text-right pr-3 text-zinc-300 select-none">{n}</span>
+    <span className="flex-1 whitespace-pre">{children}</span>
+  </div>
+)
+
+function HeroArt() {
+  return (
+    <div className="relative hidden lg:block select-none" aria-hidden="true">
+      {/* Code editor card */}
+      <div className="pf-card overflow-hidden p-0">
+        <div className="flex items-center gap-2 px-4 h-11 border-b border-zinc-200 bg-zinc-50">
+          <span className="w-3 h-3 rounded-full bg-zinc-300" />
+          <span className="w-3 h-3 rounded-full bg-zinc-300" />
+          <span className="w-3 h-3 rounded-full bg-zinc-300" />
+          <span className="ml-2 inline-flex items-center gap-1.5 text-xs font-mono text-zinc-400">
+            <Terminal className="w-3.5 h-3.5" />
+            learn.ts
+          </span>
+        </div>
+        <pre className="p-5 text-[13px] leading-7 font-mono overflow-x-auto">
+          <code className="block text-zinc-700">
+            <Line n={1}><K>const</K> <V>goal</V> <P>=</P> <S>{"'build real apps'"}</S></Line>
+            <Line n={2}>{' '}</Line>
+            <Line n={3}><K>function</K> <F>learn</F><P>(</P><V>you</V><P>{') {'}</P></Line>
+            <Line n={4}>{'  '}<K>const</K> <V>skills</V> <P>=</P> <F>study</F><P>(</P><V>you</V><P>)</P></Line>
+            <Line n={5}>{'  '}<K>return</K> <F>ship</F><P>(</P><V>skills</V><P>)</P> <C>{'// EN + ಕನ್ನಡ'}</C></Line>
+            <Line n={6}><P>{'}'}</P></Line>
+            <Line n={7}>{' '}</Line>
+            <Line n={8}><K>export default</K> <V>learn</V></Line>
+          </code>
+        </pre>
+      </div>
+
+      {/* Floating braces badge */}
+      <div className="absolute -top-4 -right-4 w-14 h-14 rounded-2xl bg-white border border-zinc-200 shadow-sm flex items-center justify-center">
+        <Braces className="w-6 h-6 text-accent-600" />
+      </div>
+
+      {/* Floating stats chip */}
+      <div className="absolute -bottom-5 -left-5 pf-card px-4 py-3 flex items-center gap-3">
+        <div className="w-9 h-9 rounded-lg bg-accent-50 flex items-center justify-center">
+          <BarChart3 className="w-4 h-4 text-accent-600" />
+        </div>
+        <div>
+          <div className="text-sm font-bold text-zinc-900 leading-none">100% free</div>
+          <div className="text-[11px] text-zinc-500 mt-1">project-based</div>
+        </div>
+      </div>
     </div>
   )
 }
