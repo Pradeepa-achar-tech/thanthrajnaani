@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import {
   ArrowRight,
@@ -280,6 +281,23 @@ function CodeRow({ widths }) {
 }
 
 function HeroArt() {
+  const [imgOk, setImgOk] = useState(true)
+  // Show the hero photo when present; fall back to the vector illustration
+  // (so the page never shows a broken image before the file is added).
+  if (!imgOk) return <VectorArt />
+  return (
+    <div className="relative animate-fade-up">
+      <img
+        src="/hero-desk.jpg"
+        alt="A developer's desk — a monitor and laptop showing code, with a Plan · Build · Test · Deploy · Iterate workflow on the wall"
+        onError={() => setImgOk(false)}
+        className="w-full aspect-[4/3] rounded-2xl object-cover shadow-xl ring-1 ring-zinc-200"
+      />
+    </div>
+  )
+}
+
+function VectorArt() {
   return (
     <div className="relative hidden lg:block select-none px-6" aria-hidden="true">
       {/* Dark code window */}
