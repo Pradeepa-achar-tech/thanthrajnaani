@@ -79,6 +79,19 @@ const TemplePlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const UpralliPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/upralli/App.jsx'),
+    import('./features/upralli/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
   if (courseId === 'flutter') return <FlutterPlayer />
@@ -86,6 +99,7 @@ function CoursePlayerSwitch() {
   if (courseId === 'billing') return <BillingPlayer />
   if (courseId === 'resort') return <ResortPlayer />
   if (courseId === 'temple') return <TemplePlayer />
+  if (courseId === 'upralli') return <UpralliPlayer />
   return <Navigate to="/courses" replace />
 }
 

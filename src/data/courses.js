@@ -1,4 +1,4 @@
-﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText } from 'lucide-react'
 
 export const courses = [
   {
@@ -65,6 +65,19 @@ export const courses = [
     icon: Landmark,
     skills: ['JavaScript / Node', 'Electron', 'React + Vite', 'PostgreSQL (local)', 'Secure IPC', 'Installer & Packaging'],
     routePlay: '/courses/temple/learn',
+  },
+  {
+    id: 'upralli',
+    title: 'Build a Pooja Register Desktop App',
+    tagline: 'A real Electron + TypeScript + Prisma app that bundles PostgreSQL inside the installer, taught the coastal Karnataka way',
+    description:
+      'A 10-module deep dive that builds a production offline desktop app from scratch with Electron, React and TypeScript — "Upralli Seva", a year-wise pooja/donor register for a village temple committee. You will use electron-vite for the three-process architecture, Prisma as the ORM over a PostgreSQL database that ships bundled inside the installer (embedded-postgres, UTF-8 for Kannada), a fully typed contextBridge IPC layer, a TanStack Table register grid with inline auto-saving checkboxes, a Kannada edit popup with a bundled Noto font, per-year rates and ₹ collection totals, daily JSON backups and restore, Chromium PDF export, and a Windows installer whose uninstaller asks whether to keep or wipe the data — with first-run logic that resumes a kept database. Every topic ships with a coastal Karnataka analogy and real code from the Upralli Seva app.',
+    level: 'Intermediate → Advanced',
+    durationHours: 88,
+    modulesCount: 10,
+    icon: ScrollText,
+    skills: ['TypeScript', 'Electron + electron-vite', 'Prisma ORM', 'Bundled PostgreSQL', 'TanStack Table/Query', 'Installer & Backups'],
+    routePlay: '/courses/upralli/learn',
   },
 ]
 

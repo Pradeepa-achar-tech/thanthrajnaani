@@ -26,6 +26,7 @@ const curriculumLoaders = {
   billing: () => import('../features/billing/data/curriculum.js'),
   resort: () => import('../features/resort/data/curriculum.js'),
   temple: () => import('../features/temple/data/curriculum.js'),
+  upralli: () => import('../features/upralli/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {
