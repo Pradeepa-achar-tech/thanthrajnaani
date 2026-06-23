@@ -1,4 +1,4 @@
-﻿import { Smartphone, Sparkles, ReceiptText, Hotel } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark } from 'lucide-react'
 
 export const courses = [
   {
@@ -52,6 +52,19 @@ export const courses = [
     icon: Hotel,
     skills: ['C# / .NET', 'ASP.NET Core', 'PostgreSQL & Dapper', 'Google OAuth', 'GST & QuestPDF', 'Deployment'],
     routePlay: '/courses/resort/learn',
+  },
+  {
+    id: 'temple',
+    title: 'Build a Temple Seva Management Desktop App',
+    tagline: 'A real Electron + React + local PostgreSQL offline desktop app, taught the coastal Karnataka way',
+    description:
+      'A 10-module deep dive that builds a production offline desktop app from scratch with Electron and React — a seva ticketing counter for Shri Brahmalingeshwara Temple, Maranakatte. You will wire a local PostgreSQL database (no cloud, all data on the machine), a secure main/preload/renderer split with IPC, a fast counter UI for daily sevas like Rangapooje, Mangalarathi and Hannikaayi, receipt and token printing, Yakshagana and Annadhana bookings, daily reports and backup, and a Windows installer that asks on uninstall whether to keep or wipe the data. Every topic ships with a coastal Karnataka analogy and real code from the Maranakatte Seva app.',
+    level: 'Beginner → Advanced',
+    durationHours: 85,
+    modulesCount: 10,
+    icon: Landmark,
+    skills: ['JavaScript / Node', 'Electron', 'React + Vite', 'PostgreSQL (local)', 'Secure IPC', 'Installer & Packaging'],
+    routePlay: '/courses/temple/learn',
   },
 ]
 
