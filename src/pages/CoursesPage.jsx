@@ -1,20 +1,33 @@
+import { useState } from 'react'
 import { Link } from 'react-router-dom'
-import { ArrowRight, BookOpen, Clock, Check, Languages } from 'lucide-react'
+import { ArrowRight, BookOpen, Clock, Check, Languages, LogIn, Loader2 } from 'lucide-react'
 import { courses } from '../data/courses.js'
 import { useAuth } from '../contexts/AuthContext.jsx'
 import { useStudyList } from '../contexts/StudyListContext.jsx'
 import Reveal from '../components/Reveal.jsx'
 
 export default function CoursesPage() {
-  const { user } = useAuth()
+  const { user, signInWithGoogle, loading } = useAuth()
   const { isEnrolled } = useStudyList()
+  const [busy, setBusy] = useState(false)
+
+  const handleSignIn = async () => {
+    setBusy(true)
+    try {
+      await signInWithGoogle()
+    } catch {
+      // popup-closed already swallowed inside the context
+    } finally {
+      setBusy(false)
+    }
+  }
 
   return (
     <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-20">
-      <div className="max-w-3xl mb-10 md:mb-12">
+      <div className="max-w-3xl mb-8 md:mb-10">
         <div className="flex items-center gap-2 mb-3">
           <BookOpen className="w-4 h-4 text-accent-600" />
-          <span className="eyebrow text-accent-600">Courses</span>
+          <span className="eyebrow text-accent-600">Courses · {courses.length} available</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-900 leading-[1.1] mb-4">
           Pick a course. Add it to your study list. Start learning.
@@ -24,6 +37,29 @@ export default function CoursesPage() {
           lessons — your progress syncs automatically across devices.
         </p>
       </div>
+
+      {/* Join CTA — only when signed out */}
+      {!loading && !user && (
+        <div className="rounded-2xl border border-accent-200 bg-accent-50 p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
+          <div className="flex-1 min-w-0">
+            <h2 className="text-base md:text-lg font-semibold text-zinc-900 mb-1">
+              Join free — sign in to start any course
+            </h2>
+            <p className="text-sm text-zinc-600 leading-relaxed">
+              One click with Google unlocks every lesson and saves your progress across devices. No
+              payment, ever.
+            </p>
+          </div>
+          <button
+            onClick={handleSignIn}
+            disabled={busy}
+            className="pf-btn-primary px-5 py-3 text-sm w-full sm:w-auto flex-shrink-0 justify-center"
+          >
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+            Sign in with Google
+          </button>
+        </div>
+      )}
 
       {/* Bilingual callout */}
       <div className="rounded-2xl border border-zinc-200 bg-zinc-50 p-5 md:p-6 flex flex-col md:flex-row md:items-center gap-4 md:gap-6 mb-8">

@@ -25,12 +25,22 @@ export default function Reveal({ as: Tag = 'div', delay = 0, className = '', chi
         if (entry.isIntersecting) {
           setShown(true)
           io.disconnect()
+          clearTimeout(fallback)
         }
       },
-      { threshold: 0.12, rootMargin: '0px 0px -8% 0px' }
+      { threshold: 0.05, rootMargin: '0px 0px -5% 0px' }
     )
     io.observe(el)
-    return () => io.disconnect()
+    // Fail-open: some mobile browsers don't reliably fire the observer for
+    // content below the fold. Never let a card stay invisible — reveal anyway.
+    const fallback = setTimeout(() => {
+      setShown(true)
+      io.disconnect()
+    }, 800)
+    return () => {
+      io.disconnect()
+      clearTimeout(fallback)
+    }
   }, [])
 
   return (

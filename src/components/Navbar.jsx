@@ -98,13 +98,41 @@ export default function Navbar() {
           )}
         </div>
 
-        <button
-          onClick={() => setOpen((v) => !v)}
-          className="md:hidden p-2 -mr-2 text-zinc-600 hover:text-zinc-900"
-          aria-label="Toggle menu"
-        >
-          {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-        </button>
+        {/* Mobile: keep an auth affordance always visible (not buried in the menu) */}
+        <div className="md:hidden flex items-center gap-1.5">
+          {loading ? (
+            <Loader2 className="w-4 h-4 animate-spin text-zinc-400" />
+          ) : user ? (
+            user.photoURL ? (
+              <img
+                src={user.photoURL}
+                alt={user.displayName || ''}
+                referrerPolicy="no-referrer"
+                className="w-8 h-8 rounded-full border border-zinc-200"
+              />
+            ) : (
+              <div className="w-8 h-8 rounded-full bg-accent-100 flex items-center justify-center text-xs font-bold text-accent-700">
+                {(user.displayName || user.email || '?')[0].toUpperCase()}
+              </div>
+            )
+          ) : (
+            <button
+              onClick={handleSignIn}
+              disabled={busy}
+              className="pf-btn-primary px-3 py-1.5 text-sm"
+            >
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogIn className="w-4 h-4" />}
+              Sign in
+            </button>
+          )}
+          <button
+            onClick={() => setOpen((v) => !v)}
+            className="p-2 -mr-2 text-zinc-600 hover:text-zinc-900"
+            aria-label="Toggle menu"
+          >
+            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
+        </div>
       </div>
 
       {open && (
