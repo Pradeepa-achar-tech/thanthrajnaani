@@ -282,13 +282,13 @@ function CodeRow({ widths }) {
 
 function HeroArt() {
   const [imgOk, setImgOk] = useState(true)
-  // Show the hero photo when present; fall back to the vector illustration
-  // (so the page never shows a broken image before the file is added).
+  // Show the hero photo (public/hero-desk.png) when it loads; fall back to the
+  // vector illustration if it's missing, so the page never shows a broken image.
   if (!imgOk) return <VectorArt />
   return (
     <div className="relative animate-fade-up">
       <img
-        src="/hero-desk.jpg"
+        src="/hero-desk.png"
         alt="A developer's desk — a monitor and laptop showing code, with a Plan · Build · Test · Deploy · Iterate workflow on the wall"
         onError={() => setImgOk(false)}
         className="w-full aspect-[4/3] rounded-2xl object-cover shadow-xl ring-1 ring-zinc-200"
