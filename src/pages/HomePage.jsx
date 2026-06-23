@@ -7,8 +7,9 @@ import {
   Youtube,
   Rocket,
   Sparkles,
-  Smartphone,
   ReceiptText,
+  Hotel,
+  Landmark,
   GraduationCap,
   MapPin,
 } from 'lucide-react'
@@ -16,16 +17,55 @@ import Reveal from '../components/Reveal.jsx'
 
 const stackGroups = [
   {
-    title: 'Engineering',
+    title: 'Web',
     items: [
-      'HTML', 'CSS', 'Bootstrap', 'JavaScript', 'jQuery', 'React',
-      'Flutter & Dart', 'ASP.NET Core', 'Python', 'GenAI', 'MS SQL',
-      'PostgreSQL', 'Docker', 'Cloud', 'Azure',
+      'HTML', 'CSS', 'Bootstrap', 'JavaScript', 'TypeScript', 'jQuery',
+      'React', 'ASP.NET Core MVC',
     ],
   },
   {
-    title: 'Leadership',
-    items: ['People management', 'Operations management'],
+    title: 'Mobile',
+    items: [
+      'Flutter', 'Dart', 'SQLite (offline)', 'Firestore (online)',
+      'Firebase Auth', 'Bluetooth & PDF',
+    ],
+  },
+  {
+    title: 'Desktop',
+    items: [
+      'Electron', 'Node.js', 'React + Vite', 'TypeScript',
+      'Local / bundled PostgreSQL', 'Secure IPC', 'Offline-first',
+    ],
+  },
+  {
+    title: 'Backend & data',
+    items: [
+      'C# / .NET', 'ASP.NET Core APIs', 'Node.js', 'PostgreSQL',
+      'MS SQL', 'SQLite', 'Dapper', 'Prisma',
+    ],
+  },
+  {
+    title: 'Auth & integrations',
+    items: ['Google SSO', 'Microsoft SSO', 'OAuth 2.0', 'Firebase'],
+  },
+  {
+    title: 'Hosting & DevOps',
+    items: [
+      'Hostinger', 'VPS', 'Linux servers', 'Nginx', 'SSL / HTTPS',
+      'Server hardening', 'Docker', 'Azure', 'Cloud deployment',
+    ],
+  },
+  {
+    title: 'AI & GenAI',
+    items: ['Python', 'GenAI', 'RAG', 'Agents'],
+  },
+  {
+    title: 'Product & leadership',
+    items: [
+      'Product ownership', 'Feature definition', 'Technical architecture',
+      'Product roadmap', 'Stakeholder management', 'Scrum & stand-ups',
+      'Team leadership', 'People & operations',
+    ],
   },
   {
     title: 'Beyond code',
@@ -35,24 +75,24 @@ const stackGroups = [
 
 const projects = [
   {
-    icon: Smartphone,
-    title: 'Flutter & Dart Course',
-    body: 'A 7-module curriculum that takes learners from Dart fundamentals to production Flutter apps — with quizzes, notes, and cloud-synced progress.',
-    href: '/courses/flutter',
-    cta: 'Open course',
-  },
-  {
-    icon: Sparkles,
-    title: 'GenAI & ML Course',
-    body: 'A hands-on path through ML basics, transformers, prompt engineering, RAG, and shipping LLM-powered features end-to-end.',
-    href: '/courses/genai',
-    cta: 'Open course',
-  },
-  {
     icon: ReceiptText,
     title: 'Restaurant Billing App (POS)',
-    body: 'A 10-module build of a production Flutter + Firebase restaurant POS — Google Sign-In, Firestore menu & orders, GST math, Bluetooth thermal printing, PDF invoices, and admin analytics.',
+    body: 'A Flutter + Firebase restaurant POS for Android: Google Sign-In, a Firestore menu and orders, GST billing, Bluetooth thermal printing, PDF invoices, and admin analytics. Built and taught module by module.',
     href: '/courses/billing',
+    cta: 'Open course',
+  },
+  {
+    icon: Hotel,
+    title: 'Resort Management System',
+    body: 'A web app on ASP.NET Core and PostgreSQL: room and wedding-hall bookings, GST invoicing, payments, a CRM, reports, and cloud deployment — built with C# and a clean, layered architecture.',
+    href: '/courses/resort',
+    cta: 'Open course',
+  },
+  {
+    icon: Landmark,
+    title: 'Temple Seva Desktop App',
+    body: 'An offline desktop app built with Electron, React, and a local PostgreSQL database — a fast seva counter with receipt printing, daily reports, and backups that keeps every record on the machine, no cloud required.',
+    href: '/courses/temple',
     cta: 'Open course',
   },
 ]
@@ -65,7 +105,7 @@ export default function HomePage() {
         <div className="max-w-3xl animate-fade-up">
           <div className="flex items-center gap-2 mb-6">
             <MapPin className="w-3.5 h-3.5 text-accent-600" />
-            <span className="eyebrow text-zinc-500">Kundapura, India · Software Engineer</span>
+            <span className="eyebrow text-zinc-500">Kundapura, India · Product Owner · Architect · Engineer</span>
           </div>
 
           <h1 className="text-4xl md:text-6xl font-bold leading-[1.08] tracking-tight text-zinc-900 mb-6">
@@ -75,9 +115,10 @@ export default function HomePage() {
           </h1>
 
           <p className="text-lg text-zinc-600 leading-relaxed mb-9 max-w-2xl">
-            I build and ship full-stack web and mobile products, lead the teams behind them, and
-            turn everything I learn into free, hands-on courses — in English and Kannada — for the
-            next person walking the same path.
+            I build full-stack products across three platforms: web apps in React and ASP.NET
+            Core, mobile apps in Flutter, and offline-first desktop software in Electron and Node.
+            I lead the teams behind them, and turn what I learn into free, project-based courses in
+            English and Kannada.
           </p>
 
           <div className="flex flex-wrap gap-3 mb-10">
@@ -125,17 +166,23 @@ export default function HomePage() {
               I write code, ship products, and document the journey.
             </h2>
             <p className="text-zinc-600 leading-relaxed mb-4">
-              By day I'm a software engineer shipping mobile and web products at my full-time role.
-              Off the clock I prototype with AI, push code on side projects, and document every
-              lesson I learn into hands-on curriculum anyone can follow.
+              By day I own a web product end to end: I define the features, architect the
+              technology, and lead the engineering team that ships it. I run the sprint stand-ups,
+              coordinate with stakeholders on the product roadmap, and still write fast,
+              high-performance code myself.
+            </p>
+            <p className="text-zinc-600 leading-relaxed mb-4">
+              Off the clock I go wider — building industry-standard, high-performance web
+              applications, mobile apps in Flutter, and offline-first desktop software in Node,
+              React, and Electron — and write up every lesson as a course anyone can follow.
             </p>
             <p className="text-zinc-600 leading-relaxed">
-              The goal: make solid engineering accessible to learners who don't have access to
-              expensive bootcamps. I teach in plain language — and every lesson is available in both{' '}
-              <span className="font-semibold text-zinc-900">English and Kannada</span> — so you can
-              learn in the language you think in. Every course on this site is free, in-depth, and
-              built around projects you'd actually ship. If a problem you're working on overlaps with
-              what I cover here, my inbox is open.
+              The goal is simple: make solid engineering accessible to people who can't reach for an
+              expensive bootcamp. I teach in plain language, and every lesson is available in both{' '}
+              <span className="font-semibold text-zinc-900">English and Kannada</span>, so you can
+              learn in the language you think in. Every course here is free, detailed, and built
+              around an app you'd actually ship. If something you're working on overlaps with what I
+              cover, my inbox is open.
             </p>
           </Reveal>
 
