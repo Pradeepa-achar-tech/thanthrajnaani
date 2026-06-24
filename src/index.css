@@ -34,6 +34,25 @@ body {
 ::-webkit-scrollbar-thumb:hover { background: #a1a1aa; } /* zinc-400 */
 
 /* ============================================================
+   Mobile safety — applies app-wide (the shell and every lazy-loaded
+   course player share this stylesheet in the same document).
+   - `overflow-x: clip` on body kills horizontal page-scroll caused by
+     off-screen decorative elements (e.g. the login aurora blobs) WITHOUT
+     creating a scroll container, so `position: sticky` keeps working.
+   - long words / inline code / URLs wrap instead of forcing the page wide.
+   Note: Tailwind Preflight already caps img/video/svg to max-width:100%.
+   ============================================================ */
+body { overflow-x: clip; }
+
+:where(p, li, h1, h2, h3, h4, h5, blockquote, a, strong, em, code, dd, dt, label, td, th) {
+  overflow-wrap: break-word;
+}
+
+/* Code blocks: scroll horizontally inside their own box rather than
+   stretching the page; never exceed their container's width. */
+pre { max-width: 100%; }
+
+/* ============================================================
    Portfolio shell utilities — prefixed with `pf-` so they don't
    collide with class names used by the course-player apps (which
    define their own `.card`, `.btn-primary`, etc. in their own
