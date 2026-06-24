@@ -30,11 +30,11 @@ export default function CoursesPage() {
           <span className="eyebrow text-accent-600">Courses · {courses.length} available</span>
         </div>
         <h1 className="text-3xl md:text-5xl font-bold tracking-tight text-zinc-900 leading-[1.1] mb-4">
-          Pick a course. Add it to your study list. Start learning.
+          Free, project-based courses in English &amp; ಕನ್ನಡ. Start watching today.
         </h1>
         <p className="text-lg text-zinc-600 leading-relaxed">
-          All courses are free. Sign in with Google to add a course to your study list and unlock the
-          lessons — your progress syncs automatically across devices.
+          Every course is free — no payment, ever. Sign in only to save your progress and pick up
+          right where you left off, on your phone or your laptop.
         </p>
       </div>
 
@@ -43,11 +43,11 @@ export default function CoursesPage() {
         <div className="rounded-2xl border border-accent-200 bg-accent-50 p-5 md:p-6 flex flex-col sm:flex-row sm:items-center gap-4 mb-8">
           <div className="flex-1 min-w-0">
             <h2 className="text-base md:text-lg font-semibold text-zinc-900 mb-1">
-              Join free — sign in to start any course
+              All free — sign in to save your progress
             </h2>
             <p className="text-sm text-zinc-600 leading-relaxed">
-              One click with Google unlocks every lesson and saves your progress across devices. No
-              payment, ever.
+              One click with Google, then learn in English or ಕನ್ನಡ and continue right where you left
+              off on any device. No payment, ever.
             </p>
           </div>
           <button
@@ -144,8 +144,8 @@ function CourseCard({ course, signedIn, enrolled }) {
         ))}
       </div>
 
-      <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-medium text-zinc-900">
-        View course
+      <span className="mt-auto inline-flex items-center gap-1.5 text-sm font-semibold text-zinc-900">
+        Start watching
         <ArrowRight className="w-4 h-4 text-accent-600 group-hover:translate-x-0.5 transition-transform" />
       </span>
     </Link>

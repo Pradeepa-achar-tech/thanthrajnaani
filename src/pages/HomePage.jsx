@@ -224,6 +224,36 @@ export default function HomePage() {
         </div>
       </section>
 
+      {/* Free-courses nudge — surfaces as the visitor scrolls */}
+      <section className="border-t border-zinc-200">
+        <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-14">
+          <Reveal>
+            <div className="rounded-2xl border border-accent-200 bg-accent-50 p-6 md:p-8 flex flex-col md:flex-row md:items-center gap-5 md:gap-6">
+              <div className="flex-shrink-0 w-12 h-12 rounded-xl bg-white border border-accent-200 flex items-center justify-center text-accent-600">
+                <GraduationCap className="w-6 h-6" />
+              </div>
+              <div className="flex-1 min-w-0">
+                <h2 className="text-lg md:text-xl font-bold tracking-tight text-zinc-900 mb-1">
+                  Every course here is free
+                </h2>
+                <p className="text-sm md:text-base text-zinc-600 leading-relaxed">
+                  Project-based lessons in English and ಕನ್ನಡ. Just sign in with Google to start
+                  studying — your progress is saved across your phone and laptop. No payment, ever.
+                </p>
+              </div>
+              <Link
+                to="/courses"
+                className="pf-btn-primary group px-5 py-3 text-sm w-full md:w-auto flex-shrink-0 justify-center"
+              >
+                <GraduationCap className="w-4 h-4" />
+                Explore courses
+                <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </div>
+          </Reveal>
+        </div>
+      </section>
+
       {/* Work & projects */}
       <section className="border-t border-zinc-200">
         <div className="max-w-6xl mx-auto px-4 md:px-6 py-16 md:py-20">
