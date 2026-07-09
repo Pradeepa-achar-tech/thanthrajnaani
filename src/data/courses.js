@@ -1,4 +1,4 @@
-﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText, Zap, Camera } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText, Zap, Camera, Palette } from 'lucide-react'
 
 export const courses = [
   {
@@ -104,6 +104,19 @@ export const courses = [
     icon: Camera,
     skills: ['Dart 3', 'Flutter', 'Supabase & Postgres', 'Row Level Security', 'Realtime & Storage', 'Free-tier Deployment'],
     routePlay: '/courses/localinsta/learn',
+  },
+  {
+    id: 'kalakaara',
+    title: 'Build an Artist Discovery Platform (KalaKaara)',
+    tagline: 'A real React + Supabase marketplace, 100% free tier, no card required — ever',
+    description:
+      'A 16-module, step-by-step build of a production artist marketplace with React (Vite) and Supabase — where painters, sketch artists, muralists and calligraphers publish portfolios and buyers find them by category and location. You will design an 18-table PostgreSQL schema, enforce every permission with Row Level Security instead of a backend server, wire Google sign-in that visitors only hit when they want a phone number, build Storage-backed portfolio uploads, and solve the hard one: matching artists to searchers across an administrative hierarchy plus radius search with the Haversine formula in plain SQL — no PostGIS, no Google Places, no credit card at any point.',
+    level: 'Beginner → Advanced',
+    durationHours: 103,
+    modulesCount: 16,
+    icon: Palette,
+    skills: ['React + Vite', 'Supabase & PostgreSQL', 'Row Level Security', 'Google OAuth', 'CSS Modules', 'Geo Search & Vercel'],
+    routePlay: '/courses/kalakaara/learn',
   },
 ]
 

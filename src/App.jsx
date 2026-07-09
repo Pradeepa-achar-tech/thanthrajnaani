@@ -118,6 +118,19 @@ const LocalInstaPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const KalaKaaraPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/kalakaara/App.jsx'),
+    import('./features/kalakaara/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
   if (courseId === 'flutter') return <FlutterPlayer />
@@ -128,6 +141,7 @@ function CoursePlayerSwitch() {
   if (courseId === 'upralli') return <UpralliPlayer />
   if (courseId === 'genaifast') return <GenAIFastPlayer />
   if (courseId === 'localinsta') return <LocalInstaPlayer />
+  if (courseId === 'kalakaara') return <KalaKaaraPlayer />
   return <Navigate to="/courses" replace />
 }
 

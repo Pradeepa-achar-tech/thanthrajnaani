@@ -29,6 +29,7 @@ const curriculumLoaders = {
   upralli: () => import('../features/upralli/data/curriculum.js'),
   genaifast: () => import('../features/genaifast/data/curriculum.js'),
   localinsta: () => import('../features/localinsta/data/curriculum.js'),
+  kalakaara: () => import('../features/kalakaara/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {
