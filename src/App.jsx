@@ -92,6 +92,32 @@ const UpralliPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const GenAIFastPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/genaifast/App.jsx'),
+    import('./features/genaifast/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
+const LocalInstaPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/localinsta/App.jsx'),
+    import('./features/localinsta/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
   if (courseId === 'flutter') return <FlutterPlayer />
@@ -100,6 +126,8 @@ function CoursePlayerSwitch() {
   if (courseId === 'resort') return <ResortPlayer />
   if (courseId === 'temple') return <TemplePlayer />
   if (courseId === 'upralli') return <UpralliPlayer />
+  if (courseId === 'genaifast') return <GenAIFastPlayer />
+  if (courseId === 'localinsta') return <LocalInstaPlayer />
   return <Navigate to="/courses" replace />
 }
 

@@ -1,4 +1,4 @@
-﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText, Zap, Camera } from 'lucide-react'
 
 export const courses = [
   {
@@ -78,6 +78,32 @@ export const courses = [
     icon: ScrollText,
     skills: ['TypeScript', 'Electron + electron-vite', 'Prisma ORM', 'Bundled PostgreSQL', 'TanStack Table/Query', 'Installer & Backups'],
     routePlay: '/courses/upralli/learn',
+  },
+  {
+    id: 'genaifast',
+    title: 'GenAI Fast-Track',
+    tagline: 'Skip the theory — go from Python to a deployed LLM app in ~60 hours',
+    description:
+      'A lean, practical 10-module path that skips deep ML theory and gets you straight to shipping: Python essentials, how LLMs actually work (tokens, context, embeddings), prompting and real API calls, RAG with LangChain, a tool-using agent, and deployment. Every module advances one running example — Kundapura Sahayaka, a coastal-Karnataka GenAI assistant — from a plain chatbot to a live, deployed, tool-using agent.',
+    level: 'Beginner → Intermediate',
+    durationHours: 62,
+    modulesCount: 10,
+    icon: Zap,
+    skills: ['Python', 'LLM APIs', 'Prompt Engineering', 'LangChain & RAG', 'Agents & Tools', 'Streamlit Deploy'],
+    routePlay: '/courses/genaifast/learn',
+  },
+  {
+    id: 'localinsta',
+    title: 'Build LocalInsta (Instagram Clone)',
+    tagline: 'A real Flutter + Supabase photo-sharing app, 100% free tier, no card required — ever',
+    description:
+      'A 10-module deep dive that builds a hyperlocal Instagram-style photo & video sharing app from scratch with Flutter and Supabase — Postgres data modelling with Row Level Security, email/Google auth, a Storage-backed media pipeline, a realtime feed with likes and comments, follows and explore, 24-hour stories cleaned up by a free pg_cron job, trigger-driven notifications, and realtime direct messages. Every service used is genuinely free with no credit card required at any point, and every topic ships with a coastal Karnataka analogy.',
+    level: 'Beginner → Advanced',
+    durationHours: 82,
+    modulesCount: 10,
+    icon: Camera,
+    skills: ['Dart 3', 'Flutter', 'Supabase & Postgres', 'Row Level Security', 'Realtime & Storage', 'Free-tier Deployment'],
+    routePlay: '/courses/localinsta/learn',
   },
 ]
 

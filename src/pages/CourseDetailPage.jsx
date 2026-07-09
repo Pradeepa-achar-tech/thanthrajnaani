@@ -27,6 +27,8 @@ const curriculumLoaders = {
   resort: () => import('../features/resort/data/curriculum.js'),
   temple: () => import('../features/temple/data/curriculum.js'),
   upralli: () => import('../features/upralli/data/curriculum.js'),
+  genaifast: () => import('../features/genaifast/data/curriculum.js'),
+  localinsta: () => import('../features/localinsta/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {
