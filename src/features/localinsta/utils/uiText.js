@@ -6,7 +6,7 @@ const en = {
   heroEyebrow: 'Flutter + Supabase, Coastal Karnataka-flavoured',
   heroTitlePrefix: 'Build an Instagram-style App by',
   heroDescription:
-    'Track every topic, project, and quiz across the full 10-module curriculum — from Flutter setup to a production photo & video sharing app with Postgres, Row Level Security, realtime feeds, stories, and direct messages, on 100% free-tier services with no card required.',
+    'Track every topic, project, and quiz across the full 11-module curriculum — from Flutter setup to a production photo & video sharing app with Postgres, Row Level Security, realtime feeds, stories, Reels, and direct messages, on 100% free-tier services with no card required.',
   overallProgress: 'Overall progress',
   moduleProgress: 'Module progress',
   dashboard: 'Dashboard',

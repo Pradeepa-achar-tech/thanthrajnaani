@@ -1,719 +1,836 @@
-// Module 9 — Polish, Performance & Deployment (Capstone)
+// Module 9 — Reels & Video Posts
 // LocalInsta (Flutter + Supabase) course content for the React course player.
 
 export const m9 = {
   id: 'm9',
-  title: 'Polish, Performance & Deployment',
-  hours: 9,
-  color: 'from-red-500/20 to-red-700/10',
-  accent: 'red',
+  title: 'Reels & Video Posts',
+  hours: 8,
+  color: 'from-pink-500/20 to-pink-700/10',
+  accent: 'pink',
   description:
-    'Wire a real dark-mode toggle, audit every loading/error/empty state and every query for N+1 and missing-index problems, run a final RLS security pass across the whole schema, ship a signed release APK, and close the course with an architecture walkthrough tying all nine modules together.',
+    'Extend LocalInsta with short-form vertical video — capture, compress, and upload a Reel, then build a swipeable, autoplaying full-screen video feed — while confirming that likes, comments, and notifications already work for video with zero schema changes, because they were built to reference a post, not a photo.',
   sections: [
     {
       id: 'm9-s1',
-      title: 'Dark mode & UX polish',
+      title: 'Video schema & capture',
       topics: [
         {
           id: 'm9-t1',
-          title: 'A real, persisted dark-mode toggle',
+          title: 'Extending posts for video: media_type, video_url, duration',
           explain:
-            'Module 0 built the theme data; this topic finally wires a user-facing toggle, persisted across app restarts via `shared_preferences`.',
+            'Three new columns on the existing `posts` table — `media_type`, `video_url`, `duration_seconds` — are all it takes to support Reels, because `image_url` keeps its job as the thumbnail for every post, photo or video.',
           analogy:
-            'A shop that installed dimmable lighting on day one, but never actually wired the switch to the wall — Module 0 installed the fixtures; this topic is finally wiring the switch, and remembering its last position the next time the shop opens.',
+            'A photo album that starts including the occasional postcard-with-a-QR-code does not need a second album — the same page slot holds a printed image either way, and the QR code (linking to a video) is just an extra detail printed on some pages, not on others.',
           theory:
-            'A `ThemeState extends ChangeNotifier` holds a `ThemeMode` (`system`, `light`, or `dark`), read from and written to `shared_preferences` on every change, and provided at the app root alongside every other `ChangeNotifier` from earlier modules. `MaterialApp.themeMode` reads `context.watch<ThemeState>().mode` instead of the hardcoded `ThemeMode.system` from Module 0 — a one-line change, now that everything downstream already reads colours from `Theme.of(context)` rather than hardcoded values (Module 0\'s discipline, paying off here directly).\n\nA simple three-option picker (System / Light / Dark) on a Settings screen, or a quick toggle in the Profile screen\'s app bar, is enough — LocalInsta does not need anything more elaborate than persisting one enum value.',
+            '`alter table public.posts add column media_type text not null default \'image\' check (media_type in (\'image\', \'video\'))` reuses Module 3\'s enum-via-check-constraint technique from `notifications.type`. Rather than making `image_url` nullable for video posts (which would ripple into every existing query and Dart model that assumes it is always present), LocalInsta keeps `image_url` **always non-null** and gives it a slightly broader meaning: for a photo post it is the photo; for a video post it is the **generated thumbnail frame**. A new nullable `video_url` holds the actual video file\'s URL, only ever populated when `media_type = \'video\'`, and `duration_seconds numeric` records the clip length for the feed UI.\n\nA `check` constraint — `check (media_type <> \'video\' or video_url is not null)` — enforces that a video post can never exist without its video file reference, the same "keep the database honest, not just the client" discipline from every constraint this course has written since Module 3.',
           whyItMatters:
-            'This topic is the direct, satisfying payoff of a discipline established all the way back in Module 0 — every screen already reads theme-aware colours, so adding a real toggle here is genuinely a small, low-risk change, not a scramble to retrofit hardcoded colours across dozens of files.',
+            'This is a genuinely elegant example of extending a schema **additively** — every existing query, every existing `Post.fromMap`, every existing feed/grid/detail screen from Modules 5-6 keeps working completely unchanged for photo posts, because `image_url` never stopped meaning "the image to show for this post".',
           steps: [
-            'Add `ThemeState extends ChangeNotifier` with a `ThemeMode mode` field, loaded from `shared_preferences` on construction.',
-            'Add `setMode(ThemeMode mode)` persisting the choice and calling `notifyListeners()`.',
-            'Provide it via `ChangeNotifierProvider` in `main.dart`, alongside the existing providers.',
-            'Change `MaterialApp.themeMode` to read from `context.watch<ThemeState>().mode`.',
-            'Add a three-option picker on a small Settings screen (or Profile app-bar action) calling `setMode`.',
-            'Test: switch to Dark, fully close and reopen the app, confirm it remembers Dark — not just for the current session.',
+            'Run `alter table public.posts add column media_type text not null default \'image\' check (media_type in (\'image\', \'video\'));`.',
+            'Add `video_url text` and `duration_seconds numeric check (duration_seconds is null or duration_seconds > 0)`.',
+            'Add the `posts_video_needs_url` check constraint tying `media_type = \'video\'` to a required `video_url`.',
+            'Update the Dart `Post` model (Module 5) with nullable `mediaType`, `videoUrl`, `durationSeconds` fields and matching `copyWith`/`fromMap` entries.',
+            'Confirm every existing seeded photo post still reads back correctly — `media_type` defaults to `\'image\'`, `video_url` is `null`, nothing else changes.',
           ],
-          code: `class ThemeState extends ChangeNotifier {
-  ThemeState() {
-    _load();
-  }
+          code: `alter table public.posts
+  add column media_type text not null default 'image'
+    check (media_type in ('image', 'video')),
+  add column video_url text,
+  add column duration_seconds numeric
+    check (duration_seconds is null or duration_seconds > 0);
 
-  ThemeMode mode = ThemeMode.system;
+alter table public.posts
+  add constraint posts_video_needs_url
+  check (media_type <> 'video' or video_url is not null);
 
-  Future<void> _load() async {
-    final prefs = await SharedPreferences.getInstance();
-    final saved = prefs.getString('theme_mode');
-    mode = switch (saved) {
-      'light' => ThemeMode.light,
-      'dark' => ThemeMode.dark,
-      _ => ThemeMode.system,
-    };
-    notifyListeners();
-  }
+-- Every existing seeded post is untouched and still valid:
+select id, media_type, image_url, video_url from public.posts limit 3;
+-- media_type='image', image_url='<real url>', video_url=null — exactly as before
 
-  Future<void> setMode(ThemeMode newMode) async {
-    mode = newMode;
-    notifyListeners();
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setString('theme_mode', newMode.name);
-  }
-}
+// Dart model addition (Post, from Module 5)
+class Post {
+  const Post({
+    // ...existing fields...
+    this.mediaType = 'image',
+    this.videoUrl,
+    this.durationSeconds,
+  });
+  final String mediaType;    // 'image' | 'video'
+  final String? videoUrl;
+  final double? durationSeconds;
 
-// main.dart — added to the existing MultiProvider
-ChangeNotifierProvider<ThemeState>(create: (_) => ThemeState()),
-
-// app.dart
-MaterialApp(
-  theme: lightTheme,
-  darkTheme: darkTheme,
-  themeMode: context.watch<ThemeState>().mode, // was hardcoded ThemeMode.system
-  home: const AuthGate(),
-)`,
+  bool get isVideo => mediaType == 'video';
+}`,
           pitfalls: [
-            '**Discovering hardcoded `Colors.white`/`Colors.black` calls only now, at the end of the course.** If Module 0\'s discipline was skipped anywhere, this is where it surfaces as visibly broken dark-mode screens. Fix: do a deliberate visual pass through every screen in dark mode now, fixing any stragglers found.',
-            '**Not persisting the choice, only holding it in memory for the current session.** Frustrating — the user picks Dark every single time they reopen the app. Fix: always persist via `shared_preferences`, exactly as shown.',
-            '**Forgetting to `await` the `SharedPreferences.getInstance()` load before the first build, causing a visible flash of the wrong theme on cold start.** A brief, minor flash is generally acceptable and hard to fully eliminate without a native splash screen coordinating with it (Module 1\'s splash-screen topic) — worth being aware of, not necessarily worth over-engineering away for this course.',
-            '**Adding theme-switching logic scattered across multiple places instead of one centralized `ThemeState`.** Fix: one provider, one source of truth, exactly like every other piece of app-wide state this course has built.',
+            '**Making `image_url` nullable to "make room" for video posts.** Would force a null-check onto every single existing screen that reads `post.imageUrl` — a needless, sprawling change for something a thumbnail column already solves cleanly. Fix: keep `image_url` non-null, let it mean "thumbnail" for video posts.',
+            '**Forgetting the `posts_video_needs_url` check constraint.** Without it, a buggy upload flow could insert a `media_type = \'video\'` row with no actual video to play — a broken post with no database-level guard against it. Fix: always tie the enum value to its required companion data.',
+            '**Adding a separate `reels` table instead of extending `posts`.** Would duplicate the entire likes/comments/notifications/RLS infrastructure this course already built, for content that is conceptually just "a post with a video attached". Fix: additive columns on the existing table, exactly as this topic does.',
+            '**Not defaulting `media_type` to `\'image\'`.** Every one of the hundreds of test rows seeded across Modules 3, 5, 6, 7 would need a manual backfill instead of just working via the column default. Fix: always give a new required column on an existing table a sensible default.',
           ],
           tryIt:
-            'Switch through all three modes (System, Light, Dark), confirming each renders correctly across the feed, profile, and chat screens, then fully close and reopen the app after picking Dark and confirm it remembers your choice.',
-          takeaway: 'Module 0\'s theme-aware-colours discipline is what makes this final wiring step small and safe — a real payoff for consistent early habits.',
+            'Run the migration against your real LocalInsta database, then re-run Module 5\'s feed query and confirm every existing seeded post still returns correctly with `media_type: \'image\'` and a `null` `video_url` — zero breakage from an additive schema change.',
+          takeaway: 'image_url keeps meaning "the thumbnail to show" for every post — video is an additive extension, not a schema fork.',
         },
         {
           id: 'm9-t2',
-          title: 'A full loading/error/empty state audit',
+          title: 'Recording or picking a video',
           explain:
-            'A deliberate, screen-by-screen pass confirming every single async operation in LocalInsta has a genuine loading state, a genuine error state, and (where relevant) a genuine empty state — no exceptions.',
+            '`image_picker` (already in `pubspec.yaml` since Module 4) has a `pickVideo` method alongside `pickImage` — the same permissions, the same camera-or-gallery choice, now capped by a maximum duration.',
           analogy:
-            'A restaurant\'s pre-opening walkthrough, checking that every single table has a menu, every light switch works, and every dish on the menu can actually be made with what is in the kitchen right now — not assuming everything is fine because it worked once during setup.',
+            'The same camera counter at a photo studio that sells both still-photo sittings and short video-message bookings — one counter, one booking desk, just a different service selected, with the video slot capped at a fixed number of minutes so the schedule stays predictable.',
           theory:
-            'Module 0 taught the three-state discipline (loading/error/data) for `FutureBuilder`/`StreamBuilder`; Module 6 taught deliberate, specific empty-state copy. This topic is the **enforcement pass**: a literal checklist walk through every screen built across Modules 2-8 — sign-in/up, feed, create-post, post-detail/comments, profile, edit-profile, followers/following, search, explore, story capture/viewer, notifications, conversations list, chat — confirming each one genuinely handles all three states, not just the happy path exercised during development.\n\nA good habit for finding gaps: deliberately trigger each bad case once per screen — airplane mode mid-load, a brand-new empty account, a search with no matches — rather than trusting memory of "I think I handled that."',
+            '`ImagePicker().pickVideo(source: ImageSource.camera, maxDuration: const Duration(seconds: 60))` mirrors Module 4\'s `pickImage` call almost exactly, returning an `XFile?` — `null` on cancellation, handled identically. `maxDuration` caps recording length at the source (the OS camera UI itself stops recording at the limit), which is both a UX choice (short-form video, matching the "Reels" format) and a direct, deliberate lever on the free-tier video math this module\'s final section covers — a 60-second cap keeps individual files bounded and predictable.\n\nThe same bottom-sheet pattern from Module 4 (Take Photo / Choose from Gallery) extends naturally to a third or alternate mode: Record Reel / Choose Video from Gallery — reusing the exact modal-sheet shape, just pointed at `pickVideo` instead of `pickImage`.',
           whyItMatters:
-            'This is exactly the kind of unglamorous, systematic pass that separates a demo-quality project from one that would survive real users — and it is disproportionately valuable in a portfolio review, where a reviewer poking at edge cases is far more common than one just admiring the happy path.',
+            'Recognising that `image_picker` already covers video (not just photos) means this topic is mostly configuration, not new API surface to learn — exactly the kind of "the tool you already know does more than you first used it for" realisation worth having.',
           steps: [
-            'List every screen built across Modules 2-8 in a simple checklist (a markdown table in the README works well).',
-            'For each, deliberately trigger: a loading state (throttle network or add an artificial delay temporarily), an error state (airplane mode), and an empty state (fresh test data) where applicable.',
-            'Mark each cell pass/fail; fix any genuine gaps found.',
-            'Re-run the full checklist once after fixes to confirm everything now passes.',
-            'Keep the checklist in the README as a living reference for any future feature work.',
+            'Add a "Record Reel" entry point (a new tab-bar affordance or a toggle on the existing Create Post flow) calling `pickVideo` instead of `pickImage`.',
+            'Set `maxDuration: const Duration(seconds: 60)` — LocalInsta\'s chosen Reel length cap.',
+            'Handle the `null` (cancelled) case identically to Module 4\'s photo flow.',
+            'On a real device, confirm the native camera UI itself visibly enforces the 60-second cap, stopping recording automatically.',
+            'Also wire a gallery fallback via `pickVideo(source: ImageSource.gallery)` for an already-recorded clip — and check its duration client-side, since a gallery pick has no OS-enforced cap.',
           ],
-          code: `<!-- README.md — LocalInsta state-coverage checklist -->
-| Screen              | Loading | Error | Empty |
-|----------------------|---------|-------|-------|
-| Sign in / Sign up    | ✅       | ✅     | n/a   |
-| Feed                 | ✅       | ✅     | ✅     |
-| Create post           | ✅       | ✅     | n/a   |
-| Post detail / comments| ✅       | ✅     | ✅     |
-| Profile (own/other)   | ✅       | ✅     | ✅     |
-| Edit profile           | ✅       | ✅     | n/a   |
-| Followers / Following | ✅       | ✅     | ✅     |
-| Search                | ✅       | ✅     | ✅     |
-| Explore               | ✅       | ✅     | ✅     |
-| Story capture/viewer  | ✅       | ✅     | n/a   |
-| Notifications          | ✅       | ✅     | ✅     |
-| Conversations list    | ✅       | ✅     | ✅     |
-| Chat screen            | ✅       | ✅     | ✅     |`,
+          code: `Future<XFile?> pickReelVideo(BuildContext context) async {
+  final source = await showModalBottomSheet<ImageSource>(
+    context: context,
+    builder: (ctx) => SafeArea(
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          ListTile(
+            leading: const Icon(Icons.videocam),
+            title: const Text('Record Reel'),
+            onTap: () => Navigator.pop(ctx, ImageSource.camera),
+          ),
+          ListTile(
+            leading: const Icon(Icons.video_library),
+            title: const Text('Choose Video from Gallery'),
+            onTap: () => Navigator.pop(ctx, ImageSource.gallery),
+          ),
+        ],
+      ),
+    ),
+  );
+  if (source == null) return null;
+
+  final picked = await ImagePicker().pickVideo(
+    source: source,
+    maxDuration: const Duration(seconds: 60),
+  );
+  return picked; // null if the user cancelled — same as every other picker flow
+}`,
           pitfalls: [
-            '**Trusting "it worked when I built it" instead of deliberately re-testing each bad case now.** Development testing naturally over-indexes on the happy path; a dedicated audit pass is what catches the rest. Fix: literally trigger each bad case, do not rely on memory.',
-            '**Skipping screens that "seem simple" (like Edit Profile).** Simple screens still make network calls, still can fail. Fix: apply the checklist uniformly, no screen is too small to skip.',
-            '**Fixing a gap on one screen and not checking whether the identical pattern is duplicated (and equally broken) elsewhere.** Fix: when a genuine gap is found, search for the same missing pattern across other screens built with similar code.',
-            '**Treating this as a one-time task instead of updating the checklist as new features are added later.** Fix: keep it in the README specifically so it stays a living reference, not a one-off exercise.',
+            '**Only setting `maxDuration` for the camera source.** A gallery pick has no such enforcement — a user could select a 10-minute video from their library. Fix: always separately check `VideoPlayerController` duration (next topic) after a gallery pick and reject or trim anything over the cap.',
+            '**Reusing `pickImage`\'s `imageQuality` parameter, which does not apply to video at all.** Fix: `pickVideo` has its own, separate parameter surface — read the actual method signature rather than assuming symmetry with `pickImage`.',
+            '**Choosing an unrealistically long `maxDuration` "to be flexible".** A longer cap directly multiplies file size, storage cost, and compression time — 30-90 seconds is the genre-appropriate range for short-form video; do not casually pick 5 minutes.',
+            '**Not testing on a real device.** Emulator camera video capture can behave inconsistently across different emulator images — always confirm the recording flow on real hardware before considering it done.',
           ],
           tryIt:
-            'Actually build and walk this checklist against your real app right now, fixing anything genuinely missing — this is real, valuable work, not busywork, and the finished checklist belongs in your README.',
-          takeaway: 'A deliberate, systematic audit — not memory of what you think you handled — is what actually confirms every screen\'s three states are real.',
+            'Record a real 60-second test clip on a physical device and confirm the camera UI stops you automatically at the cap, then pick a longer pre-existing video from your gallery and confirm your app can detect (even if it does not yet reject) that it exceeds the cap.',
+          takeaway: 'image_picker already does video — pickVideo plus a duration cap is nearly the entire capture story.',
         },
         {
           id: 'm9-t3',
-          title: 'Accessibility basics',
+          title: 'Generating a thumbnail & compressing the video',
           explain:
-            'Semantic labels for icon-only buttons, sufficient colour contrast, and tap targets no smaller than 48x48 logical pixels — a focused, achievable accessibility pass, not an exhaustive audit.',
+            '`video_compress` (free, MIT-licensed, no card) both re-encodes a video to a smaller file size and extracts a thumbnail frame — the two things this module\'s new `image_url`/`video_url` split needs.',
           analogy:
-            'Adding a small ramp beside a shop\'s front steps costs little at construction time and makes the shop usable by far more of the community — accessibility work is exactly that kind of proportionate, worthwhile investment, not an all-or-nothing overhaul.',
+            'A print shop that, from one submitted video file, produces both a compressed, easier-to-mail copy AND a single still frame to paste on the front of the envelope — one shop visit, two useful outputs from the same source.',
           theory:
-            'Every icon-only button (the "..." menu, the heart/comment icons, the send button) needs a `Semantics(label: \'...\')` wrapper or a `tooltip` so a screen-reader user knows what it does — `IconButton` already accepts a `tooltip` parameter directly, the easiest win in this whole topic. Flutter\'s `Theme.of(context).colorScheme` (Module 0) generally provides reasonable built-in contrast, but any custom-coloured text (LocalInsta\'s brand orange on white, for instance) should be checked against a 4.5:1 contrast ratio for body text. Tap targets — buttons, icons, list items — should be **at least 48x48 logical pixels**, even if their visible icon is smaller; wrap small icons in enough padding to reach this minimum.',
+            '`VideoCompress.compressVideo(path, quality: VideoQuality.MediumQuality, deleteOrigin: false)` re-encodes a video file, typically shrinking it substantially (the exact ratio varies by source, but often 50-70% smaller) — the direct video equivalent of Module 4\'s `flutter_image_compress` for photos, same underlying motivation (protect the free tier\'s storage and bandwidth). `VideoCompress.getFileThumbnail(path, quality: 50)` extracts a single JPEG frame (by default, partway into the clip) — exactly the file this module\'s schema extension stores as `image_url` for a video post.\n\nBoth operations run on-device, natively, genuinely free with no external service or card involved — consistent with every other tool this course has chosen specifically for the "free tier, no card, ever" constraint.',
           whyItMatters:
-            'This is a focused, achievable slice of a much larger topic — covering the highest-impact, lowest-effort wins rather than attempting exhaustive WCAG compliance, which is more than this course\'s scope calls for but still genuinely worth doing.',
+            'This one package call produces both artefacts (a smaller video, a representative thumbnail) this module\'s schema needs — recognising that a single well-chosen tool can serve two related needs at once is a small but real efficiency worth noticing.',
           steps: [
-            'Add `tooltip:` to every icon-only `IconButton` across the app (like, comment, more-options, send, back).',
-            'Check LocalInsta\'s brand orange against white and against your dark theme\'s background using any online contrast checker, adjusting the shade slightly if it falls short of 4.5:1 for text use.',
-            'Audit tap targets smaller than 48x48 logical pixels (a common culprit: a small heart icon with no surrounding padding) and add `Padding`/`SizedBox` to reach the minimum.',
-            'Enable a screen reader (TalkBack on Android) briefly and navigate the feed and profile screens, noting anywhere the experience is confusing or unlabeled.',
+            'Add `video_compress: ^3.1.3` to `pubspec.yaml`.',
+            'After picking a video (previous topic), call `VideoCompress.compressVideo(path, quality: VideoQuality.MediumQuality)`, awaiting the returned `MediaInfo`.',
+            'Call `VideoCompress.getFileThumbnail(path, quality: 50)` to extract the thumbnail JPEG.',
+            'Log before/after file sizes (mirroring Module 4\'s compression-logging habit) to see the real reduction on a test clip.',
+            'Confirm visually that the compressed video still looks acceptable at normal phone-screen viewing size — mirroring Module 4\'s "test visually, do not just chase the smallest file" lesson.',
           ],
-          code: `// Before: no label for a screen reader
-IconButton(icon: const Icon(Icons.favorite_border), onPressed: toggleLike)
+          code: `Future<({File video, File thumbnail, double? durationSeconds})> compressReel(String sourcePath) async {
+  final originalSize = await File(sourcePath).length();
 
-// After: a genuine, specific label
-IconButton(
-  icon: const Icon(Icons.favorite_border),
-  tooltip: 'Like this post',
-  onPressed: toggleLike,
-)
+  final info = await VideoCompress.compressVideo(
+    sourcePath,
+    quality: VideoQuality.MediumQuality,
+    deleteOrigin: false,
+  );
 
-// Ensuring a minimum 48x48 tap target around a small icon
-SizedBox(
-  width: 48,
-  height: 48,
-  child: IconButton(
-    icon: const Icon(Icons.more_vert, size: 20),
-    tooltip: 'More options',
-    onPressed: showOptionsMenu,
-  ),
-)`,
+  final thumbnail = await VideoCompress.getFileThumbnail(sourcePath, quality: 50);
+
+  if (info?.file == null) {
+    throw Exception('Video compression failed — try a shorter clip.');
+  }
+
+  debugPrint(
+    'Reel compressed \${(originalSize / 1024 / 1024).toStringAsFixed(1)}MB '
+    '-> \${((info!.filesize ?? 0) / 1024 / 1024).toStringAsFixed(1)}MB',
+  );
+
+  return (video: info.file!, thumbnail: thumbnail, durationSeconds: info.duration != null ? info.duration! / 1000 : null);
+}`,
           pitfalls: [
-            '**Treating accessibility as optional polish rather than a real, if scoped, requirement.** A meaningful fraction of real users benefit from these fixes, and they are genuinely cheap here given how much time they cost to retrofit later. Fix: do this focused pass now, as part of finishing the course, not as an afterthought.',
-            '**Adding a generic tooltip like "Button" instead of a specific, meaningful one.** Fix: describe the actual action — "Like this post", not "Icon button".',
-            '**Only checking contrast for the light theme, forgetting the dark theme entirely.** Fix: check both, since Module 9\'s dark-mode work (this section\'s first topic) means both are genuinely live, user-facing themes now.',
-            '**Attempting a full WCAG AA/AAA audit and getting overwhelmed, abandoning the effort entirely.** Fix: the three specific, bounded checks in this topic (labels, contrast, tap targets) are a genuinely worthwhile, achievable scope — perfect is the enemy of good here.',
+            '**Skipping compression entirely "since video_compress adds a dependency".** A single uncompressed 60-second phone video can easily be 50-100MB — directly threatening the free tier\'s 1GB storage ceiling after only a handful of Reels. Fix: compression is not optional for video the way it barely was for photos in Module 4 — it is essential here.',
+            '**Setting `quality: VideoQuality.HighestQuality` by default.** Defeats the entire purpose of compressing at all. Fix: `MediumQuality` is a sensible default for short-form, phone-screen-viewed content; reserve higher quality only if a real product need demands it.',
+            '**Forgetting `deleteOrigin: false` and accidentally losing the original file before confirming the compression succeeded.** Fix: keep the original until the compressed output is verified, exactly as shown.',
+            '**Not handling a `null`/failed compression result.** A corrupt or unusually-encoded source video can occasionally fail to compress. Fix: always check for `null` and surface a clear error rather than silently proceeding with a missing file.',
           ],
           tryIt:
-            'Enable TalkBack (Settings → Accessibility on a real Android device) and navigate the feed and a post\'s like/comment buttons using only the screen reader — note anywhere the experience is confusing, and fix at least the icon-button labelling gaps you find.',
-          takeaway: 'Icon labels, contrast checks, and 48x48 tap targets are a focused, genuinely achievable accessibility pass — not an all-or-nothing commitment.',
+            'Run a real 30-60 second test clip through this full pipeline and confirm you get back both a meaningfully smaller video file and a real JPEG thumbnail, with a printed before/after size comparison in your debug console.',
+          takeaway: 'One package call produces both the compressed video and its thumbnail — the same free-tier-protection instinct from Module 4, now applied to a format that needs it even more.',
         },
         {
           id: 'm9-t4',
-          title: 'Sign-out and data-cleanup review',
+          title: 'Uploading video: bigger files, and the real bandwidth math',
           explain:
-            'A final check that Module 2\'s "safe sign out" principle was actually followed everywhere new features (stories, notifications, chat) were added since.',
+            'The upload call itself is identical to Module 4\'s photo pipeline — `uploadBinary` into the existing `posts` bucket — but video\'s much larger file size means the free-tier bandwidth conversation from Module 4 needs a second, more urgent look.',
           analogy:
-            'A final walkthrough of every room in a guesthouse before a new guest checks in, confirming the previous guest\'s belongings are genuinely gone from every drawer — not just the ones checked the first time the process was designed.',
+            'The same courier service that delivers postcards also delivers parcels — same counter, same process, but a parcel eats far more of a monthly shipping budget than a postcard does, and a business that only ever budgeted for postcards needs to redo the math the day parcels start shipping too.',
           theory:
-            'Module 2 established the principle: sign-out should reset every feature-level `ChangeNotifier` holding user-specific cached state, not just clear the auth session. Since then, this course has added `FeedState`, `StoriesState`, `NotificationsState`, `ConversationsListState`, `ChatState` — this topic is the deliberate check that **every one** of them has a working `resetAll()`-style method, called from the same central sign-out flow.\n\nThis matters more now than it did in Module 2: a shared or handed-down device signing out of one LocalInsta account and into another should never flash a previous user\'s cached feed, notifications, or (especially) private chat messages, even briefly.',
+            '`StorageRepository.uploadImageBytes` (Module 4) works unchanged for video bytes — Supabase Storage does not care about file type, only bytes and a path, and the same folder-owned RLS policies from Module 4\'s `posts` bucket apply identically (a video file at `<user_id>/<uuid>.mp4` is governed by the exact same `(storage.foldername(name))[1] = auth.uid()::text` check as any photo). No new bucket, no new Storage policy, is needed — a second confirmation (after this module\'s schema topic) that the foundation built in Modules 3-4 was designed generally enough to extend cleanly.\n\nThe number that changes is the **math**: where Module 4 estimated ~300KB per compressed photo (2,500-5,000 posts per GB), a compressed 30-60 second Reel at medium quality typically lands in the 3-8MB range — roughly **15-25x larger per post**. The free tier\'s 1GB storage now holds more like 125-330 Reels instead of thousands of photos, and the 5GB/month bandwidth ceiling (every feed view of a Reel counts against it) becomes the binding constraint far sooner than it did for a photo-only app.',
           whyItMatters:
-            'Private chat message data lingering after sign-out would be a genuine, serious privacy bug — this final review exists specifically to catch that class of gap before considering the app finished.',
+            'This is the single most consequential free-tier number in the entire course to get right — shipping Reels without redoing this math is exactly how a course project could unexpectedly hit its free-tier ceiling mid-demo.',
           steps: [
-            'List every `ChangeNotifier` added since Module 2 (Feed, Stories, Notifications, ConversationsList, Chat, Theme — note Theme deliberately should NOT reset on sign-out, since it is a device preference, not user data).',
-            'Confirm each user-data-holding one has a reset method, called from the central sign-out flow.',
-            'Manually test: sign in as user A, browse the feed, open a chat, sign out, sign in as user B, and confirm zero traces of A\'s data appear anywhere, even briefly.',
-            'Specifically test the chat case, given its heightened privacy sensitivity.',
+            'Confirm `StorageRepository.uploadImageBytes(bucket: \'posts\', path: ..., bytes: ...)` (Module 4) works unchanged for a compressed video\'s bytes — same method, same bucket, same RLS.',
+            'Build the upload path with the same `buildUploadPath` helper (Module 4), just a `.mp4` extension instead of `.jpg`.',
+            'Upload both the compressed video AND its thumbnail (two separate Storage objects, two URLs) for a single Reel post.',
+            'Recalculate the free-tier math explicitly: at ~5MB/Reel average, estimate how many Reels the 1GB storage ceiling and 5GB/month bandwidth ceiling each support.',
+            'Write the updated number in your README, right next to Module 4\'s original photo-only estimate, so the trade-off is explicit and visible.',
           ],
-          code: `// The central sign-out flow, extended since Module 2 to cover every
-// feature added along the way.
-Future<void> _confirmSignOut(BuildContext context) async {
-  final confirmed = await showDialog<bool>(/* Module 2's confirmation dialog */);
-  if (confirmed != true || !context.mounted) return;
+          code: `Future<({String videoUrl, String thumbnailUrl})> uploadReel({
+  required File video,
+  required File thumbnail,
+  required String userId,
+}) async {
+  final storageRepo = StorageRepository();
 
-  // Reset every user-data-holding provider — NOT ThemeState, which is a
-  // device preference, not user data, and should persist across accounts.
-  context.read<FeedState>().resetAll();
-  context.read<StoriesState>().resetAll();
-  context.read<NotificationsState>().resetAll();
-  context.read<ConversationsListState>().resetAll();
-  // ChatState is typically screen-scoped and disposed on navigation away
-  // rather than app-wide — confirm this is genuinely true in your build,
-  // not assumed.
+  final videoPath = buildUploadPath(userId: userId, extension: 'mp4');
+  final videoUrl = await storageRepo.uploadImageBytes(
+    bucket: 'posts', // the SAME bucket from Module 4 — no new bucket needed
+    path: videoPath,
+    bytes: await video.readAsBytes(),
+  );
 
-  await context.read<AuthRepository>().signOut();
-}`,
+  final thumbPath = buildUploadPath(userId: userId, extension: 'jpg');
+  final thumbnailUrl = await storageRepo.uploadImageBytes(
+    bucket: 'posts',
+    path: thumbPath,
+    bytes: await thumbnail.readAsBytes(),
+  );
+
+  return (videoUrl: videoUrl, thumbnailUrl: thumbnailUrl);
+}
+
+// Updated free-tier math (README note)
+// Photos (Module 4):  ~300KB/post  -> ~2,500-5,000 posts per 1GB
+// Reels (this module): ~3-8MB/reel -> ~125-330 reels per 1GB
+// Bandwidth (5GB/mo) is now the binding constraint far sooner — each
+// Reel VIEW in the feed re-downloads (or re-streams) roughly its full
+// compressed size unless cached, unlike a tiny already-cached thumbnail.`,
           pitfalls: [
-            '**Adding a new feature\'s state provider without also adding it to this sign-out checklist.** The exact gap this review pass exists to close — easy to forget in the moment a new feature ships, only caught by a deliberate later audit. Fix: this topic, done now, catches everything accumulated since Module 2.',
-            '**Resetting `ThemeState` on sign-out by mistake.** Dark mode is a device/user-interface preference, not sensitive user data — resetting it needlessly annoys a user who has to re-pick their preferred theme after every sign-out. Fix: distinguish "user content that must not leak" from "device preference that should persist".',
-            '**Assuming a screen-scoped state (like `ChatState`, typically created fresh per chat screen and disposed on navigation away) needs the same app-wide reset treatment as a persistent provider like `FeedState`.** Fix: reason about each provider\'s actual lifecycle rather than applying one blanket rule everywhere.',
-            '**Not testing the actual account-switch scenario end to end, only checking that each reset method exists in isolation.** Fix: the real, manual two-account test in this topic\'s steps is what actually proves the fix works.',
+            '**Assuming Module 4\'s photo-only free-tier estimate still applies once Reels ship.** A course README that never revisits this number after adding video is quietly misleading. Fix: always recalculate and re-document when a feature meaningfully changes resource usage, exactly as this topic does.',
+            '**Creating a separate Storage bucket for video "since it feels like a different kind of content".** Unnecessary — the existing `posts` bucket\'s RLS policies are file-type-agnostic, and a second bucket would only duplicate policy maintenance for no benefit. Fix: reuse the existing bucket.',
+            '**Uploading the thumbnail and video sequentially when they could run concurrently.** A small, genuine performance opportunity — `Future.wait([uploadVideo(), uploadThumbnail()])` would upload both in parallel rather than one after the other. Fix: consider this a worthwhile, low-risk optimisation once the sequential version works correctly.',
+            '**Not considering that repeated feed views of the same Reel re-consume bandwidth unless genuinely cached.** Module 4\'s `CachedNetworkImage` caches images to disk; video playback (this module\'s next section) needs its own caching consideration for the same reason. Fix: keep this in mind heading into the feed-playback topics.',
           ],
           tryIt:
-            'Sign in as test account A, browse the feed and open a chat conversation, sign out, sign in as test account B, and confirm — deliberately watching for even a brief flash — that none of account A\'s data appears anywhere during or after the transition.',
-          takeaway: 'Every feature added since Module 2 needs its own place in the sign-out reset checklist — a deliberate audit now catches gaps that accumulate silently as a course (or a real app) grows.',
+            'Upload a real compressed test Reel and its thumbnail, confirm both appear in the Supabase Storage dashboard under your user folder in the existing `posts` bucket, and write the updated free-tier Reel-capacity estimate into your README.',
+          takeaway: 'The upload call is unchanged from Module 4 — the real work this topic asks of you is redoing the free-tier math honestly now that files are 15-25x larger.',
         },
       ],
     },
     {
       id: 'm9-s2',
-      title: 'Performance & free-tier stewardship',
+      title: 'The vertical Reels feed',
       topics: [
         {
           id: 'm9-t5',
-          title: 'A final N+1 and indexing audit',
+          title: 'video_player fundamentals',
           explain:
-            'A deliberate re-read of every repository method built across Modules 5-8, checking each for the N+1 query mistake Module 5 first warned against, and confirming every genuinely hot query has a matching index.',
+            '`VideoPlayerController.networkUrl(...)` gives you play, pause, loop, and mute control over a remote video — the low-level building block every Reels screen sits on top of.',
           analogy:
-            'A final proofread of a long letter after writing it end to end — individual paragraphs made sense in isolation while writing, but a full re-read catches the inconsistencies and repeated mistakes that only become visible in hindsight, across the whole.',
+            'A cassette player\'s basic controls — play, pause, and a loop switch — are the same handful of buttons whether the tape is a 3-minute song or a 30-second jingle. `VideoPlayerController` is that same small, universal control surface for any video, regardless of what screen it is embedded in.',
           theory:
-            'Module 5 taught the embedded-select technique specifically to avoid N+1 queries; this topic is the discipline of re-checking every repository method written since **for that same mistake resurfacing under time pressure** — a genuinely common thing to slip on later in a project even after learning the lesson early. Grep your own codebase for any loop containing an `await supabase.from(...)` call — that pattern is almost always an N+1 mistake waiting to be converted into a single embedded-select or batch query.\n\nFor indexing, `explain analyze` (Module 3) run against each of LocalInsta\'s real, hot queries — the feed, a profile\'s post grid, a conversation\'s messages, a notification list — confirms each one is genuinely using an index (`Index Scan`) rather than falling back to a full table scan (`Seq Scan`) as your seeded test data has grown across the course.',
+            '`VideoPlayerController.networkUrl(Uri.parse(videoUrl))` creates a controller; `await controller.initialize()` prepares it (buffering, reading metadata) before it can render anything — always await this before building the `VideoPlayer` widget. `controller.play()` / `.pause()`, `controller.setLooping(true)` (Reels conventionally loop, unlike a one-shot post-detail video), and `controller.setVolume(0)`/`setVolume(1)` for mute control round out the API this module needs.\n\nUnlike Module 7\'s `AnimationController` (a Flutter-side timer), `VideoPlayerController` wraps genuine platform media playback — it must be **disposed** explicitly (`controller.dispose()`) or it leaks native decoder resources, not just Dart memory — a real distinction worth being precise about heading into the next topic\'s lifecycle-management focus.',
           whyItMatters:
-            'This topic is explicitly about the gap between "I learned this lesson in Module 5" and "I actually applied it consistently for the rest of the course under the pressure of building new features" — a very real, very common gap worth deliberately checking for.',
+            'Every later topic in this section — autoplay, preloading, mute — is built entirely from these five or six method calls. Getting comfortable with the raw controller now makes the more involved lifecycle topic next feel like composition, not new complexity.',
           steps: [
-            'Search your codebase for any `for`/`.map()` loop containing an `await supabase.from(...)` call — each hit is a candidate N+1 bug.',
-            'For each candidate, determine whether an embedded select (Module 5) or a single batched query would replace the loop.',
-            'Run `explain analyze` against the feed query, the profile grid query, the chat message-history query, and the notifications query.',
-            'Confirm each shows `Index Scan`, not `Seq Scan`, on your current (course-scale) seeded data.',
-            'Fix any genuine gaps found in either category.',
+            'Add `video_player: ^2.9.2` to `pubspec.yaml`.',
+            'Build a minimal `ReelPlayer(videoUrl: String)` StatefulWidget creating and initializing a `VideoPlayerController.networkUrl`.',
+            'Call `setLooping(true)` once initialized.',
+            'Render the initialized controller via `AspectRatio(aspectRatio: controller.value.aspectRatio, child: VideoPlayer(controller))`.',
+            'Add a simple tap-to-toggle play/pause, and confirm `dispose()` is called correctly when the widget is removed.',
           ],
-          code: `-- Example: confirming the feed query is index-backed after a course's
--- worth of seeded data
-explain analyze
-select * from public.posts
-order by created_at desc
-limit 20;
--- Look for: Index Scan using idx_posts_created_at ...
--- A red flag: Seq Scan on posts (cost=0.00..N.NN rows=...) ...
+          code: `class ReelPlayer extends StatefulWidget {
+  const ReelPlayer({super.key, required this.videoUrl});
+  final String videoUrl;
+  @override
+  State<ReelPlayer> createState() => _ReelPlayerState();
+}
 
--- Example: confirming chat history pagination is index-backed
-explain analyze
-select * from public.messages
-where conversation_id = '<a real conversation id>'
-order by created_at desc
-limit 50;
--- Look for: Index Scan using idx_messages_conversation ...`,
+class _ReelPlayerState extends State<ReelPlayer> {
+  late final VideoPlayerController _controller;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+      ..setLooping(true)
+      ..initialize().then((_) {
+        if (mounted) setState(() => _ready = true);
+      });
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose(); // releases native decoder resources — not optional
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) return const Center(child: CircularProgressIndicator());
+    return GestureDetector(
+      onTap: () => setState(() {
+        _controller.value.isPlaying ? _controller.pause() : _controller.play();
+      }),
+      child: AspectRatio(
+        aspectRatio: _controller.value.aspectRatio,
+        child: VideoPlayer(_controller),
+      ),
+    );
+  }
+}`,
           pitfalls: [
-            '**Assuming Module 5\'s lesson was internalized once and would automatically apply to every later module without re-checking.** A genuinely common failure mode — knowing a principle and consistently applying it under the pressure of building new features across five more modules are different things. Fix: this deliberate re-audit is exactly what catches the gap.',
-            '**Testing `explain analyze` only against nearly-empty tables.** At very small row counts, Postgres may reasonably choose a sequential scan even *with* an index present, since it is genuinely faster for a handful of rows — not itself a bug. Fix: seed enough test data (a few hundred rows per hot table) for the `explain analyze` results to be meaningful.',
-            '**Fixing a found N+1 or missing-index issue without re-testing the specific screen afterward.** Fix: always confirm the fix actually resolves the issue by re-running `explain analyze` or re-checking network call counts.',
-            '**Treating this as a one-time pass rather than a habit to carry into any future feature work.** Fix: the grep-for-loop-queries technique and the `explain analyze` habit are both cheap enough to repeat any time a new query is added going forward.',
+            '**Building `VideoPlayer(controller)` before `initialize()` completes.** Throws or renders nothing useful — always gate rendering on a `_ready`-style flag, exactly as `FutureBuilder`\'s `ConnectionState.waiting` gated rendering back in Module 0. Fix: never render before initialization resolves.',
+            '**Forgetting `dispose()`.** Unlike most Flutter objects, a `VideoPlayerController` holds a genuine native platform resource (a media decoder) — forgetting to dispose it is a much more expensive leak than a typical Dart memory leak, and repeated across a scrolling feed of Reels, this compounds fast.',
+            '**Not calling `setLooping(true)` for the Reels context specifically.** A Reel that plays once and freezes on its last frame breaks the expected "endless loop" feel of the format. Fix: loop for the feed context; a one-shot post-detail view (if built) might reasonably not loop.',
+            '**Using `VideoPlayerController.asset` or `.file` out of habit instead of `.networkUrl`.** LocalInsta\'s videos live in Supabase Storage as remote URLs, exactly like every image this course has ever displayed — always the network variant.',
           ],
           tryIt:
-            'Actually run the grep search and the four `explain analyze` queries above against your real, course-scale seeded data, and fix anything genuinely found — this is real verification work, not a rhetorical exercise.',
-          takeaway: 'Learning a lesson once (Module 5) and consistently applying it under later time pressure are different skills — a deliberate final audit is what closes that gap.',
+            'Build this minimal player against one of your real uploaded test Reels, confirm it initializes, plays, loops correctly, and that tapping toggles play/pause — this is the exact building block the rest of this section assembles into a full feed.',
+          takeaway: 'VideoPlayerController wraps real native media playback — five or six method calls, and one non-negotiable dispose() call.',
         },
         {
           id: 'm9-t6',
-          title: 'Checking real free-tier usage after a full build',
+          title: 'A vertical, swipeable feed with PageView',
           explain:
-            'A concrete look at Supabase\'s dashboard usage meters — database size, Storage, bandwidth, Edge Function invocations — now that LocalInsta has a full course\'s worth of features and seeded test data.',
+            '`PageView.builder(scrollDirection: Axis.vertical, ...)` renders one full-screen Reel per page, swiped vertically — the defining interaction of the format.',
           analogy:
-            'Checking the electricity meter after a full month of actually living in a house, rather than only estimating usage on moving-in day — the real number, after real use, is what tells you whether your assumptions held up.',
+            'A flip-book of postcards held sideways, where flipping to the next card reveals a whole new scene filling your entire view, rather than a shelf of small thumbnails you scan across — the vertical `PageView` is exactly that: one full-bleed experience at a time.',
           theory:
-            'Module 4 discussed free-tier ceilings in the abstract, before LocalInsta had many real features; this topic is the concrete follow-up, checking **actual** usage after building the entire app: **Project Settings → Usage** shows Database size (Modules 3, 6, 7, 8\'s schema and seeded rows), Storage size and bandwidth (Module 4\'s images, Module 7\'s stories), Edge Function invocations (Module 7\'s optional push extension, if built), and Realtime concurrent connections (every Modules 5, 7, 8 subscription).\n\nFor a course project with realistic test data (a few dozen posts, a handful of test accounts, some chat history), usage should sit comfortably within free-tier limits — if any meter is surprisingly high, this is the moment to investigate why (an uncompressed image slipping through Module 4\'s pipeline is a common culprit) rather than after the app is already \'finished\'.',
+            '`PageView.builder(scrollDirection: Axis.vertical, itemCount: reels.length, itemBuilder: (context, i) => ReelPlayer(videoUrl: reels[i].videoUrl))` is a close cousin of Module 0\'s `ListView.builder`, differing in two ways: `scrollDirection: Axis.vertical` (a `ListView` scrolls vertically by default; a `PageView` needs it stated explicitly since its default is horizontal), and its **paging** behaviour — a `PageView` snaps to show exactly one full item at a time, rather than a continuous scroll of many partially-visible items, which is precisely the "one Reel fills the whole screen" feel this format requires.\n\nA `PageController` attached to the `PageView` exposes the current page index via a listener, which the very next topic uses to decide which Reel should actually be playing.',
           whyItMatters:
-            'This is the honest, concrete conclusion to the "free tier, no card, ever" promise threaded through the entire course — actually checking real numbers, not just trusting the promise abstractly, is what a genuinely careful engineer does before calling a project done.',
+            'This is the one genuinely new Flutter widget this course introduces — `PageView` is the correct, purpose-built tool for "one full-screen item at a time, swiped between" and recognising it (rather than reaching for a `ListView` with manual snap logic) saves real implementation effort.',
           steps: [
-            'Open **Project Settings → Usage** (or the main dashboard\'s usage summary).',
-            'Record Database size, Storage size, Storage bandwidth, Edge Function invocations, and Realtime concurrent peak connections.',
-            'Compare each against its free-tier ceiling from Modules 1 and 4.',
-            'If anything is surprisingly high, investigate — check for an uncompressed image, an accidentally-unbounded query, or leftover test data from early debugging.',
-            'Write the final numbers in your README as a concrete "here is what this course actually costs on the free tier" data point.',
+            'Fetch a `List<Post>` filtered to `media_type = \'video\'` for the Reels feed (a straightforward `.eq(\'media_type\', \'video\')` filter on Module 5\'s existing feed query).',
+            'Build `ReelsFeedScreen` wrapping a `PageView.builder(scrollDirection: Axis.vertical, ...)` over this list.',
+            'Render each page as a full-screen `ReelPlayer` (previous topic) plus an overlay for caption/username/like-comment icons (mirroring `PostCard`\'s content, repositioned for a full-screen dark background).',
+            'Attach a `PageController`, logging the current page index on change for now — the next topic wires real behaviour to it.',
+            'Test swiping through several seeded test Reels, confirming each snaps cleanly to fill the screen.',
           ],
-          code: `-- A rough self-check via SQL, alongside the dashboard's own usage page
-select pg_size_pretty(pg_database_size(current_database())) as db_size;
+          code: `Future<List<Post>> fetchReelsFeed() async {
+  final rows = await supabase
+      .from('posts')
+      .select('*, profiles(username, avatar_url)')
+      .eq('media_type', 'video')
+      .order('created_at', ascending: false);
+  return (rows as List).map((r) => Post.fromMap(r)).toList();
+}
 
-select bucket_id, count(*) as files, pg_size_pretty(sum((metadata->>'size')::bigint)) as total_size
-from storage.objects
-group by bucket_id;`,
+class ReelsFeedScreen extends StatefulWidget {
+  const ReelsFeedScreen({super.key, required this.reels});
+  final List<Post> reels;
+  @override
+  State<ReelsFeedScreen> createState() => _ReelsFeedScreenState();
+}
+
+class _ReelsFeedScreenState extends State<ReelsFeedScreen> {
+  final _pageController = PageController();
+
+  @override
+  void dispose() {
+    _pageController.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      body: PageView.builder(
+        controller: _pageController,
+        scrollDirection: Axis.vertical,
+        itemCount: widget.reels.length,
+        onPageChanged: (i) => debugPrint('Now viewing reel \$i'), // wired for real next topic
+        itemBuilder: (context, i) => Stack(
+          fit: StackFit.expand,
+          children: [
+            ReelPlayer(videoUrl: widget.reels[i].videoUrl!),
+            Positioned(
+              left: 12, right: 60, bottom: 24,
+              child: Text(
+                '@\${widget.reels[i].author.username}  \${widget.reels[i].caption ?? ''}',
+                style: const TextStyle(color: Colors.white),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+}`,
           pitfalls: [
-            '**Never actually checking, trusting the free-tier promise purely in the abstract.** The whole point of this topic is verifying, not assuming. Fix: check the real dashboard numbers now.',
-            '**Panicking over a number that is technically within limits but "feels high".** Compare against the actual documented ceiling, not a vague gut feeling. Fix: know the real numbers from Modules 1/4 and compare precisely.',
-            '**Not investigating a genuinely surprising number, just accepting it.** A single uncompressed multi-megabyte image slipping past Module 4\'s compression step (perhaps from an early testing session before compression was wired up) is a realistic, findable cause worth tracking down. Fix: treat a surprising number as a signal worth a few minutes of investigation.',
-            '**Forgetting Realtime concurrent connections has its own free-tier ceiling, separate from database/storage/bandwidth.** Worth checking specifically given how many Realtime subscriptions this course built (likes, comments, notifications, messages, presence).',
+            '**Forgetting `scrollDirection: Axis.vertical`.** `PageView`\'s default is horizontal — omitting this produces a left-right swiping feed, the wrong interaction entirely for Reels. Fix: always set it explicitly.',
+            '**Using `ListView` with manual scroll-snapping logic instead of `PageView`.** More code, more edge cases, solving a problem `PageView` already solves natively. Fix: reach for the purpose-built widget.',
+            '**Building every `ReelPlayer` in the list eagerly (not via `.builder`).** The exact same performance mistake Module 0 warned against, now with a far more expensive resource (video decoders, not just widgets) at stake per item. Fix: `PageView.builder`, never a plain `PageView(children: ...)`, for anything beyond a handful of items.',
+            '**Not disposing the `PageController`.** Fix: same discipline as every other controller in this course — dispose it in the State\'s `dispose()`.',
           ],
           tryIt:
-            'Check your actual dashboard usage right now and write the real numbers into your README — this concrete data point is worth having for your own portfolio narrative ("built a full social app, used X% of the free tier").',
-          takeaway: 'Verify the free-tier promise with real dashboard numbers after a full build, rather than trusting it only in the abstract.',
+            'Seed at least five test video posts, open `ReelsFeedScreen`, and confirm vertical swiping snaps cleanly between full-screen Reels — do not worry yet that every video plays simultaneously in the background; the next topic fixes exactly that.',
+          takeaway: 'PageView with a vertical scroll direction is the purpose-built widget for "one full-screen item at a time, swiped between" — the defining Reels interaction in one widget.',
         },
         {
           id: 'm9-t7',
-          title: 'Living with the weekly-pause gotcha',
+          title: 'Autoplay-when-visible: the single biggest pitfall',
           explain:
-            'A practical playbook for the one genuine inconvenience of Supabase\'s free tier — a project pausing after 7 days of no API activity — for a portfolio project that might sit untouched between demos or interviews.',
+            'Without deliberate lifecycle management, `PageView.builder` would happily construct (and start playing) every Reel\'s video controller at once — the single most damaging mistake this module can make, and the one this topic exists entirely to prevent.',
           analogy:
-            'A well shop that closes its shutter after a week with no customers, reopening the instant someone knocks — mildly inconvenient if you show up unannounced, but a single knock (logging into the dashboard) is all it takes to reopen for good.',
+            'A jukebox that started every record in the building playing simultaneously the moment you walked in, rather than the one you actually selected — chaotic, resource-draining, and obviously not how a jukebox should behave. Unmanaged video controllers in a `PageView` are exactly this failure mode.',
           theory:
-            'Module 1 first mentioned this: a free Supabase project pauses after 7 consecutive days with zero API activity — genuinely harmless (no data loss, one click to "Restore" in the dashboard) but worth planning around for a **portfolio project** specifically, since it might sit untouched between when you build it and when you show it to an interviewer or reviewer weeks later. A practical playbook: before any planned demo, log into the Supabase dashboard a day ahead to confirm the project is active (and restore it if not — restoration is fast but not always instant); for a project you want to keep permanently "warm" with minimal effort, a free, external scheduled ping (a free-tier cron service like GitHub Actions\' scheduled workflows, calling a trivial Supabase endpoint weekly) can prevent the pause entirely, at zero cost.',
+            'The previous topic\'s naive `itemBuilder` creates a **new** `ReelPlayer` (and therefore a new `VideoPlayerController`, decoding and playing video) for every page `PageView.builder` happens to construct — which, depending on `PageView`\'s internal caching (`allowImplicitScrolling`, viewport extent), can be more than just the one visible page. The fix: lift controller lifecycle **out** of `ReelPlayer` and into the parent `ReelsFeedScreen`, which already tracks the current page via `PageController`\'s `onPageChanged` — only the **current** page\'s controller should ever call `.play()`; every other page\'s controller should be paused (or, more aggressively, not even initialized until it becomes the current or adjacent page).\n\nA clean pattern: `ReelPlayer` accepts an `isActive` bool prop; internally, it calls `.play()`/`.pause()` reactively whenever `isActive` changes (via `didUpdateWidget`), rather than deciding for itself. The parent computes `isActive: i == _currentPage` for every item it builds, keeping the "who should be playing" decision in exactly one place.',
           whyItMatters:
-            'This is a genuinely practical, portfolio-specific piece of advice — the difference between confidently demoing a live project and an awkward "let me just restore this real quick" moment in front of an interviewer.',
+            'This is, without qualification, the highest-stakes correctness topic in this entire module — get it wrong, and LocalInsta\'s Reels feed silently plays every video in a session simultaneously, burning battery, bandwidth, and CPU on a real device in a way that would be immediately, embarrassingly obvious to anyone testing it.',
           steps: [
-            'Note the exact pause condition (7 days, zero API activity) and the exact recovery step (dashboard → Restore) in your README.',
-            'Before any planned demo or interview, check the dashboard a day ahead as a habit.',
-            'Optionally, set up a free weekly GitHub Actions scheduled workflow that calls a trivial Supabase endpoint (e.g. a lightweight `select 1;` via the REST API) to keep the project permanently active with zero manual effort.',
-            'Test the actual restore flow once deliberately, so it is not an unfamiliar process the first time it matters.',
+            'Add an `isActive` bool parameter to `ReelPlayer`.',
+            'Inside `ReelPlayer`, override `didUpdateWidget` to call `_controller.play()` when `isActive` becomes true and `_controller.pause()` when it becomes false.',
+            'In `ReelsFeedScreen`, track `int _currentPage = 0`, updated via the `PageController`\'s real `onPageChanged` callback (replacing the previous topic\'s placeholder `debugPrint`).',
+            'Pass `isActive: i == _currentPage` into every `ReelPlayer` the `itemBuilder` constructs.',
+            'Test deliberately: swipe through several Reels and confirm — by ear, and by checking `controller.value.isPlaying` in each — that **only** the currently visible one is ever playing.',
           ],
-          code: `# .github/workflows/keep-supabase-warm.yml (optional, entirely free)
-name: Keep Supabase project warm
-on:
-  schedule:
-    - cron: '0 6 * * 1' # every Monday at 06:00 UTC
-  workflow_dispatch: {} # allow manual triggering too
+          code: `class ReelPlayer extends StatefulWidget {
+  const ReelPlayer({super.key, required this.videoUrl, required this.isActive});
+  final String videoUrl;
+  final bool isActive;
+  @override
+  State<ReelPlayer> createState() => _ReelPlayerState();
+}
 
-jobs:
-  ping:
-    runs-on: ubuntu-latest
-    steps:
-      - name: Ping Supabase REST endpoint
-        run: |
-          curl -s "\${{ secrets.SUPABASE_URL }}/rest/v1/profiles?select=id&limit=1" \\
-            -H "apikey: \${{ secrets.SUPABASE_ANON_KEY }}"`,
+class _ReelPlayerState extends State<ReelPlayer> {
+  late final VideoPlayerController _controller;
+  bool _ready = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _controller = VideoPlayerController.networkUrl(Uri.parse(widget.videoUrl))
+      ..setLooping(true)
+      ..initialize().then((_) {
+        if (!mounted) return;
+        setState(() => _ready = true);
+        if (widget.isActive) _controller.play(); // may already be active on first build
+      });
+  }
+
+  @override
+  void didUpdateWidget(covariant ReelPlayer old) {
+    super.didUpdateWidget(old);
+    if (!_ready) return;
+    if (widget.isActive && !old.isActive) _controller.play();
+    if (!widget.isActive && old.isActive) _controller.pause();
+  }
+
+  @override
+  void dispose() {
+    _controller.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    if (!_ready) return const Center(child: CircularProgressIndicator());
+    return AspectRatio(aspectRatio: _controller.value.aspectRatio, child: VideoPlayer(_controller));
+  }
+}
+
+// ReelsFeedScreen — the single source of truth for "who is active"
+int _currentPage = 0;
+
+PageView.builder(
+  controller: _pageController,
+  scrollDirection: Axis.vertical,
+  onPageChanged: (i) => setState(() => _currentPage = i),
+  itemCount: reels.length,
+  itemBuilder: (context, i) => ReelPlayer(
+    videoUrl: reels[i].videoUrl!,
+    isActive: i == _currentPage,
+  ),
+)`,
           pitfalls: [
-            '**Being caught off guard by a paused project during an actual demo or interview.** Entirely avoidable with a day-ahead check — the single most practical piece of advice in this topic. Fix: build the habit, or automate it away entirely with the optional GitHub Actions workflow.',
-            '**Storing the Supabase URL or anon key as plain workflow text instead of GitHub Actions secrets.** The anon key alone is low-risk (Module 1), but using secrets is still the correct, professional habit regardless. Fix: always use repository secrets for any credential-shaped value, even a low-risk one.',
-            '**Assuming restoration is always instant.** It is typically fast but can occasionally take a minute or two — worth checking the day before a demo, not five minutes before. Fix: build in a buffer.',
-            '**Over-engineering a keep-alive solution for a project that will only ever be demoed by you, personally, whenever you feel like it.** The manual day-ahead check is genuinely sufficient for many learners; the GitHub Actions automation is a nice-to-have, not a requirement. Fix: match the solution to your actual, real usage pattern.',
+            '**Letting each `ReelPlayer` decide for itself whether to play, based on its own guess at visibility.** Leads to exactly the "everything plays at once" failure this topic warns against — the decision must be made in one place (the parent, which alone knows the true current page) and handed down. Fix: `isActive` is always computed by the parent, never inferred locally.',
+            '**Calling `.play()` unconditionally in `initState` regardless of `isActive`.** Every newly-built page (even ones `PageView` pre-builds slightly ahead of the visible one) would start playing immediately. Fix: only play in `initState` if already active; otherwise wait for `didUpdateWidget`.',
+            '**Not testing with more than 2-3 Reels.** The bug is far more obvious (and far more damaging) with ten or more — a shallow test might miss it. Fix: test with a genuinely long seeded list.',
+            '**Forgetting this same "who is active" discipline applies again if the Reels feed is ever embedded inside a larger tab structure using `IndexedStack` (Module 6).** An off-screen but `IndexedStack`-preserved Reels tab could keep a video playing in the background. Fix: consider pausing the current Reel explicitly when the Reels tab itself loses focus, not just when swiping within it.',
           ],
           tryIt:
-            'Add the pause/restore note to your README now, and decide (and act on) whether the manual day-ahead check or the automated GitHub Actions keep-alive better fits how you plan to use this project going forward.',
-          takeaway: 'The weekly pause is a real, minor, well-understood inconvenience with a one-click fix — plan for it explicitly rather than being surprised by it before a demo.',
+            'Swipe through at least eight seeded test Reels at a normal pace, and — with the device volume up — confirm you only ever hear exactly one video playing at a time, with no overlap or background audio bleeding from a page you have swiped past.',
+          takeaway: 'Exactly one page decides who is playing, and it is always the parent, computed from the real current page index — never left to each item to guess.',
         },
         {
           id: 'm9-t8',
-          title: 'A final, systematic RLS security pass',
+          title: 'Preloading the next Reel',
           explain:
-            'A single, complete pass through every table\'s RLS policies, using the Module 3 impersonation technique against every table this course has built, before calling the schema genuinely finished.',
+            'Initializing (but not yet playing) the *next* page\'s controller slightly ahead of time removes the visible stutter of starting a fresh video decode exactly at the moment a swipe completes.',
           analogy:
-            'A locksmith\'s final walkthrough of an entire building before handing over the keys — checking every single door, not just the ones that got the most attention during construction.',
+            'A relay race baton handoff rehearsed in advance — the incoming runner is already up to speed before the baton actually changes hands, rather than starting from a standstill at the exact handoff moment.',
           theory:
-            'This course built RLS policies incrementally across five modules (3, 4, 6, 7, 8) — `profiles`, `posts`, `likes`, `comments`, `follows`, `storage.objects` (three buckets), `notifications`, `conversations`, `conversation_participants`, `messages`. A final security pass means systematically re-running the Module 3 impersonation test against **every single one**: for each table, confirm a legitimate owner/participant can do exactly what they should, and a non-owner/non-participant is genuinely blocked from everything they should not be able to do — not just spot-checking the tables that felt trickiest at the time they were built.\n\nThis is also the moment to re-confirm the `service_role` key has never once been used anywhere in the Flutter app (Module 1\'s original promise) — a `grep -r "service_role"` across the entire codebase should return zero matches outside of Edge Function code (if Module 7\'s optional push extension was built), which runs in a trusted server environment, not the client.',
+            'The previous topic\'s `isActive`-driven play/pause already avoids the *worst* problem (everything playing at once); this topic is a **polish** refinement — initializing the next likely page\'s `VideoPlayerController` (buffering its first frames) slightly before the user swipes to it, so playback can start instantly rather than showing a brief loading spinner on arrival. A simple, proportionate approach: keep the current page\'s neighbours\' controllers alive (not disposed) via `PageView`\'s own built-in `allowImplicitScrolling` or a small manual cache of the current ± 1 page\'s controllers, disposing anything outside that window as the user swipes further.\n\nThis is explicitly framed as a refinement, not a correctness requirement — the previous topic\'s fix is what prevents a genuinely broken experience; this topic is what turns a *working* Reels feed into a *smooth* one.',
           whyItMatters:
-            'This is the single most important verification step before considering LocalInsta genuinely done — a beautiful UI and working features mean nothing if the underlying data is not actually secured the way ten modules of careful RLS design intended.',
+            'Distinguishing "this fixes a real bug" (previous topic) from "this is a worthwhile but optional polish pass" (this topic) is itself a useful habit — not every improvement carries equal urgency, and being able to tell the difference helps prioritise real project time.',
           steps: [
-            'List every table with RLS policies built across this course: profiles, posts, likes, comments, follows, storage.objects, notifications, conversations, conversation_participants, messages.',
-            'For each, run the Module 3 impersonation technique twice: once as a legitimate actor (should succeed), once as an illegitimate one (should fail).',
-            'Record pass/fail for each table in your README\'s security checklist.',
-            'Run `grep -r "service_role" lib/` (or your Flutter source folder) across the entire Flutter codebase and confirm zero matches.',
-            'Fix any genuine gap found — do not consider the course finished until every row in the checklist passes.',
+            'Confirm the previous topic\'s `isActive` correctness fix is solid before adding this refinement on top of it.',
+            'Extend `ReelsFeedScreen` to keep a small window of controllers alive: current page, plus one page ahead and one page behind.',
+            'Initialize (but do not play) the ahead/behind pages\' controllers as soon as they enter this window.',
+            'Dispose any controller that falls outside the window as the user continues swiping.',
+            'Test: swipe at a brisk, realistic pace through a long seeded list and confirm playback starts noticeably faster than the un-preloaded version.',
           ],
-          code: `<!-- README.md — final RLS verification checklist -->
-| Table                        | Owner action succeeds | Non-owner action blocked |
-|-------------------------------|:---:|:---:|
-| profiles (update own)         | ✅  | ✅  |
-| posts (insert/update/delete)  | ✅  | ✅  |
-| likes (insert/delete)         | ✅  | ✅  |
-| comments (insert/delete)      | ✅  | ✅  |
-| follows (insert/delete)       | ✅  | ✅  |
-| storage.objects (avatars)     | ✅  | ✅  |
-| storage.objects (posts)       | ✅  | ✅  |
-| storage.objects (stories)     | ✅  | ✅  |
-| notifications (select/update) | ✅  | ✅  |
-| conversations (select)        | ✅  | ✅  |
-| conversation_participants     | ✅  | ✅  |
-| messages (select/insert)      | ✅  | ✅  |
+          code: `// A minimal preload window: keep current ± 1 controller initialized.
+// (Illustrative sketch — the full implementation manages a Map<int, VideoPlayerController>
+// keyed by page index, initializing entries as they enter the window and disposing
+// entries that fall outside it as _currentPage changes.)
 
-\`\`\`bash
-# Confirm the service_role key never appears in client code
-grep -r "service_role" lib/
-# Expect: no matches (or matches only inside Edge Function source,
-# which is trusted server code, never shipped in the Flutter binary)
-\`\`\``,
+void _maintainPreloadWindow(int currentPage, int totalPages) {
+  final windowStart = (currentPage - 1).clamp(0, totalPages - 1);
+  final windowEnd = (currentPage + 1).clamp(0, totalPages - 1);
+
+  // Initialize any page in [windowStart, windowEnd] not already controlled.
+  for (var i = windowStart; i <= windowEnd; i++) {
+    _ensureControllerInitialized(i); // no-op if already present
+  }
+
+  // Dispose anything outside the window.
+  _controllers.keys
+      .where((i) => i < windowStart || i > windowEnd)
+      .toList()
+      .forEach(_disposeController);
+}`,
           pitfalls: [
-            '**Only re-testing tables that felt tricky at the time (like chat\'s subquery policies), skipping the ones that felt "obviously fine" (like posts).** Every table deserves the same systematic re-check — confidence at build time is not the same as verified correctness now. Fix: apply the checklist uniformly, no exceptions.',
-            '**Testing only the positive case (legitimate access) and treating that as sufficient.** The negative case (illegitimate access genuinely blocked) is the half that actually matters for security. Fix: always test both, exactly as Module 3 established from the start.',
-            '**Skipping this pass because "it all worked during development".** Development testing naturally happens as the legitimate owner of test data — it rarely deliberately attempts the attack case unless you make a point of it. Fix: this final pass is precisely where that gap gets closed.',
-            '**Finding a genuine gap and patching it without immediately re-running the full checklist to confirm the fix.** Fix: always re-verify after any policy change, treating RLS fixes with the same rigor as the original policy work.',
+            '**Preloading too wide a window (e.g. ±3 pages).** Multiplies memory and native-decoder resource usage for diminishing returns — a swipe rarely skips more than one page ahead. Fix: current ± 1 is a proportionate default.',
+            '**Attempting this refinement before the previous topic\'s correctness fix is solid.** Preloading on top of a broken "everything plays at once" implementation only makes the underlying problem worse, not better. Fix: always get correctness right first, polish second.',
+            '**Not disposing controllers that fall outside the window as the user swipes onward.** Silently reintroduces a slow resource leak across a long scrolling session — the exact failure mode this whole section has been careful to avoid. Fix: the disposal half of the window-maintenance logic is just as important as the initialization half.',
+            '**Over-investing in this refinement for a course project\'s realistic testing scale.** A working, correctness-first Reels feed (previous topic) is a complete, legitimate deliverable on its own — treat this topic as a genuine but optional enhancement, not a blocker.',
           ],
           tryIt:
-            'Actually complete the full checklist above against your real, deployed schema — every single row — and only consider this topic (and, meaningfully, the whole course\'s security posture) done once every cell genuinely passes.',
-          takeaway: 'A systematic re-verification of every table, not just the ones that felt hardest at build time, is what actually confirms LocalInsta\'s data is secure.',
+            'If you implement the preload window, compare the perceived startup delay when swiping to a next Reel with and without it, on a real device — the difference should be a clearly noticeable reduction in the brief loading-spinner moment.',
+          takeaway: 'Preloading is a genuine, optional polish pass on top of the previous topic\'s correctness fix — know the difference, and get correctness right first.',
+        },
+        {
+          id: 'm9-t9',
+          title: 'Mute, tap-to-pause & double-tap-to-like',
+          explain:
+            'A persistent mute toggle, a tap-anywhere-to-pause gesture, and Module 5\'s double-tap-like overlay, reused directly on top of the video layer.',
+          analogy:
+            'The same set of quick, one-handed gestures a museum audio-guide remote offers — pause, mute, and a single "mark this one" button — familiar enough that no visitor ever needs instructions.',
+          theory:
+            'A simple `bool _muted` (defaulting to `true` — Reels conventionally start muted in a feed context, since audio autoplay in a public/social setting is often unwelcome by default) drives `controller.setVolume(_muted ? 0 : 1)`, toggled by a persistent speaker-icon button overlaid in a corner of the screen. Tap-anywhere-to-pause reuses the `GestureDetector.onTap` pattern from this module\'s first topic, now layered *underneath* the double-tap-to-like gesture.\n\nModule 5\'s `DoubleTapLikeOverlay` widget — built to wrap "any child" — slots directly over a `ReelPlayer` with zero modification, calling the exact same `toggle_like` RPC (Module 3) via the exact same `FeedState.toggleLike` method (Module 5). This is a genuine, satisfying confirmation that a widget built to be generic (Module 5 deliberately typed it as `{required Widget child, ...}`, not `{required PostImage image, ...}`) pays off the moment a second, unforeseen use case (video) appears.',
+          whyItMatters:
+            'This topic is the clearest demonstration in the whole module of *why* Module 5\'s like-toggle infrastructure was worth building generically — the exact same widget, the exact same RPC call, the exact same optimistic-update logic, now serving a media type that did not exist when it was first written.',
+          steps: [
+            'Add a `bool _muted = true` field to `ReelsFeedScreen`, toggled by a persistent speaker icon, applied via `controller.setVolume` on the currently active `ReelPlayer`.',
+            'Add a tap-to-pause `GestureDetector` inside `ReelPlayer`, toggling `controller.play()`/`.pause()` (already built in this module\'s first topic — confirm it survives the `isActive` refactor from two topics ago).',
+            'Wrap the whole `ReelPlayer` in Module 5\'s existing `DoubleTapLikeOverlay`, passing the Reel\'s current liked-state and the same `FeedState.toggleLike` call used by the photo feed.',
+            'Confirm a like on a Reel updates `posts.like_count` via the same trigger from Module 3 — no special-casing needed anywhere in the database layer.',
+            'Test all three gestures together on a real device: mute toggle, tap-to-pause, and double-tap-to-like, confirming none interfere with each other.',
+          ],
+          code: `// Reusing Module 5's DoubleTapLikeOverlay completely unmodified —
+// it was always generic over "any child", exactly for a moment like this.
+DoubleTapLikeOverlay(
+  isLiked: feedState.isLikedOptimistic(reel, /* known liked state */ false),
+  onLike: () => feedState.toggleLike(reel, currentlyLiked: false),
+  child: ReelPlayer(
+    videoUrl: reel.videoUrl!,
+    isActive: i == _currentPage,
+    muted: _muted,
+  ),
+)
+
+// Mute toggle, applied to whichever controller is currently active
+IconButton(
+  icon: Icon(_muted ? Icons.volume_off : Icons.volume_up, color: Colors.white),
+  onPressed: () => setState(() => _muted = !_muted),
+)`,
+          pitfalls: [
+            '**Defaulting to unmuted audio in the feed.** Autoplaying audio unexpectedly in a scrolling social feed is a well-known, disliked pattern across every major platform, for good reason. Fix: default muted, let the user opt in.',
+            '**Rebuilding a new like-toggle implementation for Reels instead of reusing `DoubleTapLikeOverlay` and `FeedState.toggleLike` verbatim.** Would duplicate logic that already correctly handles optimistic updates and rollback (Module 5) for no benefit. Fix: always check whether an existing, generic widget/method already solves a new problem before writing something new.',
+            '**Letting the tap-to-pause gesture and the double-tap-to-like gesture conflict** (a naive single `GestureDetector` cannot always cleanly distinguish a single tap from the first half of a double tap without care). Fix: `GestureDetector` natively handles this distinction via its separate `onTap`/`onDoubleTap` callbacks correctly when both are provided on the same detector — test this specific interaction deliberately rather than assuming it just works.',
+            '**Applying the mute toggle to every controller instead of only the currently active one.** Since only one controller is ever playing (per this section\'s earlier topic), this rarely causes an audible bug, but is worth being precise about — mute state should be considered global UI state (as shown, a screen-level `_muted` bool), applied to whichever controller is active at any moment.',
+          ],
+          tryIt:
+            'On a real device with sound, confirm a Reel starts muted, tapping the speaker icon unmutes it, a single tap on the video pauses/resumes it, and a double tap likes it with the same heart animation from the photo feed — all three working together without interfering.',
+          takeaway: 'DoubleTapLikeOverlay needed zero changes to work on video — a genuine payoff of building it generically over "any child" back in Module 5.',
         },
       ],
     },
     {
       id: 'm9-s3',
-      title: 'Signed release APK & distribution',
+      title: 'Posting & integrating with existing infrastructure',
       topics: [
         {
-          id: 'm9-t9',
-          title: 'Generating a release keystore',
+          id: 'm9-t10',
+          title: 'CreateReelScreen: publishing a video post',
           explain:
-            'A one-time, precious cryptographic key that signs every future release build of LocalInsta — lose it, and you can never publish an update under the same app identity again.',
+            'A close cousin of Module 5\'s `CreatePostScreen` — capture/pick, preview, caption, publish — with the crop step swapped for compression and thumbnail generation.',
           analogy:
-            'A business\'s official rubber stamp and seal, used to certify every document as genuinely theirs — lose the seal, and you cannot simply carve a new one and claim it is the same business\'s seal; every past document stamped with the old one becomes unverifiable against anything new.',
+            'The same order-slip counter used for both a photo print and a short video message — the shape of the interaction (choose the media, add a note, hand it over) barely changes even though what happens behind the counter differs.',
           theory:
-            '`keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload` generates a release signing keystore — genuinely the single most precious file in the entire project, exactly as the billing course in this portfolio emphasizes for its own release process. Losing it means you can never publish an update to the same app listing again; a new keystore produces a build Android and app stores treat as a completely different, unrelated app.\n\n`android/key.properties` (holding the keystore path, alias, and passwords) must be added to `.gitignore` immediately — never committed — and `android/app/build.gradle` wires a `signingConfigs.release` block reading from it, replacing the default debug-signing config for release builds.',
+            '`CreateReelScreen` mirrors Module 5\'s `CreatePostScreen` structurally: open directly into the picker (this module\'s capture topic) on load, preview the result, collect a caption, and a "Share" button that runs the full pipeline — compress + thumbnail (this module\'s compression topic) → upload both files (this module\'s upload topic) → insert a `posts` row with `media_type: \'video\'`, `image_url: thumbnailUrl`, `video_url: videoUrl`, `duration_seconds: ...`.\n\n`PostsRepository.createPost` (Module 5) needs a small, additive extension to accept these new optional fields — not a rewrite, exactly mirroring this module\'s opening schema topic\'s "additive, not forked" philosophy.',
           whyItMatters:
-            'This is a genuinely high-stakes, one-time step — getting it right (and backed up) now avoids a permanent, unfixable mistake that has ended real published apps\' ability to ever update again.',
+            'This topic is where every earlier piece of this module — schema, capture, compression, upload — assembles into one real, working, publishable feature, the same "vertical slice" satisfaction Module 4\'s avatar-upload topic delivered for the photo pipeline.',
           steps: [
-            'Run `keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload` in a terminal, choosing a strong password.',
-            'Immediately back up `upload.jks` to **two separate locations** (e.g. a password manager\'s file storage and a separate cloud drive) — never just one copy on one machine.',
-            'Create `android/key.properties` with the keystore path, alias, and both passwords.',
-            'Add `android/key.properties` and `*.jks` to `.gitignore` — confirm via `git status` that neither is staged.',
-            'Wire `android/app/build.gradle`\'s `signingConfigs.release` to read from `key.properties`, and set `buildTypes.release.signingConfig signingConfigs.release`.',
+            'Extend `PostsRepository.createPost` with optional `mediaType`, `videoUrl`, `durationSeconds` parameters, defaulting to the existing photo-only behaviour when omitted.',
+            'Build `CreateReelScreen`, opening directly into `pickReelVideo` (this module\'s capture topic).',
+            'On pick, run `compressReel` (compression topic) and preview the compressed result (or a static frame) with a caption field.',
+            'On "Share", run `uploadReel` (upload topic) then call the extended `createPost`, passing `mediaType: \'video\'`.',
+            'Confirm the new Reel appears correctly in both the main feed (Module 5, since it is still just a `posts` row) and the dedicated Reels feed (this module) — the two are simply different queries over the same table.',
           ],
-          code: `# Generate the keystore (run once, ever, for this app's lifetime)
-$ keytool -genkey -v -keystore upload.jks -keyalg RSA -keysize 2048 -validity 10000 -alias upload
-
-# android/key.properties (gitignored, never committed)
-storePassword=<your-strong-password>
-keyPassword=<your-strong-password>
-keyAlias=upload
-storeFile=../upload.jks
-
-// android/app/build.gradle (relevant excerpt)
-def keystoreProperties = new Properties()
-def keystorePropertiesFile = rootProject.file('key.properties')
-if (keystorePropertiesFile.exists()) {
-    keystoreProperties.load(new FileInputStream(keystorePropertiesFile))
+          code: `// Extending Module 5's createPost — additive, not rewritten
+Future<Post> createPost({
+  required String imageUrl,
+  String? caption,
+  String mediaType = 'image',
+  String? videoUrl,
+  double? durationSeconds,
+}) async {
+  final userId = _client.auth.currentUser!.id;
+  final row = await _client
+      .from('posts')
+      .insert({
+        'user_id': userId,
+        'image_url': imageUrl, // thumbnail, for a video post
+        'caption': caption,
+        'media_type': mediaType,
+        'video_url': videoUrl,
+        'duration_seconds': durationSeconds,
+      })
+      .select('*, profiles(username, avatar_url)')
+      .single();
+  return Post.fromMap(row);
 }
 
-android {
-    signingConfigs {
-        release {
-            keyAlias keystoreProperties['keyAlias']
-            keyPassword keystoreProperties['keyPassword']
-            storeFile keystoreProperties['storeFile'] ? file(keystoreProperties['storeFile']) : null
-            storePassword keystoreProperties['storePassword']
-        }
-    }
-    buildTypes {
-        release {
-            signingConfig signingConfigs.release
-        }
-    }
+// CreateReelScreen's submit handler
+Future<void> _publishReel() async {
+  final compressed = await compressReel(_pickedPath);
+  final uploaded = await uploadReel(
+    video: compressed.video,
+    thumbnail: compressed.thumbnail,
+    userId: supabase.auth.currentUser!.id,
+  );
+  await context.read<PostsRepository>().createPost(
+        imageUrl: uploaded.thumbnailUrl,
+        videoUrl: uploaded.videoUrl,
+        mediaType: 'video',
+        durationSeconds: compressed.durationSeconds,
+        caption: _captionController.text.trim().isEmpty ? null : _captionController.text.trim(),
+      );
 }`,
           pitfalls: [
-            '**Keeping only one copy of `upload.jks`, on one machine, with no backup.** A single hard drive failure permanently ends your ability to publish updates under this app\'s identity. Fix: back up to at least two separate, genuinely independent locations immediately after generation.',
-            '**Committing `key.properties` or the `.jks` file to git "just this once, I\'ll remove it later".** Even a single commit puts it in git history permanently unless you rewrite history (a painful, error-prone process). Fix: gitignore both before ever running `git add`.',
-            '**Forgetting the exact keystore password anywhere retrievable.** Functionally identical to losing the file itself — a strong password manager entry is essential, not optional. Fix: store the password with the same care as the file.',
-            '**Choosing a low `validity` value.** `10000` days (~27 years) is the conventional, sensible choice, matching Android\'s own documentation — a shorter validity risks the certificate expiring while the app is still actively maintained. Fix: use the standard, generous validity period.',
+            '**Writing a separate `createReel` method instead of extending `createPost`.** Both ultimately insert into the same table with the same ownership rules — a parallel method would duplicate the RLS-respecting insert logic for no real benefit. Fix: one method, optional parameters, exactly as Module 3\'s schema philosophy intended.',
+            '**Forgetting to pass `mediaType: \'video\'` explicitly.** The parameter\'s default of `\'image\'` would silently mis-tag a real video post, and the `posts_video_needs_url` check constraint would then correctly reject the insert (since `video_url` would be set but `media_type` would not say `\'video\'`) — a good example of the database catching a client-side bug, but better to get it right the first time.',
+            '**Not testing that a newly created Reel shows up correctly in the ALREADY EXISTING main feed too.** Module 5\'s feed query has no `media_type` filter — it would show a video post using `image_url` (the thumbnail) exactly like a photo post, with no video-specific handling. This is expected and fine for a first pass, but worth confirming deliberately (this module\'s next topic covers making it visually distinguishable there).',
+            '**Blocking the "Share" button on an unrealistically long compression step with no feedback.** Video compression can genuinely take several seconds longer than photo compression. Fix: apply Module 4\'s uploading-state pattern (a visible "Processing..." indicator) here too, scaled to video\'s longer processing time.',
           ],
           tryIt:
-            'Generate your real keystore now, back it up to two separate locations immediately, and confirm via `git status` that neither the `.jks` file nor `key.properties` ever appears as a trackable file.',
-          takeaway: 'The release keystore is the single most precious file in the project — back it up in two places the moment it is created, and never let it near git.',
-        },
-        {
-          id: 'm9-t10',
-          title: 'Building the signed release APK',
-          explain:
-            '`flutter build apk --release --split-per-abi` produces smaller, signed, installable APKs — and every `--dart-define` secret from Module 1 must be passed again, explicitly, at this final build step.',
-          analogy:
-            'A final, official print run of a document, using the business\'s real seal (the keystore) rather than the informal draft stamp used during editing (the debug signing key) — the same content, but now bearing the mark that makes it genuinely official.',
-          theory:
-            '`flutter build apk --release` produces a release-mode, signed (via the previous topic\'s config) APK — release mode strips debug information and enables optimizations, producing a meaningfully smaller, faster binary than any debug build. `--split-per-abi` produces **separate** APKs per CPU architecture (`arm64-v8a`, `armeabi-v7a`, `x86_64`) instead of one universal APK bundling all three — roughly a third the size each, ideal for direct side-loading where you know the target device\'s architecture (`arm64-v8a` covers essentially every modern Android phone).\n\n**Critically**, this build command must repeat the exact `--dart-define=SUPABASE_URL=...` and `--dart-define=SUPABASE_ANON_KEY=...` flags from Module 1 — the release build has no memory of your `launch.json`\'s dev-time flags, and omitting them produces an app that crashes immediately on `Env.assertConfigured()` (Module 1).',
-          whyItMatters:
-            'Forgetting the `--dart-define` flags on a release build is a genuinely common, easy-to-hit mistake that produces a confusing "works in debug, crashes in release" bug — recognising this specific failure mode immediately, rather than debugging from scratch, is valuable.',
-          steps: [
-            'Confirm the release keystore and `key.properties` from the previous topic are correctly wired.',
-            'Run `flutter build apk --release --split-per-abi --dart-define=SUPABASE_URL=<real-url> --dart-define=SUPABASE_ANON_KEY=<real-anon-key>`.',
-            'Locate the output APKs under `build/app/outputs/flutter-apk/`.',
-            'Note the file sizes — confirm `app-arm64-v8a-release.apk` is meaningfully smaller than a universal build would be.',
-            'Bump `pubspec.yaml`\'s `version:` (e.g. `1.0.0+1`) before this first release build, so any future update has a clear version to increment from.',
-          ],
-          code: `# The full release build command — note EVERY --dart-define flag repeated
-$ flutter build apk --release --split-per-abi \\
-    --dart-define=SUPABASE_URL=https://your-ref.supabase.co \\
-    --dart-define=SUPABASE_ANON_KEY=your-real-anon-key-here
-
-# Output location
-build/app/outputs/flutter-apk/
-  app-armeabi-v7a-release.apk
-  app-arm64-v8a-release.apk   <- the one to side-load on any modern phone
-  app-x86_64-release.apk
-
-# pubspec.yaml — bump before every release
-# version: 1.0.0+1
-#          ^^^^^ ^
-#          versionName (user-visible)
-#                +versionCode (must increase on every update)`,
-          pitfalls: [
-            '**Forgetting the `--dart-define` flags entirely.** Produces an app that installs fine but crashes instantly on launch with Module 1\'s `Env.assertConfigured()` error — a specific, recognisable failure mode worth remembering. Fix: always repeat the full flag set for any release build.',
-            '**Distributing the universal (non-split) APK when a split, architecture-specific one would do.** Roughly 3x larger for no benefit when you know the target device. Fix: `--split-per-abi` and pick `arm64-v8a` for any modern phone.',
-            '**Forgetting to bump `versionCode` before a second release build.** Installing over an existing app with the same or lower `versionCode` fails with `INSTALL_FAILED_VERSION_DOWNGRADE` — a specific, well-known error worth recognising if hit later.',
-            '**Testing only the debug build and assuming the release build behaves identically.** Release mode\'s optimizations and stripped debug info can occasionally surface behaviour differences (though rare in typical Flutter apps) — always do at least one real test install of the actual release APK before considering it done.',
-          ],
-          tryIt:
-            'Run the full release build command with your real Supabase credentials, confirm three architecture-specific APKs are produced, and note their file sizes compared to what a debug build would produce.',
-          takeaway: 'A release build needs its own --dart-define flags every time — the exact same flags used in development, repeated explicitly, or the app crashes on first launch.',
+            'Publish a real test Reel end to end, then confirm it appears in your seeded data both via `fetchReelsFeed()` (this module) and via Module 5\'s original `fetchFeedPage()` — the same row, correctly serving two different queries.',
+          takeaway: 'createPost grew three optional parameters, not a sibling method — the same additive philosophy from this module\'s opening schema topic, now applied to the repository layer.',
         },
         {
           id: 'm9-t11',
-          title: 'Side-loading on a real phone',
+          title: 'Reels in the grid & explore: a play-icon overlay',
           explain:
-            'Transferring `app-arm64-v8a-release.apk` to a real Android device and installing it directly — LocalInsta\'s primary, entirely free distribution path.',
+            'Module 6\'s profile grid and explore grid already render every post via its `image_url` — a small play-icon overlay on video posts is the only change needed to visually distinguish them.',
           analogy:
-            'Hand-delivering a finished print run directly to a customer\'s door, rather than routing it through a formal distributor first — perfectly legitimate, immediate, and appropriate for a personal or small-audience app.',
+            'A photo album where video-message pages get a small printed film-reel icon stamped in the corner — everything else about the page looks the same, one small mark tells you it plays.',
           theory:
-            'Side-loading (installing an APK directly, outside the Play Store) requires the target device to have **"Install unknown apps"** enabled for whichever app you use to open the file — Settings → Apps → [Chrome/Files/WhatsApp] → Install unknown apps → toggle on, specific to Android\'s per-source permission model. Transfer the APK via USB, a self-sent WhatsApp/Telegram file, or a cloud drive link, then tap to install.\n\nA common first-install snag: if a **debug** build of LocalInsta was ever installed on the same device during development, Android will refuse to install the release build over it (**"App not installed"**, with no further detail) because the two builds are signed with different keys (the debug keystore vs. the new release keystore) — Android treats a signature mismatch as a potential security risk and blocks the install rather than silently overwriting. The fix is simply uninstalling the debug build first.',
+            'Because a video post\'s `image_url` is always populated (this module\'s schema topic), Module 6\'s `postGrid` widget already renders it correctly with **zero changes** — the thumbnail simply appears exactly like a photo would. The only enhancement worth adding: a small `Icons.play_arrow` badge in the corner of any grid cell where `post.isVideo` is true, so a browsing user can tell at a glance which cells are tappable-into-a-video versus a static photo.\n\nTapping through still goes to `PostDetailScreen(postId: ...)` unchanged — a genuinely nice consequence of Module 5\'s "pass only the id, refetch fresh" navigation convention: the detail screen does not need to know in advance whether it is about to render a photo or a video, it discovers that from the fetched row\'s `media_type` and branches its own rendering accordingly (next topic touches this briefly, though full post-detail video playback is a natural, small extension left to the learner using this module\'s `ReelPlayer` widget directly).',
           whyItMatters:
-            'This entire distribution path — side-loading a signed APK — is completely free, requires no Play Console registration, no review process, and no fee, making it the natural, appropriate distribution channel for a personal project or a small hyperlocal community app exactly like LocalInsta\'s premise.',
+            'This is the smallest topic in the module by implementation effort, and deliberately so — it is here specifically to demonstrate how far Module 6\'s existing, well-factored grid code carries a genuinely new content type with almost no new code.',
           steps: [
-            'On the target phone, enable "Install unknown apps" for whichever app you will use to open the APK file.',
-            'Transfer `app-arm64-v8a-release.apk` to the device (USB cable, WhatsApp self-message, cloud drive — any method works).',
-            'If a debug build of LocalInsta is already installed, uninstall it first.',
-            'Tap the transferred APK file and confirm the install prompt.',
-            'Open the installed app and confirm it runs correctly, connecting to your real Supabase project exactly as the debug build did.',
+            'Add a small `Positioned` play-icon `Icon(Icons.play_arrow, color: Colors.white)` badge, shown only when `post.isVideo`, layered over the existing `PostImage` in Module 6\'s grid cell builder.',
+            'Confirm no other change is needed to the grid layout, the `GridView.builder`, or the tap-to-navigate wiring.',
+            'Apply the identical badge to Module 6\'s explore grid (which reuses the same rendering pattern).',
+            'Visually confirm a mixed grid of photos and Reels renders correctly, with only video cells showing the play icon.',
           ],
-          code: `# No commands here — this is a device-level, manual process. Checklist:
-#
-# 1. Settings -> Apps -> [chosen app] -> Install unknown apps -> ON
-# 2. Transfer app-arm64-v8a-release.apk to the device
-# 3. IF a debug build is already installed: uninstall it first
-#    (mismatched signing keys will otherwise block the install silently)
-# 4. Tap the APK, confirm install
-# 5. Open, verify it connects and behaves correctly`,
+          code: `// Module 6's grid cell builder — one small addition, everything else unchanged
+GridView.builder(
+  // ...unchanged gridDelegate, padding, etc. from Module 6...
+  itemBuilder: (context, i) {
+    final post = posts[i];
+    return GestureDetector(
+      onTap: () => Navigator.push(context, MaterialPageRoute(
+        builder: (_) => PostDetailScreen(postId: post.id), // unchanged
+      )),
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          PostImage(imageUrl: post.imageUrl), // unchanged — this is the thumbnail either way
+          if (post.isVideo)
+            const Positioned(
+              top: 4, right: 4,
+              child: Icon(Icons.play_arrow, color: Colors.white, size: 18,
+                  shadows: [Shadow(blurRadius: 4, color: Colors.black54)]),
+            ),
+        ],
+      ),
+    );
+  },
+)`,
           pitfalls: [
-            '**Hitting "App not installed" with no further explanation and assuming the APK build itself is broken.** The far more common cause is a leftover debug build with a mismatched signing key already on the device. Fix: always uninstall any prior debug install before side-loading a release build for the first time.',
-            '**Forgetting to enable "Install unknown apps" first, being blocked entirely with a vague warning.** Fix: enable it specifically for whichever app you use to open the file (this permission is per-source-app on modern Android, not a single global toggle).',
-            '**Transferring the wrong architecture-specific APK for the target device.** `arm64-v8a` covers virtually every modern phone (the last several years of Android devices), but a very old or unusual device might need `armeabi-v7a` instead. Fix: `arm64-v8a` is the safe default; fall back to the others only if install genuinely fails on a specific old device.',
-            '**Not actually testing the installed release build against the real, live Supabase project.** Fix: open it, sign in, browse the feed — a genuine smoke test, not just a successful install.',
+            '**Rewriting the grid cell builder from scratch "to support video".** The existing builder already works correctly for video posts via `image_url`; only a small additive overlay is needed. Fix: extend, do not rewrite, matching every other integration topic in this module.',
+            '**Forgetting the play icon needs a visible contrast treatment (a drop shadow, or a translucent background circle) regardless of the underlying thumbnail\'s colours.** A plain white icon can vanish against a bright thumbnail. Fix: a small shadow or backing circle, as shown.',
+            '**Adding this overlay only to the profile grid and forgetting explore uses the identical rendering pattern.** Fix: since both grids share the same underlying builder shape (Module 6), apply the fix once, in the shared code path, rather than twice in two near-duplicate places.',
+            '**Assuming the post-detail screen automatically knows how to play a video just because the grid links to it correctly.** The grid change is purely cosmetic; actual video playback inside `PostDetailScreen` is a separate, small extension (branching on `post.isVideo` to render `ReelPlayer` instead of `PostImage`) worth doing but distinct from this topic\'s narrow scope.',
           ],
           tryIt:
-            'Actually side-load `app-arm64-v8a-release.apk` onto a real Android phone (uninstalling any prior debug build first), and confirm you can sign in, browse the feed, and post — a real, working, distributed copy of LocalInsta, entirely free.',
-          takeaway: 'Side-loading is completely free, needs no Play Console registration, and is the appropriate distribution path for a personal or small-community app like LocalInsta.',
+            'View a profile or explore grid containing a mix of your seeded photo and video test posts, and confirm only the video ones show a play-icon badge, with tapping either type still correctly opening the post detail screen.',
+          takeaway: 'A well-factored grid from Module 6 needed one small overlay, not a rewrite, to correctly represent a brand-new content type.',
         },
         {
           id: 'm9-t12',
-          title: 'The Play Store path — informational, and the one place a fee could enter',
+          title: 'Confirming zero changes to likes, comments & notifications',
           explain:
-            'Publishing to the Play Store is entirely optional and involves a one-time $25 Play Console registration fee — the single place any money could ever enter LocalInsta\'s story, and even this step is not required to consider the app finished.',
+            'Every one of Module 5\'s likes/comments and Module 7\'s notifications already reference `post_id` generically — a deliberate audit confirming none of them need to know or care whether that post is a photo or a video.',
           analogy:
-            'Registering a small home business with the local trade office is a real, sometimes-worthwhile step for reaching more customers — but plenty of legitimate small shops (like side-loading, the previous topic) operate perfectly well without it, and the registration fee is a one-time, known, optional cost, not a recurring one baked into daily operations.',
+            'A library\'s "borrow this item" desk process does not change based on whether the item is a book, a DVD, or a magazine — the desk only ever asks "which item, which member", and that same process turns out to already work perfectly for a format nobody had invented yet when the desk was designed.',
           theory:
-            'The Google Play Console requires a **one-time $25 USD registration fee** per developer account — genuinely the only place, in this entire course, where real money could ever be required, and even then, only if you choose to pursue Play Store distribution at all. Every other service used throughout LocalInsta\'s build — Supabase, Google Cloud OAuth clients, OneSignal, pg_cron, Edge Functions — is genuinely free with no card required, exactly as promised from Module 1 onward.\n\nFor context (informational, not a requirement to act on): **Internal testing track** is the fastest path — upload the signed AAB (`flutter build appbundle --release`, the Play Store\'s preferred format over a raw APK), add specific testers by Google account email, share an opt-in link, live within 5-10 minutes, no public review required. **Production listing** requires a store icon, screenshots, a privacy policy URL, a completed data-safety form, and content rating — a genuine half-day-or-more undertaking with a 1-7 day review period, appropriate only if wide public distribution is actually the goal.',
+            'This topic is deliberately **verification, not implementation** — walking through `likes` (`post_id references posts(id)`), `comments` (`post_id references posts(id)`), and `notifications` (`post_id references posts(id)`, nullable) from Modules 3 and 7, confirming each one\'s foreign key, RLS policy, and trigger logic operates purely on a post\'s `id`, with **zero** reference to `image_url`, `media_type`, or anything photo-specific anywhere in their schema or logic. The `notify_on_like`/`notify_on_comment` triggers (Module 7) look up `posts.user_id` to find the recipient — a column that exists identically on every post regardless of media type.\n\nThis is the payoff of *why* Module 3\'s schema was designed the way it was: every related table references "a post", an abstraction that always included the possibility of a post being something other than a photo, even though video did not exist as a concept until this module.',
           whyItMatters:
-            'Being explicit and honest about this one boundary — rather than silently glossing over it — is exactly the kind of transparent, trustworthy communication the "no card, ever" promise deserves, and it leaves the choice genuinely informed and entirely optional for the learner.',
+            'This topic is arguably the single best teaching moment in the entire course about the value of designing around the right abstraction — "a post" instead of "a photo" — paying off, concretely and provably, five modules later for a feature nobody had planned in detail at the time.',
           steps: [
-            'Read through this topic as informational context — no action is required to complete LocalInsta or this course.',
-            'If (and only if) you choose to pursue Play Store distribution: register a Google Play Console developer account (one-time $25 fee).',
-            'For the fastest path, build an AAB (`flutter build appbundle --release`, with the same `--dart-define` flags from the previous topic) and use the Internal testing track.',
-            'For a public listing, budget genuine time for store assets, the privacy policy, and the data-safety form, and expect a multi-day review.',
-            'Whichever path (or neither) you choose, note the decision explicitly in your README — side-loading alone is a complete, legitimate, and free way to finish this course.',
+            'Re-read Module 3\'s `likes`, `comments` schema and RLS policies, confirming every reference is to `posts.id`, never `posts.image_url` or any photo-specific column.',
+            'Re-read Module 3\'s `increment_post_like_count`/`increment_post_comment_count` triggers, confirming they update `posts.like_count`/`comment_count` — columns that exist identically for every post.',
+            'Re-read Module 7\'s `notify_on_like`/`notify_on_comment` triggers, confirming the same.',
+            'Test directly: like and comment on a real seeded video post from a second test account, and confirm the like/comment counters and the resulting notification all work exactly as they do for a photo post, with zero code changes anywhere in this module.',
+            'Write a short README note capturing this specific finding — genuinely worth documenting as evidence of a well-designed schema.',
           ],
-          code: `# Building an AAB (Android App Bundle) — the Play Store's preferred format
-$ flutter build appbundle --release \\
-    --dart-define=SUPABASE_URL=https://your-ref.supabase.co \\
-    --dart-define=SUPABASE_ANON_KEY=your-real-anon-key-here
+          code: `-- A direct verification query — likes/comments/notifications on a
+-- VIDEO post, using tables and triggers that were never touched by
+-- this entire module.
+select p.id, p.media_type, p.like_count, p.comment_count
+from public.posts p
+where p.media_type = 'video'
+order by p.created_at desc
+limit 1;
 
-# Output:
-# build/app/outputs/bundle/release/app-release.aab
-#
-# This AAB is what you would upload to Play Console's Internal testing
-# track — a decision entirely separate from, and not required for,
-# finishing LocalInsta as a complete, working, side-loadable app.`,
+-- Like it as a different test user (reusing the exact Module 5 RPC)
+select public.toggle_like('<that video post id>');
+
+-- Confirm the count updated via the SAME Module 3 trigger
+select like_count from public.posts where id = '<that video post id>';
+
+-- Confirm a notification was generated via the SAME Module 7 trigger
+select type, actor_id, post_id from public.notifications
+where post_id = '<that video post id>' order by created_at desc limit 1;`,
           pitfalls: [
-            '**Feeling obligated to publish to the Play Store to consider the course "really" finished.** Explicitly false — side-loading (the previous topic) is a complete, legitimate distribution method, and this entire topic is informational only. Fix: treat Play Store publishing as a genuinely optional next step, not a requirement.',
-            '**Confusing the one-time $25 developer registration fee with a recurring cost.** It is paid once, ever, per developer account, not per app or per year. Fix: know the real, bounded cost if you do choose this path.',
-            '**Underestimating the time cost of a production listing (screenshots, privacy policy, data-safety form, review time) versus the fast Internal testing track.** Fix: Internal testing is the right choice for sharing with a handful of specific people (like the real business owner this course\'s other apps are built for); production listing is a different, larger undertaking.',
-            '**Building an APK when the Play Store specifically wants an AAB, or vice versa.** Side-loading needs an APK (Module 9\'s previous topic); Play Store upload needs an AAB. Fix: use the right build command for the right destination.',
+            '**Assuming a new content type automatically needs new supporting infrastructure without checking first.** The instinct to build `video_likes`, `video_comments`, or video-specific notification types would have been pure, unnecessary duplication. Fix: always check whether an existing, sufficiently-general abstraction already covers a new case before building something new — this topic is the concrete proof it is worth checking.',
+            '**Skipping this verification because "it probably just works".** Probably is not verified — the point of this topic is running the real queries and confirming, not assuming. Fix: always do the actual test, exactly as the steps describe.',
+            '**Not appreciating this as a genuine architecture win, treating it as an unremarkable non-event.** A design decision paying off cleanly, five modules later, for a feature that was not originally planned, is worth explicitly recognising and remembering — it is exactly the kind of thing worth being able to point to in an interview as an example of good abstraction design.',
+            '**Confusing "no code changes needed" with "no testing needed."** The absence of new code is precisely why a deliberate, explicit test matters — there is no new code path whose correctness would otherwise be exercised by simply writing it.',
           ],
           tryIt:
-            'No action is required — read this topic, note your decision (Play Store or side-load-only) in your README, and move on to the capstone review with a complete, honest picture of every cost (there is exactly one, optional, one-time $25 fee) in LocalInsta\'s entire build.',
-          takeaway: 'The Play Store\'s one-time $25 fee is the single place money could ever enter this course\'s story — and it is entirely optional; side-loading alone is a complete finish.',
+            'Run the full verification query sequence above against a real seeded video post, confirming likes, comments, and notifications all work identically to a photo post — then write the one-paragraph README note this topic\'s steps ask for.',
+          takeaway: 'Nothing in likes, comments, or notifications needed to change — the strongest possible evidence that Module 3\'s "reference a post, not a photo" design was the right call.',
         },
       ],
     },
     {
       id: 'm9-s4',
-      title: 'Capstone review',
+      title: 'Free-tier video stewardship',
       topics: [
         {
           id: 'm9-t13',
-          title: 'Architecture walkthrough: explain LocalInsta end to end',
+          title: 'A duration & size cap policy',
           explain:
-            'A deliberate, spoken (or written) exercise: explain LocalInsta\'s entire architecture, module by module, as if walking a new teammate through the codebase on their first day.',
+            'A deliberate, documented policy — 60-second max duration, a hard file-size ceiling enforced after compression, and a friendly rejection message — keeps Reels from quietly overwhelming the free tier this course has protected since Module 1.',
           analogy:
-            'A head chef walking a new cook through the entire kitchen on their first morning — not just pointing at stations, but explaining *why* the tandoor sits where it does, why the prep counter is ordered the way it is, so the new cook understands the reasoning, not just the layout.',
+            'A postal service that accepts parcels up to a clearly posted weight limit, printed right at the counter, rather than accepting anything and being surprised later when a delivery truck cannot handle the load — a clear, upfront policy beats an unpleasant surprise.',
           theory:
-            'True understanding shows itself in the ability to **explain**, not just to have built something once by following instructions. This topic asks you to narrate LocalInsta\'s full architecture out loud (or in writing, as a genuine README architecture section) in your own words, covering: why Supabase over Firebase for this specific "no card" constraint (Module 1); the repository + ChangeNotifier pattern and why it exists (Modules 2, 5); why RLS with subquery-based policies is the real security boundary, not client-side checks (Modules 3, 8); the denormalized-counter-plus-trigger pattern and why it recurs across likes, comments, follows (Modules 3, 6); the optimistic-UI-for-your-own-actions vs. Realtime-for-others\'-actions distinction (Module 5); and the two genuinely free advanced-infrastructure pieces — pg_cron and Edge Functions — that make the whole "no card, ever" promise hold even for scheduled jobs and push notifications (Module 7).',
+            'This module\'s earlier capture topic already caps recording at 60 seconds via `maxDuration` — but a gallery-picked video has no such enforcement, and even a 60-second clip can occasionally compress to a larger-than-expected file depending on source content (a fast-motion, high-detail clip compresses less efficiently than a mostly-static one). A **post-compression size check** — reject (with a clear, friendly message) any compressed result over a hard ceiling, e.g. 15MB — is the belt-and-suspenders safeguard, mirroring Module 7\'s "instant client-side filter plus eventual server-side cleanup" two-layer thinking: the duration cap is the first, preventative layer; the size check is the second, corrective layer that catches whatever the first layer did not.\n\nThis policy is a genuine product decision worth stating explicitly (in-app copy, and the README), not a silent, undocumented limit a user discovers only by hitting it.',
           whyItMatters:
-            'This is explicitly modeled on the real interview question "walk me through a project you built" — practicing a clear, confident, accurate narration of your own architecture now, in a low-stakes setting, is directly transferable to that exact real-world moment.',
+            'A clearly communicated limit, hit occasionally with a helpful message, reads as a deliberate, professional product decision; a silent failure or a mysterious crash at the same limit reads as a bug — the exact same underlying constraint, two very different user experiences depending on whether it was designed for.',
           steps: [
-            'Without looking anything up, write (or say out loud, recorded) a 5-10 minute walkthrough of LocalInsta\'s architecture, module by module.',
-            'Cover, at minimum: the backend choice and why; the repository/state pattern; RLS as the real security boundary; the counter-trigger pattern; optimistic UI vs. Realtime; the free-tier-advanced-infrastructure story (pg_cron, Edge Functions).',
-            'Afterward, check your walkthrough against this course\'s actual module descriptions — note anything you glossed over or got slightly wrong, and revisit that specific module\'s content.',
-            'Save the written version in your README as a genuine architecture overview — valuable both for your own portfolio and for anyone else reading the codebase.',
+            'After compression (this module\'s earlier topic), check the resulting file size against a hard ceiling (e.g. 15MB).',
+            'If over the limit, reject the upload with a specific, friendly message ("This video is a bit long — try trimming it under a minute") rather than a generic error.',
+            'Document both the duration cap (60s) and the size ceiling (15MB) explicitly in the app\'s create-Reel screen copy, not just in code.',
+            'Add the same numbers to your README\'s free-tier stewardship section, alongside this module\'s earlier bandwidth-math topic.',
+            'Test deliberately: pick an unusually long gallery video and confirm the friendly rejection message appears rather than a confusing partial upload or crash.',
           ],
-          code: `<!-- README.md — a real architecture overview, written in your own words -->
-## Architecture
+          code: `Future<void> _publishReel() async {
+  final compressed = await compressReel(_pickedPath);
 
-LocalInsta is a Flutter + Supabase Instagram-style app built to run entirely
-on free-tier services, with no credit card required anywhere in the stack.
+  const maxBytes = 15 * 1024 * 1024; // 15MB hard ceiling, post-compression
+  final compressedSize = await compressed.video.length();
+  if (compressedSize > maxBytes) {
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text(
+          "This video is a bit long or detailed to fit our size limit — "
+          "try a shorter clip (under a minute works best).",
+        )),
+      );
+    }
+    return; // reject before ever reaching the network
+  }
 
-**Backend choice.** Supabase (Postgres + Auth + Storage + Realtime + Edge
-Functions), chosen over Firebase specifically because Firebase's Cloud
-Storage now requires the paid Blaze plan for new projects — a hard
-conflict with this project's "no card, ever" constraint.
-
-**Data & security.** Every table uses Row Level Security as the real
-access-control boundary — never client-side checks alone. [...continue
-in your own words, covering the repository pattern, denormalized
-counters + triggers, optimistic UI vs. Realtime, and the pg_cron /
-Edge Functions story...]`,
+  // ...proceed with upload + createPost as before...
+}`,
           pitfalls: [
-            '**Only ever having explained pieces of this in isolation (per-module), never the whole thing end to end in one sitting.** The connections *between* modules — why the same optimistic-UI pattern reappears three times, why RLS underlies both posts and chat — are exactly what this exercise surfaces. Fix: do the full walkthrough in one sitting, not piecemeal.',
-            '**Reading module descriptions and paraphrasing them instead of genuinely explaining in your own words from memory first.** Fix: attempt the walkthrough cold first, then check against the material — the gap between the two is the most valuable signal.',
-            '**Treating this as optional busywork rather than genuine interview preparation.** Fix: this is close to verbatim what a real technical interview\'s "tell me about a project" question looks like — practice it with that seriousness.',
-            '**Not writing any of it down.** A spoken walkthrough is valuable practice, but a written README architecture section is a permanent, reusable artifact for your actual portfolio. Fix: do both — speak it first, then write it.',
+            '**Relying only on the 60-second duration cap and skipping the post-compression size check.** A gallery-picked video (no OS-enforced duration cap) or an unusually detail-heavy 60-second clip could still slip through oversized. Fix: always check the real, final compressed size before uploading, not just the recording duration.',
+            '**Rejecting an oversized video with a generic or technical error message.** Fix: a specific, friendly, actionable message — telling the user roughly what to do differently — is a small effort with an outsized impact on how the limit is perceived.',
+            '**Not documenting the limits anywhere visible to the user until they hit one.** Fix: state the cap in the create-Reel screen\'s own copy (e.g. a small "up to 60 seconds" hint near the record button), not only in an error message after the fact.',
+            '**Picking an arbitrary size ceiling without connecting it back to this module\'s earlier free-tier math.** Fix: 15MB is chosen deliberately here as roughly 2-3x this module\'s typical compressed-Reel estimate — a generous but real ceiling, not a round number picked at random.',
           ],
           tryIt:
-            'Actually do the cold, unaided 5-10 minute walkthrough right now, either recorded or written, then compare it against this course\'s module descriptions and fill in anything genuinely missed — then write the polished version into your README.',
-          takeaway: 'Explaining your own architecture cold, end to end, is the realest test of whether you understood it — and it is near-identical practice for a real interview question.',
+            'Deliberately test the rejection path with an oversized gallery video, confirm the friendly message appears and no upload is attempted, then confirm a normal, well-within-limits test Reel still publishes successfully.',
+          takeaway: 'Duration cap at capture, size check after compression — two layers, the same "prevent, then catch" thinking from Module 7\'s story-expiry design, now protecting video specifically.',
         },
         {
           id: 'm9-t14',
-          title: 'Interview questions this build prepares you for',
+          title: 'End-to-end testing & updating the deployment checklist',
           explain:
-            'A curated list of realistic technical interview questions LocalInsta directly equips you to answer confidently, each traced back to the specific module and decision that taught it.',
+            'A final pass confirming the whole Reels feature works together, plus folding video-specific checks into Module 10\'s existing state-coverage and free-tier-usage checklists rather than treating them as separate, forgotten lists.',
           analogy:
-            'A student who has actually cooked every dish on a menu, rather than only reading the recipes, walks into a kitchen trial able to answer "why did you rest the dough" with real, lived experience — not a memorized textbook line.',
+            'Adding a new dish to a restaurant\'s menu means walking it through the exact same pre-opening checklist as every other dish — can it be ordered, cooked, served, and cleaned up correctly — rather than inventing a brand-new, separate checklist just for that one item.',
           theory:
-            'Real interview questions this build genuinely prepares you for, each with a concrete anchor in LocalInsta\'s own code: **"Why did you choose your backend?"** — the Firebase-Storage-requires-Blaze constraint (Module 1). **"How do you prevent a race condition in a like/follow toggle?"** — the unique-constraint-plus-RPC-function pattern (Modules 3, 6). **"Walk me through your database security model."** — RLS policies, including the subquery-based chat policies (Modules 3, 8). **"How do you keep a denormalized counter accurate?"** — the trigger pattern (Modules 3, 6). **"How would you implement a live-updating feed?"** — Postgres Changes vs. Presence, and when to use which (Modules 5, 8). **"How do you handle a scheduled background job without a paid tier?"** — pg_cron (Module 7). **"How do you test that your access control actually works?"** — the impersonation technique, used systematically across the whole course (Modules 3, 9).',
+            'Module 10\'s capstone work (state-coverage audit, free-tier usage check, RLS security pass) was written before this module existed — this final topic is about **folding Reels into those same existing checklists**, not creating parallel ones. Add "Reels feed" and "Create Reel" rows to Module 10\'s loading/error/empty state table; re-check the free-tier usage dashboard now that video content exists; re-run the RLS impersonation test against `posts` specifically confirming a video post\'s ownership checks behave identically to a photo post\'s (they do, per this module\'s earlier verification topic — but worth confirming once more as part of the *complete*, final security pass).\n\nA genuine end-to-end walkthrough: sign in, capture a Reel, publish it, see it in the main feed AND the dedicated Reels feed, swipe through several Reels confirming only one plays at a time, like and comment on one from a second account, confirm the notification arrives — the full loop, exercised for real.',
           whyItMatters:
-            'Recognising these questions as ones you can now answer with a real, specific, lived example — not a rehearsed generic answer — is a concrete, confidence-building way to close out the course.',
+            'Treating a new feature\'s quality bar as "fold it into the existing rigour" rather than "it is new, so it gets a pass for now" is exactly the discipline that keeps a growing codebase\'s overall quality from eroding one feature at a time.',
           steps: [
-            'Read through the question list above.',
-            'For each, without looking anything up, give yourself a genuine, spoken answer using LocalInsta as the concrete example.',
-            'Note any question where your answer felt shaky, and revisit that specific module\'s topics.',
-            'Consider adding two or three of your strongest answers to your README or portfolio notes as talking points for a future interview.',
+            'Add "Reels feed" and "Create Reel" rows to Module 10\'s state-coverage checklist (README), testing loading/error/empty states for each exactly as rigorously as every other screen.',
+            'Re-check the Supabase usage dashboard (Module 10\'s free-tier topic) now that real test Reels exist, updating the recorded numbers.',
+            'Re-run the RLS impersonation test (Module 10\'s security pass) against `posts` specifically for a video row, confirming cross-user protection holds identically to a photo row.',
+            'Do the full manual walkthrough described in this topic\'s theory, on a real device, start to finish.',
+            'Update Module 10\'s architecture-walkthrough README section (its capstone topic) to mention Reels as part of the honest, complete picture of what LocalInsta does.',
           ],
-          code: `<!-- A worked example answer, in your own README/notes -->
-Q: "Walk me through your database security model."
+          code: `<!-- README.md — state-coverage checklist, extended -->
+| Screen              | Loading | Error | Empty |
+|----------------------|---------|-------|-------|
+| ...existing rows from Module 10 unchanged...
+| Reels feed            | ✅       | ✅     | ✅     |
+| Create Reel            | ✅       | ✅     | n/a   |
 
-A: "Every table in LocalInsta has Row Level Security enabled by default,
-which means a table with no policies is fully closed, not fully open —
-that's the safe default I built every table around. For simple ownership
-tables like posts, the policy is a straightforward auth.uid() = user_id
-check. For chat, though, a message doesn't directly say who's allowed to
-read it — so I used a subquery checking whether the current user has a
-row in conversation_participants for that message's conversation. I
-verified every single policy by literally trying to break it — impersonating
-a non-owner in the SQL editor and confirming the write or read genuinely
-failed, not just assuming the policy text was correct."`,
+<!-- RLS checklist, extended -->
+| Table (case)                          | Owner succeeds | Non-owner blocked |
+|----------------------------------------|:---:|:---:|
+| posts — video row insert/update/delete | ✅  | ✅  |`,
           pitfalls: [
-            '**Giving a generic, textbook answer instead of anchoring it in your own actual build.** Interviewers can tell the difference immediately, and a specific example is always more convincing. Fix: always reference the real table, the real trigger, the real decision from your own code.',
-            '**Only preparing answers for the questions on this list, treating it as exhaustive.** It is a representative sample, not the complete universe of possible questions — the real preparation is genuine understanding (this topic\'s predecessor), which generalizes to questions not explicitly listed here.',
-            '**Memorizing a scripted answer word-for-word instead of genuinely understanding it well enough to explain it differently if asked a follow-up.** Fix: practice explaining each answer two different ways, to confirm real understanding rather than rote recall.',
-            '**Skipping this topic because the course already feels "done" after Module 9\'s deployment work.** This reflective, consolidating step is exactly what turns "I built something" into "I can confidently discuss what I built" — a genuinely different, valuable skill.',
+            '**Creating a separate "Reels checklist" document instead of extending Module 10\'s existing ones.** Fragments the project\'s quality tracking across multiple places, easy to let one drift out of date while updating the other. Fix: one set of living checklists, every feature folded in.',
+            '**Assuming the RLS re-check is redundant given this module\'s earlier verification topic already confirmed it.** That earlier topic checked the *trigger and schema* logic conceptually; this final pass is the *literal impersonation test* from Module 10\'s security methodology, applied to a video row specifically — related, but not identical, verification. Fix: do both; they check different things.',
+            '**Skipping the real, full manual walkthrough because individual pieces were each tested in isolation while building them.** The same integration-gap risk Module 10\'s own capstone topic warned about for the rest of the app applies just as much to this module\'s late addition. Fix: one complete, real walkthrough, start to finish.',
+            '**Forgetting to update the architecture-walkthrough README section from Module 10\'s final topic.** An architecture overview that does not mention a real, shipped feature is quietly inaccurate. Fix: treat documentation as part of "done", not an afterthought.',
           ],
           tryIt:
-            'Pick the three questions from the list that feel hardest to answer confidently right now, and spend focused time revisiting the relevant module until you can answer each with a specific, concrete example from your own LocalInsta build.',
-          takeaway: 'Every one of these questions has a real, specific answer sitting in your own codebase — practice retrieving it fluently, not just recognising it when read.',
-        },
-        {
-          id: 'm9-t15',
-          title: 'Where to go next',
-          explain:
-            'A closing map of natural extensions — Reels-style video posts, multi-language support, admin moderation tools — each explicitly scoped as a genuine next step, not a required part of this course.',
-          analogy:
-            'A well-built starter home, finished and genuinely livable, with the electrical and plumbing already run to support an eventual extra room — the room itself is not part of the original build, but the foundation was laid to make adding it straightforward later.',
-          theory:
-            '**Reels-style video posts** — `video_player`/`chewie` for playback, extending `posts.image_url` (perhaps renamed or paired with a `media_type` column) to support video files uploaded through the exact same Module 4 Storage pipeline, just skipping the compression step in favour of video-specific handling. **Multi-language support** — this course\'s `translations_kn.js` pattern (seen across every course in this portfolio) is ready and waiting, just never filled in; LocalInsta\'s coastal-Karnataka framing makes Kannada a natural first addition. **Admin moderation** — a `role` column on `profiles`, an admin-only screen for reviewing reported content, and a `reports` table modeled closely on `notifications`\' RLS pattern (a report is visible only to its creator and to admins, a genuinely new, three-way RLS shape worth exploring). **Group chat** — Module 8\'s conversation/participants schema was deliberately designed to support this as an additive change, exactly as promised.\n\nEach of these is a genuine, realistic extension — but **none is required** to consider LocalInsta, or this course, complete. The app built across Modules 0-9 is a real, working, secured, deployable social app on its own.',
-          whyItMatters:
-            'Ending with a clear, honest boundary — "here is what you built, fully finished; here is what a natural next step could look like, entirely optional" — respects both the real accomplishment of finishing a ten-module course and the learner\'s own judgment about what to build next.',
-          steps: [
-            'Read through the four extension ideas above.',
-            'Pick zero, one, or several that genuinely interest you — none is a requirement.',
-            'For any you pursue, notice how much of the existing foundation (Storage pipeline, RLS patterns, repository/state architecture) transfers directly, versus what is genuinely new.',
-            'If you pursue none of them right now, that is a completely legitimate, finished outcome — LocalInsta as built across this course is a real, working app.',
-          ],
-          code: `-- A sketch of the admin-moderation extension's core new RLS shape,
--- for anyone curious what a genuinely new pattern (beyond anything
--- built in this course) might look like:
-
-alter table public.profiles add column role text not null default 'user'
-  check (role in ('user', 'admin'));
-
-create table public.reports (
-  id uuid primary key default gen_random_uuid(),
-  reporter_id uuid not null references public.profiles(id),
-  post_id uuid references public.posts(id),
-  reason text not null,
-  created_at timestamptz not null default now()
-);
-
--- Visible to its own creator OR any admin — a genuinely new,
--- three-way RLS shape this course never needed until now.
-create policy "reports visible to creator or admin"
-on public.reports for select
-to authenticated
-using (
-  auth.uid() = reporter_id
-  or exists (select 1 from public.profiles where id = auth.uid() and role = 'admin')
-);`,
-          pitfalls: [
-            '**Feeling obligated to build every extension listed here to consider the course "really" finished.** Explicitly false — this topic is a map of possibilities, not a checklist. Fix: treat the completed Modules 0-9 build as the genuine, real finish line.',
-            '**Attempting a major extension (like group chat) without re-reading the specific module that laid its foundation.** Module 8\'s participants-table design decision exists precisely to make this easier — revisit that reasoning before diving in. Fix: reread the relevant "why we built it this way" theory before extending.',
-            '**Underestimating a seemingly small extension\'s real scope** (e.g. assuming multi-language is "just translate the strings" when the actual UI/RTL/pluralization concerns can run deeper). Fix: scope any real extension carefully, the same deliberate way this entire course approached every feature.',
-            '**Not appreciating what was actually built by immediately jumping to "what\'s next" without pausing on the accomplishment.** Ten modules, a real Postgres schema, genuine RLS security, working Realtime features, and a signed release APK is a substantial, complete piece of work. Fix: let that land before deciding what (if anything) comes next.',
-          ],
-          tryIt:
-            'Take a moment to actually open your finished LocalInsta app, browse the feed, post something, chat with a test account, and simply use the thing you built end to end — a genuine, complete, deployable Instagram-style app, built entirely on free-tier services with no card required anywhere.',
-          takeaway: 'LocalInsta as built across Modules 0-9 is a complete, real, secured, deployable app — everything past this point is a genuine, entirely optional choice, not an unfinished obligation.',
+            'Do the complete real-device walkthrough described in this topic — capture, publish, browse both feeds, like/comment from a second account, confirm the notification — and update every relevant Module 10 checklist and README section with the real results.',
+          takeaway: 'A new feature earns its place by meeting the same bar as everything that came before it — folded into the existing checklists, not exempted from them.',
         },
       ],
     },
@@ -722,178 +839,127 @@ using (
     {
       id: 'm9-p1',
       type: 'Project',
-      title: 'Polish, Audit & Ship',
-      domain: 'Deployment / Quality',
-      duration: '3 hours',
+      title: 'Reels, End to End',
+      domain: 'Video / Storage / Realtime UI',
+      duration: '3.5 hours',
       description:
-        'Wire a persisted dark-mode toggle, complete a full loading/error/empty-state and accessibility audit, run a final N+1/indexing and RLS security pass across the entire schema, and produce a signed, side-loadable release APK.',
-      tools: ['Flutter', 'Supabase', 'keytool'],
+        'Extend posts for video, build the capture-compress-upload pipeline, and ship a correct, non-leaking vertical Reels feed with autoplay, mute, and full reuse of the existing like/comment/notification infrastructure.',
+      tools: ['Flutter', 'video_player', 'video_compress', 'supabase_flutter'],
       blueprint: {
         overview:
-          'A ThemeState-driven dark mode toggle persisted via shared_preferences; a completed state-coverage checklist across every screen; icon-button tooltips and tap-target fixes; a documented N+1/index audit using explain analyze; a fully re-verified RLS impersonation checklist across every table; and a signed, split-per-abi release APK successfully side-loaded and smoke-tested on a real device.',
+          'An additive posts schema extension (media_type, video_url, duration_seconds) with a matching check constraint; a capture-compress-thumbnail-upload pipeline reusing Module 4\'s Storage plumbing; a vertical PageView Reels feed with correct single-active-controller playback (no leaked or simultaneously-playing videos), mute toggle, and Module 5\'s double-tap-like reused unmodified; a play-icon overlay on Module 6\'s existing grids; and an explicit verification that likes/comments/notifications needed zero changes.',
         functionalRequirements: [
-          '**Dark mode.** A real, persisted ThemeMode toggle reachable from Settings/Profile, correct across every screen.',
-          '**State audit.** A completed loading/error/empty checklist across every screen built in Modules 2-8, with any found gaps fixed.',
-          '**Accessibility.** Tooltips on every icon-only button, verified contrast on custom colours, 48x48 minimum tap targets.',
-          '**Performance & security.** A documented explain analyze pass on every hot query, and a completed RLS impersonation checklist across every table.',
-          '**Release.** A signed, split-per-abi APK, successfully side-loaded and smoke-tested on a real device.',
+          '**Schema.** Additive posts columns with a check constraint tying media_type to a required video_url; zero changes to existing RLS policies.',
+          '**Capture & compression.** A 60-second duration cap, video_compress-based compression and thumbnail extraction, a post-compression size ceiling with a friendly rejection message.',
+          '**Reels feed.** Vertical PageView, exactly one active/playing controller at any time verified by real testing, a preload window (optional refinement), mute toggle, tap-to-pause, double-tap-to-like via the unmodified Module 5 overlay.',
+          '**Integration.** A play-icon overlay on Module 6\'s grids; a verified, unmodified path for likes/comments/notifications on video posts.',
         ],
         technicalImplementation: [
-          '**core/theme_state.dart.** Persisted ThemeMode via shared_preferences.',
-          '**README.md.** State-coverage checklist, RLS verification checklist, and free-tier usage numbers, all filled in with real results.',
-          '**android/key.properties + build.gradle signing config.** Release keystore wired, gitignored.',
-          '**Build artifacts.** app-arm64-v8a-release.apk, verified installed on a real device.',
+          '**supabase/migrations/0009_reels.sql.** The additive posts columns and check constraint.',
+          '**features/feed/data/{post.dart, posts_repository.dart}.** Extended Post model and createPost signature.',
+          '**features/reels/data/{reel_capture.dart, reel_compression.dart, reel_upload.dart}.**',
+          '**features/reels/presentation/{create_reel_screen.dart, reels_feed_screen.dart, reel_player.dart}.**',
+          '**features/profile/presentation/profile_screen.dart & explore_screen.dart updates.** The play-icon overlay only.',
         ],
         prompts: [
           {
             step: 1,
-            label: 'Dark mode + accessibility pass',
-            outcome: 'A working, persisted theme toggle and accessibility fixes applied.',
+            label: 'Schema extension + Post model',
+            outcome: 'An additive migration and an extended, backward-compatible Post model.',
             prompt:
-              'Create lib/core/theme_state.dart as a ChangeNotifier persisting ThemeMode via shared_preferences, wired into MaterialApp.themeMode and a Settings/Profile toggle. Then audit the whole app for icon-only IconButtons missing a tooltip, adding specific, meaningful labels to each; check the brand orange against white and the dark background for 4.5:1 contrast; and pad any tap target smaller than 48x48 logical pixels.',
+              'Write supabase/migrations/0009_reels.sql adding media_type (default \'image\', check constraint), video_url, and duration_seconds columns to posts, plus a posts_video_needs_url check constraint tying media_type=\'video\' to a required video_url. Extend the Dart Post model with mediaType/videoUrl/durationSeconds fields (all optional, defaulting to the existing photo behaviour) and an isVideo getter, updating copyWith and fromMap. Confirm every existing seeded photo post still round-trips correctly with zero other changes.',
           },
           {
             step: 2,
-            label: 'Loading/error/empty state and N+1/index audit',
-            outcome: 'Every screen genuinely handles all three states; every hot query is index-backed.',
+            label: 'Capture, compression, and upload pipeline',
+            outcome: 'A working pick-to-uploaded-URLs pipeline for video.',
             prompt:
-              'Walk every screen built since Module 2 (auth, feed, create-post, post-detail/comments, profile, edit-profile, followers/following, search, explore, stories, notifications, conversations list, chat) and verify genuine loading, error, and empty-state handling by deliberately testing each (throttled network, airplane mode, fresh test data), fixing any gaps found. Then grep the codebase for any loop containing an await supabase.from(...) call, converting any genuine N+1 pattern found to an embedded select, and run explain analyze against the feed, profile grid, chat history, and notifications queries, confirming Index Scan not Seq Scan on realistic seeded data.',
+              'Add video_compress to pubspec.yaml. Create lib/features/reels/data/reel_capture.dart with pickReelVideo (camera-or-gallery bottom sheet, 60-second maxDuration on the camera source). Create reel_compression.dart with compressReel(path) returning the compressed video file, an extracted thumbnail file, and duration, with a post-compression 15MB size check rejecting oversized results with a friendly message. Create reel_upload.dart with uploadReel reusing Module 4\'s StorageRepository against the existing posts bucket for both the video and thumbnail files.',
           },
           {
             step: 3,
-            label: 'Final RLS security pass',
-            outcome: 'Every table\'s access control independently re-verified.',
+            label: 'The vertical Reels feed with correct playback lifecycle',
+            outcome: 'A working feed where exactly one video ever plays at a time.',
             prompt:
-              'Using the Module 3 impersonation technique, systematically re-verify RLS on every table built this course (profiles, posts, likes, comments, follows, all three storage buckets, notifications, conversations, conversation_participants, messages): for each, confirm a legitimate owner/participant action succeeds and an illegitimate one is blocked. Also grep the Flutter codebase for "service_role" and confirm zero matches. Report the full pass/fail checklist.',
+              'Build lib/features/reels/presentation/reel_player.dart as a StatefulWidget taking videoUrl and isActive, using VideoPlayerController.networkUrl, looping, playing/pausing reactively in didUpdateWidget based on isActive, and disposing correctly. Build reels_feed_screen.dart with a vertical PageView.builder tracking the real current page via onPageChanged, passing isActive: i == currentPage to every ReelPlayer, wrapping each in Module 5\'s existing DoubleTapLikeOverlay unmodified, with a mute toggle and tap-to-pause. Have me test on a real device with sound that only one video ever plays at a time across at least eight seeded Reels.',
           },
           {
             step: 4,
-            label: 'Signed release build and side-load',
-            outcome: 'A working, installed, signed release APK on a real device.',
+            label: 'Publishing + grid integration + infrastructure verification',
+            outcome: 'A complete, integrated Reels feature.',
             prompt:
-              'Guide me through generating a release keystore with keytool, wiring android/key.properties (gitignored) and build.gradle\'s signingConfigs.release, bumping pubspec.yaml\'s version, and running flutter build apk --release --split-per-abi with the real --dart-define SUPABASE_URL and SUPABASE_ANON_KEY flags. Then walk me through side-loading app-arm64-v8a-release.apk onto a real Android device (uninstalling any prior debug build first) and confirm it runs correctly against the live Supabase project.',
+              'Extend PostsRepository.createPost with optional mediaType/videoUrl/durationSeconds parameters. Build create_reel_screen.dart chaining pickReelVideo -> compressReel -> uploadReel -> createPost(mediaType: \'video\'). Add a play-icon overlay to Module 6\'s existing grid cell builder, shown only when post.isVideo, with no other grid changes. Finally, walk me through verifying (with real SQL queries, not just UI testing) that liking, commenting on, and receiving a notification for a video post all work through the exact same Module 3/Module 7 triggers with zero code changes, and update Module 10\'s state-coverage and RLS checklists to include Reels.',
           },
         ],
         deliverable:
-          'A polished, audited, secured, and signed release build of LocalInsta — dark mode works everywhere, every screen handles loading/error/empty states, every hot query is index-backed, every table\'s RLS is independently re-verified, and a real signed APK is installed and working on a physical Android device.',
-      },
-    },
-    {
-      id: 'm9-p2',
-      type: 'Capstone',
-      title: 'Ship LocalInsta End-to-End',
-      domain: 'Full App Delivery',
-      duration: '3 hours',
-      description:
-        'The capstone: confirm every module\'s feature works together as one coherent app, write the complete architecture walkthrough, and close out the course with a genuine, deployable, free-tier social app.',
-      tools: ['Flutter', 'Supabase', 'Everything built across Modules 0-9'],
-      blueprint: {
-        overview:
-          'A full, end-to-end walkthrough of the finished LocalInsta app — sign-up through Google or email, a live feed with likes and comments, stories, follows, search and explore, notifications, real-time chat, dark mode, and a signed release build — paired with a written architecture overview explaining every major decision from Module 1 through Module 9.',
-        functionalRequirements: [
-          '**End-to-end user journey.** Sign up, build a profile, post, like, comment, follow, message — every core feature working together as one coherent app, not isolated demos.',
-          '**Architecture documentation.** A written README section explaining the backend choice, the security model, the recurring patterns (repositories, triggers, optimistic UI), and the free-tier stewardship story.',
-          '**Verified security.** Every table\'s RLS independently re-verified (from the previous project).',
-          '**Deployed artifact.** A signed release APK, side-loaded and smoke-tested on a real device.',
-          '**Interview readiness.** Confident, specific answers to the representative interview questions from this module, anchored in the real build.',
-        ],
-        technicalImplementation: [
-          '**Full manual walkthrough.** Every screen, every feature, exercised in one continuous session as a real user would.',
-          '**README.md.** Complete architecture section, state-coverage checklist, RLS verification checklist, free-tier usage numbers, and the Play Store/side-load decision — all real, filled-in results, not placeholders.',
-          '**Final commit.** A clean git history with no committed secrets, keystores, or credential files.',
-        ],
-        prompts: [
-          {
-            step: 1,
-            label: 'Full end-to-end manual walkthrough',
-            outcome: 'Confirmation that every module\'s feature genuinely works together.',
-            prompt:
-              'Walk me through testing the complete LocalInsta app end to end on a real or emulated device, in one continuous session: sign up with email, confirm the auto-created profile, sign in with Google on a second account, follow the first account, post a photo, like and comment on it from the second account, confirm the notification arrives, post and view a story, search for a username, browse explore, start a chat and exchange messages with live delivery, toggle dark mode, and sign out and back in confirming no data leaked between accounts. Report any integration gap found between features built in different modules.',
-          },
-          {
-            step: 2,
-            label: 'Write the complete architecture README',
-            outcome: 'A genuine, complete architecture document.',
-            prompt:
-              'Help me write a complete "Architecture" section for LocalInsta\'s README covering: why Supabase was chosen over Firebase for this project\'s no-card constraint; the repository + ChangeNotifier pattern used throughout; Row Level Security as the real access-control boundary, including the subquery-based chat policies; the denormalized-counter-plus-trigger pattern and everywhere it recurs; the optimistic-UI-for-own-actions versus Realtime-for-others\'-actions distinction; and how pg_cron and Edge Functions extend the free-tier promise to scheduled jobs and optional push notifications. Base it on what I actually built, not generic boilerplate.',
-          },
-          {
-            step: 3,
-            label: 'Final git hygiene check',
-            outcome: 'A clean, secret-free git history ready to share publicly.',
-            prompt:
-              'Audit my LocalInsta git history for anything that should never have been committed: the release keystore, key.properties, any .env file, or a hardcoded Supabase URL/anon key in a committed .dart file. If anything is found, walk me through the safest remediation (rotating the credential if it is a genuine secret, and/or rewriting history if appropriate) rather than just deleting the file in a new commit.',
-          },
-        ],
-        deliverable:
-          'A complete, working, end-to-end LocalInsta app — every feature from every module functioning together as one coherent product, a genuine architecture write-up in the README, a verified-clean git history, and a signed release APK ready to hand to a real user. This is the finished course capstone.',
+          'A working Reels feature: recording or picking a video, publishing it with a real thumbnail and caption, seeing it in both the main feed and a dedicated vertical swipeable Reels feed where exactly one video ever plays at a time, liking and commenting on it from a second test account with the notification arriving correctly — all verified end to end on a real device.',
       },
     },
   ],
   quiz: [
     {
       id: 'm9-q1',
-      q: 'Why is wiring the dark-mode toggle in Module 9 a relatively small, low-risk change rather than a major undertaking?',
+      q: 'Why does LocalInsta keep `posts.image_url` non-null and add a separate nullable `video_url`, rather than making `image_url` nullable for video posts?',
       options: [
-        'Every screen was already built to read colours from Theme.of(context) since Module 0, instead of hardcoding them',
-        'Flutter automatically supports dark mode with zero code required',
-        'Dark mode only affects the app bar, nothing else',
-        'Supabase manages theme state automatically',
+        'It avoids a null-check ripple effect across every existing screen that already reads image_url as the thumbnail, for both photo and video posts',
+        'Postgres does not allow nullable text columns',
+        'RLS policies require every column to be non-null',
+        'It has no real benefit, it is just a style choice',
       ],
       answer: 0,
     },
     {
       id: 'm9-q2',
-      q: 'Why does the final state-coverage audit involve deliberately triggering loading/error/empty states rather than trusting memory of what was handled during development?',
+      q: 'What is the single biggest correctness risk in a naive PageView.builder-based Reels feed?',
       options: [
-        'Development testing naturally over-indexes on the happy path, so a deliberate audit is needed to actually verify the bad-path handling',
-        'Flutter cannot detect these states automatically',
-        'It is required for App Store submission',
-        'It has no real value beyond documentation',
+        'Every page\'s video controller can end up initialized and playing simultaneously instead of just the currently visible one',
+        'PageView cannot scroll vertically under any configuration',
+        'video_player cannot play more than one video per app session',
+        'Supabase Storage rejects video file uploads by default',
       ],
       answer: 0,
     },
     {
       id: 'm9-q3',
-      q: 'Why does the N+1/indexing audit specifically re-check modules built AFTER Module 5, where the lesson was first taught?',
+      q: 'Why does the "isActive" decision in the Reels feed get computed by the parent ReelsFeedScreen rather than by each ReelPlayer deciding for itself?',
       options: [
-        'Knowing a principle and consistently applying it under the pressure of building later features are different skills, worth deliberately re-verifying',
-        'Only later modules can have N+1 query problems',
-        'Module 5 code is automatically exempt from needing review',
-        'Indexes only matter for tables created after Module 5',
+        'Only the parent, via the real PageController page index, actually knows which page is truly current — leaving it to each item to guess reintroduces the multi-playback bug',
+        'Flutter requires all boolean state to live in a StatelessWidget',
+        'ReelPlayer cannot access BuildContext',
+        'It has no functional difference, only code style',
       ],
       answer: 0,
     },
     {
       id: 'm9-q4',
-      q: 'What happens if a release APK build omits the --dart-define SUPABASE_URL and SUPABASE_ANON_KEY flags used during development?',
+      q: 'Why do likes, comments, and notifications need zero schema or trigger changes to work correctly on a new video post?',
       options: [
-        'The app installs but crashes immediately on Env.assertConfigured() since the compile-time config is empty',
-        'It automatically falls back to a demo mode',
-        'Supabase provides default credentials automatically',
-        'The build fails to compile entirely',
+        'They were always designed to reference a post by its id, never anything photo-specific — an abstraction general enough to cover a content type that did not exist yet',
+        'Likes and comments do not actually work on video posts',
+        'A separate video_likes table was created automatically',
+        'RLS policies are disabled for video posts',
       ],
       answer: 0,
     },
     {
       id: 'm9-q5',
-      q: 'Why does installing a release build over an existing debug build sometimes fail with "App not installed"?',
+      q: 'Why does LocalInsta enforce both a 60-second recording duration cap AND a separate post-compression file-size ceiling for Reels?',
       options: [
-        'The debug and release builds are signed with different keystores, and Android blocks installs with a signature mismatch',
-        'The release APK is always corrupted',
-        'Android limits each device to one Flutter app',
-        'The dart-define flags were formatted incorrectly',
+        'The duration cap does not apply to gallery-picked videos, and even a capped-duration clip can occasionally compress larger than expected — two layers catch what one alone would miss',
+        'Supabase requires exactly two validation layers for every upload',
+        'The size ceiling replaces the need for video compression entirely',
+        'It has no real purpose beyond redundancy',
       ],
       answer: 0,
     },
     {
       id: 'm9-q6',
-      q: 'What is the one place real money could ever be required across LocalInsta\'s entire build, and is it required to finish the course?',
+      q: 'Why does the Reels-specific free-tier math (~3-8MB per Reel) matter more than Module 4\'s original photo-only estimate (~300KB per post)?',
       options: [
-        'The optional one-time $25 Play Console registration fee, only if choosing to publish to the Play Store — side-loading alone is a complete, free finish',
-        'The Supabase free tier eventually requires payment after a certain usage level',
-        'Google Cloud OAuth client creation requires a paid plan',
-        'OneSignal requires a credit card for its free tier',
+        'Video files are roughly 15-25x larger per post, meaning the free tier\'s storage and especially bandwidth ceilings become binding far sooner than they did for photos alone',
+        'Video does not count against the Supabase free tier at all',
+        'Photos and video consume identical amounts of storage once compressed',
+        'The free tier ceiling automatically increases when video content is added',
       ],
       answer: 0,
     },

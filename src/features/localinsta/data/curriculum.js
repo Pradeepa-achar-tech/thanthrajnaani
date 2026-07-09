@@ -1,5 +1,5 @@
 ﻿// Build an Instagram-style App (LocalInsta) — curriculum.
-// A 10-module course that builds a hyperlocal photo & video sharing app with
+// An 11-module course that builds a hyperlocal photo & video sharing app with
 // Flutter + Supabase (Postgres, Auth, Storage, Realtime) from scratch, taught
 // the coastal-Karnataka way, on 100% free-tier services — no card required
 // anywhere in the stack. Each module lives in its own file under ./modules/
@@ -15,11 +15,12 @@ import { m6 } from './modules/m6.js'
 import { m7 } from './modules/m7.js'
 import { m8 } from './modules/m8.js'
 import { m9 } from './modules/m9.js'
+import { m10 } from './modules/m10.js'
 
 export const curriculum = {
   title: 'Build LocalInsta by Thanthrajnaani',
   subtitle: 'A real Flutter + Supabase Instagram-style app, taught the coastal Karnataka way',
-  modules: [m0, m1, m2, m3, m4, m5, m6, m7, m8, m9],
+  modules: [m0, m1, m2, m3, m4, m5, m6, m7, m8, m9, m10],
 }
 
 export const flattenTopics = (mods = curriculum.modules) =>

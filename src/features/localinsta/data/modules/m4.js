@@ -177,7 +177,7 @@ await supabase.from('posts').insert({
             'Note today\'s baseline usage (likely near zero at this point in the course).',
             'Calculate roughly: at ~300KB per compressed post image, how many posts fit in the 1GB storage budget?',
             'Note the monthly bandwidth reset date shown in the dashboard.',
-            'Bookmark this page — you will revisit it in Module 9\'s performance topic once the app has real usage.',
+            'Bookmark this page — you will revisit it in Module 10\'s performance topic once the app has real usage.',
           ],
           code: `-- You can also estimate current Storage usage directly via SQL:
 select
@@ -193,7 +193,7 @@ group by bucket_id;`,
             '**Confusing database storage (Module 3\'s 500MB Postgres quota) with file Storage (this module\'s 1GB quota).** They are two entirely separate meters. Fix: know which quota a given piece of data counts against.',
           ],
           tryIt:
-            'Run the SQL usage-estimation query above right now (even with your Storage buckets still empty or nearly so) so you know exactly how to check it again in Module 9 once the app has real seeded content.',
+            'Run the SQL usage-estimation query above right now (even with your Storage buckets still empty or nearly so) so you know exactly how to check it again in Module 10 once the app has real seeded content.',
           takeaway: '1GB storage and 5GB bandwidth, genuinely free, is enormous headroom for this course — compression is what stretches it further, not what saves you from an imminent crisis.',
         },
       ],

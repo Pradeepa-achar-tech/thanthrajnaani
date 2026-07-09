@@ -95,14 +95,14 @@ export const courses = [
   {
     id: 'localinsta',
     title: 'Build LocalInsta (Instagram Clone)',
-    tagline: 'A real Flutter + Supabase photo-sharing app, 100% free tier, no card required — ever',
+    tagline: 'A real Flutter + Supabase photo & video app, 100% free tier, no card required — ever',
     description:
-      'A 10-module deep dive that builds a hyperlocal Instagram-style photo & video sharing app from scratch with Flutter and Supabase — Postgres data modelling with Row Level Security, email/Google auth, a Storage-backed media pipeline, a realtime feed with likes and comments, follows and explore, 24-hour stories cleaned up by a free pg_cron job, trigger-driven notifications, and realtime direct messages. Every service used is genuinely free with no credit card required at any point, and every topic ships with a coastal Karnataka analogy.',
+      'An 11-module deep dive that builds a hyperlocal Instagram-style photo & video sharing app from scratch with Flutter and Supabase — Postgres data modelling with Row Level Security, email/Google auth, a Storage-backed media pipeline, a realtime feed with likes and comments, follows and explore, 24-hour stories cleaned up by a free pg_cron job, trigger-driven notifications, realtime direct messages, and a full vertical Reels video feed. Every service used is genuinely free with no credit card required at any point, and every topic ships with a coastal Karnataka analogy.',
     level: 'Beginner → Advanced',
-    durationHours: 82,
-    modulesCount: 10,
+    durationHours: 90,
+    modulesCount: 11,
     icon: Camera,
-    skills: ['Dart 3', 'Flutter', 'Supabase & Postgres', 'Row Level Security', 'Realtime & Storage', 'Free-tier Deployment'],
+    skills: ['Dart 3', 'Flutter', 'Supabase & Postgres', 'Row Level Security', 'Realtime & Storage', 'Reels & Video', 'Free-tier Deployment'],
     routePlay: '/courses/localinsta/learn',
   },
   {

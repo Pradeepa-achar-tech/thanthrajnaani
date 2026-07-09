@@ -237,7 +237,7 @@ class Env {
 *.env`,
           pitfalls: [
             '**Writing `const url = \'https://xxxx.supabase.co\';` directly in `main.dart`.** Works, but now it is permanently in git history even if you delete it later. Fix: always route secrets through `String.fromEnvironment`.',
-            '**Forgetting `--dart-define` flags when building a release APK.** The app compiles but crashes on `Env.assertConfigured()` at startup. Fix: your release build command (Module 9) must pass the same flags.',
+            '**Forgetting `--dart-define` flags when building a release APK.** The app compiles but crashes on `Env.assertConfigured()` at startup. Fix: your release build command (Module 10) must pass the same flags.',
             '**Committing `launch.json` by accident because it "looked like config, not a secret".** Fix: gitignore it explicitly and keep a `launch.json.example` with placeholder values checked in instead.',
             '**Using `Platform.environment` instead of `String.fromEnvironment`.** Reads OS environment variables at *runtime*, which does not exist the same way on a compiled mobile app. Fix: `String.fromEnvironment` is resolved at *compile* time — the correct tool for Flutter.',
           ],
@@ -302,7 +302,7 @@ final supabase = Supabase.instance.client;
           id: 'm1-t7',
           title: 'Folder architecture: features, core & shared',
           explain:
-            'A feature-first folder structure — `features/auth`, `features/feed`, `features/profile`, `features/stories`, `features/chat`, `features/notifications` — keeps LocalInsta navigable as it grows across ten modules.',
+            'A feature-first folder structure — `features/auth`, `features/feed`, `features/profile`, `features/stories`, `features/chat`, `features/notifications` — keeps LocalInsta navigable as it grows across eleven modules.',
           analogy:
             'A well-run kitchen keeps ingredients organised by dish station, not by alphabet — the tandoor station has its own spices, tools, and prep counter, separate from the dessert station. Feature-first folders do the same for LocalInsta: everything the feed needs lives together, everything chat needs lives together, and `core/` holds the shared plumbing every station uses (the gas line, the water supply).',
           theory:
@@ -341,7 +341,8 @@ final supabase = Supabase.instance.client;
     profile/
     stories/
     chat/
-    notifications/`,
+    notifications/
+    reels/`,
           pitfalls: [
             '**Mixing feature-first and layer-first halfway through.** Half the app in `screens/`, half in `features/*/presentation/` — nobody can find anything. Fix: commit to feature-first from this module onward.',
             '**Putting a genuinely shared widget inside one feature folder "because that is where it was first needed".** Other features end up importing across feature boundaries, creating tangled dependencies. Fix: promote it to `shared/` the moment a second feature needs it.',
@@ -364,7 +365,7 @@ final supabase = Supabase.instance.client;
           explain:
             '`flutter_lints` plus `dart format` keep LocalInsta\'s code consistent from the very first commit, across every module and every future contributor.',
           analogy:
-            'A shared recipe book only works if everyone measures a "cup" the same way — the lint rules are that shared measurement standard, so code written in Module 1 still reads naturally next to code written in Module 9.',
+            'A shared recipe book only works if everyone measures a "cup" the same way — the lint rules are that shared measurement standard, so code written in Module 1 still reads naturally next to code written in Module 10.',
           theory:
             '`flutter_lints` (already added to `dev_dependencies` in an earlier topic) ships a curated set of Dart/Flutter static-analysis rules — unused imports, missing `const`, prefer-final-fields, and more — enforced via `analysis_options.yaml`. VS Code\'s Dart extension surfaces these as live squiggly warnings as you type.\n\n`dart format .` auto-formats every `.dart` file to a single, consistent style (2-space indent, trailing commas, line-wrapping rules) — no more bikeshedding over spacing in code review. Run it before every commit; many teams wire it into a pre-commit hook so it is never optional.',
           whyItMatters:
@@ -453,7 +454,7 @@ $ dart run flutter_native_splash:create`,
           analogy:
             'A caterer\'s recipe notebook is shared freely with the next cook — but the safe combination and the day\'s cash tally are kept in a separate, private drawer. Your git repo is the recipe notebook; `.gitignore` is what keeps the safe combination (secrets) and today\'s clutter (build artifacts) out of it.',
           theory:
-            '`flutter create` already generates a solid baseline `.gitignore` (covering `build/`, `.dart_tool/`, platform-specific caches). You extend it with the LocalInsta-specific exclusions from earlier topics: `.vscode/launch.json` (holds the Supabase URL/anon key locally), any `.env` file, and later the Android signing `key.properties`/`*.jks` files from Module 9.\n\n`pubspec.lock` is the one "generated-looking" file you **do** commit for an app (not a library) — it pins exact dependency versions so every clone builds identically. A clean first commit, a `README.md` describing the project, and a sensible default branch name (`main`) round out a repo that looks professional from commit one.',
+            '`flutter create` already generates a solid baseline `.gitignore` (covering `build/`, `.dart_tool/`, platform-specific caches). You extend it with the LocalInsta-specific exclusions from earlier topics: `.vscode/launch.json` (holds the Supabase URL/anon key locally), any `.env` file, and later the Android signing `key.properties`/`*.jks` files from Module 10.\n\n`pubspec.lock` is the one "generated-looking" file you **do** commit for an app (not a library) — it pins exact dependency versions so every clone builds identically. A clean first commit, a `README.md` describing the project, and a sensible default branch name (`main`) round out a repo that looks professional from commit one.',
           whyItMatters:
             'A leaked API key or keystore in git history is one of the most common real-world security incidents — and once something is pushed to a public GitHub repo, treat it as compromised forever, even if you delete it in a later commit. Getting `.gitignore` right *before* the first commit is far cheaper than scrubbing history after.',
           steps: [

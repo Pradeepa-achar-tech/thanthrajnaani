@@ -468,7 +468,7 @@ Future<void> setNewPassword(String newPassword) async {
           analogy:
             'Every signature on a bank cheque is compared against a signature card on file — a debug build and a release build sign with two different "pens", so each needs its own signature registered before the bank (Google) will honour it.',
           theory:
-            'Every Android app is cryptographically **signed** — during development, Flutter auto-generates and uses a shared **debug keystore** on your machine; production builds use a separate **release keystore** you generate yourself (covered fully in Module 9). Google Sign-In validates the calling app by checking its **SHA-1 certificate fingerprint** against what is registered on the Android OAuth client — an unregistered fingerprint means Google refuses to hand back a token at all, no error dialog, just silent failure or a generic `ApiException: 10`.\n\n`cd android && ./gradlew signingReport` prints every variant\'s SHA-1 (and SHA-256). For now you only need the **debug** SHA-1; register it on the Android OAuth client from the previous topic. You will repeat this exact step with your **release** keystore\'s SHA-1 in Module 9, right before shipping — forgetting that second registration is the single most common "Google Sign-In worked in development but broke in the release APK" bug.',
+            'Every Android app is cryptographically **signed** — during development, Flutter auto-generates and uses a shared **debug keystore** on your machine; production builds use a separate **release keystore** you generate yourself (covered fully in Module 10). Google Sign-In validates the calling app by checking its **SHA-1 certificate fingerprint** against what is registered on the Android OAuth client — an unregistered fingerprint means Google refuses to hand back a token at all, no error dialog, just silent failure or a generic `ApiException: 10`.\n\n`cd android && ./gradlew signingReport` prints every variant\'s SHA-1 (and SHA-256). For now you only need the **debug** SHA-1; register it on the Android OAuth client from the previous topic. You will repeat this exact step with your **release** keystore\'s SHA-1 in Module 10, right before shipping — forgetting that second registration is the single most common "Google Sign-In worked in development but broke in the release APK" bug.',
           whyItMatters:
             '`ApiException: 10` (DEVELOPER_ERROR) is one of the most-searched Android errors precisely because a missing SHA-1 gives almost no useful information back to your app — recognising the symptom immediately, instead of debugging your Dart code for an hour, is a genuinely valuable skill.',
           steps: [
@@ -476,7 +476,7 @@ Future<void> setNewPassword(String newPassword) async {
             'Find the `Variant: debug` block and copy its `SHA1:` value.',
             'Go back to Google Cloud Console → your Android OAuth client → paste the SHA-1 into the fingerprint field.',
             'Save, and wait 1-5 minutes for Google\'s propagation (it is not always instant).',
-            'Keep a note: "release SHA-1 still needed before shipping" — you will action this in Module 9.',
+            'Keep a note: "release SHA-1 still needed before shipping" — you will action this in Module 10.',
           ],
           code: `# From the android/ folder
 $ ./gradlew signingReport
@@ -491,16 +491,16 @@ SHA256: ...
 
 Variant: release
 Config: release
-Store: android/app/upload-keystore.jks   # does not exist yet — Module 9
+Store: android/app/upload-keystore.jks   # does not exist yet — Module 10
 ...`,
           pitfalls: [
             '**Getting `ApiException: 10` and assuming it is a Dart/Flutter bug.** It almost always means an unregistered or mismatched SHA-1. Fix: re-run `signingReport`, double-check the exact fingerprint is pasted into the correct Android OAuth client.',
             '**Registering the SHA-1 but not waiting for propagation.** Google\'s change can take a few minutes to take effect. Fix: wait, then retry, before assuming the fix did not work.',
             '**Forgetting that every teammate\'s machine has a different debug keystore (hence a different SHA-1).** Google Sign-In works for you, fails for a teammate. Fix: register every developer\'s debug SHA-1, or share one debug keystore file across the team (a common real-world practice).',
-            '**Not planning ahead for the release SHA-1.** Google Sign-In silently breaks the day you ship a signed release build. Fix: note this now; Module 9 makes it an explicit checklist item.',
+            '**Not planning ahead for the release SHA-1.** Google Sign-In silently breaks the day you ship a signed release build. Fix: note this now; Module 10 makes it an explicit checklist item.',
           ],
           tryIt:
-            'Run `signingReport` yourself, register your real debug SHA-1 on the Android OAuth client, and write both the debug SHA-1 and today\'s date in your project README so future-you (in Module 9) knows exactly what was already done.',
+            'Run `signingReport` yourself, register your real debug SHA-1 on the Android OAuth client, and write both the debug SHA-1 and today\'s date in your project README so future-you (in Module 10) knows exactly what was already done.',
           takeaway: 'Every signing key needs its own registered SHA-1 — debug now, release later — or Google Sign-In fails silently.',
         },
         {

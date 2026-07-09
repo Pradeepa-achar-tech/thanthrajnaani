@@ -740,13 +740,13 @@ class SignInButton extends StatelessWidget {
           id: 'm0-t14',
           title: 'Theming with ThemeData — laying the groundwork for dark mode',
           explain:
-            'A single `ThemeData` object drives every default colour, font, and spacing across the app — and switching it is how Module 9\'s dark mode works.',
+            'A single `ThemeData` object drives every default colour, font, and spacing across the app — and switching it is how Module 10\'s dark mode works.',
           analogy:
             'A restaurant\'s house style — plate colour, font on the menu, the shade of the tablecloth — is decided once by the owner and every dish just inherits it. `ThemeData` is that house style for LocalInsta: set it once at the root, and every `Text`, `AppBar`, and `ElevatedButton` picks it up automatically unless you override it locally.',
           theory:
             '`MaterialApp(theme: ThemeData(...))` sets the **light** theme; `darkTheme: ThemeData.dark(...)` sets the dark one, and `themeMode: ThemeMode.system` (or `.light`/`.dark`) picks which is active. Inside a widget, `Theme.of(context).colorScheme.primary` reads the current theme rather than hardcoding a colour — meaning the same widget automatically looks right in both modes.\n\nDefine LocalInsta\'s palette once via `ColorScheme.fromSeed(seedColor: ...)`, which Material 3 uses to derive a full, harmonious set of shades — primary, surface, error, and their "on-" text-contrast pairs — instead of you picking a dozen colours by hand.',
           whyItMatters:
-            'Retrofitting theming after fifty screens hardcode `Colors.white` and `Colors.black` directly is a miserable multi-day job. Wiring theme-aware colours from the very first screen means Module 9\'s dark-mode toggle is a five-minute feature, not a rewrite.',
+            'Retrofitting theming after fifty screens hardcode `Colors.white` and `Colors.black` directly is a miserable multi-day job. Wiring theme-aware colours from the very first screen means Module 10\'s dark-mode toggle is a five-minute feature, not a rewrite.',
           steps: [
             'Define `ThemeData(colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepOrange))` for light mode.',
             'Define a second `ThemeData.dark(...)` variant for dark mode.',
@@ -775,7 +775,7 @@ class LocalInstaApp extends StatelessWidget {
       title: 'LocalInsta',
       theme: lightTheme,
       darkTheme: darkTheme,
-      themeMode: ThemeMode.system, // Module 9 swaps this for a user toggle
+      themeMode: ThemeMode.system, // Module 10 swaps this for a user toggle
       home: const FeedScreen(),
     );
   }
