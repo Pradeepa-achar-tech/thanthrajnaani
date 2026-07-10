@@ -4,6 +4,7 @@ import { Loader2 } from 'lucide-react'
 import Navbar from './components/Navbar.jsx'
 import Footer from './components/Footer.jsx'
 import ErrorBoundary from './components/ErrorBoundary.jsx'
+import PwaPrompts from './components/PwaPrompts.jsx'
 import HomePage from './pages/HomePage.jsx'
 import CoursesPage from './pages/CoursesPage.jsx'
 import CourseDetailPage from './pages/CourseDetailPage.jsx'
@@ -209,6 +210,7 @@ export default function App() {
       </main>
 
       {!isPlayer && <Footer />}
+      <PwaPrompts />
     </div>
   )
 }
