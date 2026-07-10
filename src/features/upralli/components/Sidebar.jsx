@@ -1,12 +1,9 @@
-import { useRef } from 'react'
 import {
   BookOpen,
-  Download,
   GraduationCap,
   LayoutDashboard,
   LogOut,
   RotateCcw,
-  Upload,
   X,
 } from 'lucide-react'
 import { curriculum } from '../data/curriculum.js'
@@ -30,22 +27,12 @@ export default function Sidebar({
   overallPct,
   onSelect,
   onReset,
-  onExport,
-  onImport,
   onSignOut,
   open,
   onClose,
 }) {
-  const fileInputRef = useRef(null)
   const L = useUiText()
   const isKannada = useIsKannada()
-
-  const triggerImport = () => fileInputRef.current?.click()
-  const handleFileChange = (e) => {
-    const file = e.target.files?.[0]
-    if (file) onImport?.(file)
-    e.target.value = ''
-  }
 
   return (
     <>
@@ -181,31 +168,6 @@ export default function Sidebar({
 
         {/* Utility actions */}
         <div className="border-t border-zinc-200 p-3 space-y-2">
-          <div className="grid grid-cols-2 gap-2">
-            <button
-              onClick={onExport}
-              title={L.exportTitle}
-              className="flex items-center justify-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 hover:bg-white px-2 py-2 rounded-lg border border-zinc-200 transition-colors"
-            >
-              <Download className="w-3.5 h-3.5" />
-              {L.export}
-            </button>
-            <button
-              onClick={triggerImport}
-              title={L.importTitle}
-              className="flex items-center justify-center gap-1.5 text-xs text-zinc-600 hover:text-zinc-900 hover:bg-white px-2 py-2 rounded-lg border border-zinc-200 transition-colors"
-            >
-              <Upload className="w-3.5 h-3.5" />
-              {L.import}
-            </button>
-            <input
-              ref={fileInputRef}
-              type="file"
-              accept="application/json,.json"
-              onChange={handleFileChange}
-              className="hidden"
-            />
-          </div>
           <button
             onClick={onReset}
             className="w-full flex items-center justify-center gap-2 text-xs text-zinc-600 hover:text-rose-700 hover:bg-rose-50 hover:border-rose-200 px-3 py-2 rounded-lg border border-zinc-200 transition-colors"
