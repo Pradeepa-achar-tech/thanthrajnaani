@@ -2,7 +2,6 @@ import { useState } from 'react'
 import {
   BookOpen,
   Brain,
-  GraduationCap,
   Trophy,
   BarChart3,
   Zap,
@@ -216,9 +215,7 @@ export default function LoginPage() {
 
             {/* Logo */}
             <div className="flex items-center gap-3 mb-8">
-              <div className="w-9 h-9 rounded-xl bg-accent-500/15 border border-accent-500/30 flex items-center justify-center flex-shrink-0">
-                <GraduationCap className="w-4 h-4 text-accent-400" />
-              </div>
+              <img src="/logo-mark.png" alt="Thanthrajnaani" className="w-9 h-9 rounded-xl flex-shrink-0" />
               <div>
                 <p className="text-sm font-bold text-white leading-tight">GenAI - ML Tutorial</p>
                 <p className="text-[11px] font-extrabold italic bg-gradient-to-r from-accent-300 via-fuchsia-400 to-cyan-300 bg-clip-text text-transparent">
@@ -340,9 +337,7 @@ export default function LoginPage() {
 
             {/* Mobile-only logo */}
             <div className="flex md:hidden items-center gap-2.5 mb-6">
-              <div className="w-8 h-8 rounded-lg bg-accent-500/15 border border-accent-500/30 flex items-center justify-center">
-                <GraduationCap className="w-4 h-4 text-accent-400" />
-              </div>
+              <img src="/logo-mark.png" alt="Thanthrajnaani" className="w-8 h-8 rounded-lg" />
               <span className="text-sm font-bold text-white">GenAI - ML Tutorial</span>
             </div>
 

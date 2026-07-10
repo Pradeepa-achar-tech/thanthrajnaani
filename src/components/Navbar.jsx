@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
-import { GraduationCap, LogIn, LogOut, Menu, X, Loader2 } from 'lucide-react'
+import { LogIn, LogOut, Menu, X, Loader2 } from 'lucide-react'
 import { useAuth } from '../contexts/AuthContext.jsx'
 
 export default function Navbar() {
@@ -37,9 +37,7 @@ export default function Navbar() {
     <header className="sticky top-0 z-30 bg-white/80 backdrop-blur-md border-b border-zinc-200">
       <div className="max-w-6xl mx-auto px-4 md:px-6 h-16 flex items-center gap-3">
         <Link to="/" className="group flex items-center gap-2.5 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-accent-500 flex items-center justify-center">
-            <GraduationCap className="w-4 h-4 text-white" />
-          </div>
+          <img src="/logo-mark.png" alt="Thanthrajnaani" className="w-8 h-8 rounded-lg flex-shrink-0" />
           <span className="font-semibold tracking-tight text-zinc-900 text-[15px]">
             Thanthrajnaani
           </span>

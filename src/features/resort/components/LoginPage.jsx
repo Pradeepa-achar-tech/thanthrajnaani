@@ -4,7 +4,6 @@ import {
   BookOpen,
   Check,
   Cloud,
-  GraduationCap,
   Loader2,
   ShieldCheck,
   Smartphone,
@@ -88,9 +87,7 @@ export default function LoginPage() {
 
       <header className="relative z-10 px-4 md:px-8 h-14 flex items-center justify-between border-b border-slate-900/80">
         <div className="flex items-center gap-2 min-w-0">
-          <div className="w-8 h-8 rounded-lg bg-accent-500/15 border border-accent-500/30 flex items-center justify-center flex-shrink-0">
-            <GraduationCap className="w-4 h-4 text-accent-400" />
-          </div>
+          <img src="/logo-mark.png" alt="Thanthrajnaani" className="w-8 h-8 rounded-lg flex-shrink-0" />
           <div className="leading-tight min-w-0">
             <div className="text-sm font-semibold truncate">{L.appTitle}</div>
             <div className="text-[11px] text-slate-500 truncate">
