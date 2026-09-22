@@ -8,3 +8,15 @@ dist
 .DS_Store
 .claude/
 
+# LocalInstaApp (Flutter) — build artifacts, never secrets
+LocalInstaApp/build/
+LocalInstaApp/.dart_tool/
+LocalInstaApp/.flutter-plugins
+LocalInstaApp/.flutter-plugins-dependencies
+LocalInstaApp/.packages
+LocalInstaApp/android/local.properties
+LocalInstaApp/android/key.properties
+LocalInstaApp/android/**/*.jks
+LocalInstaApp/android/**/*.keystore
+LocalInstaApp/.vscode/launch.json
+

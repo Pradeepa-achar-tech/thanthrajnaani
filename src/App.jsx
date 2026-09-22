@@ -106,6 +106,19 @@ const GenAIFastPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const GitPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/git/App.jsx'),
+    import('./features/git/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 const LocalInstaPlayer = lazy(async () => {
   const [App, Lang] = await Promise.all([
     import('./features/localinsta/App.jsx'),
@@ -132,6 +145,45 @@ const KalaKaaraPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const DockerPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/docker/App.jsx'),
+    import('./features/docker/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
+const AuthPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/auth/App.jsx'),
+    import('./features/auth/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
+const AIAgentPlayer = lazy(async () => {
+  const [App, Lang] = await Promise.all([
+    import('./features/aiagent/App.jsx'),
+    import('./features/aiagent/contexts/LanguageContext.jsx'),
+  ])
+  const Wrapped = () => (
+    <Lang.LanguageProvider>
+      <App.default />
+    </Lang.LanguageProvider>
+  )
+  return { default: Wrapped }
+})
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
   if (courseId === 'flutter') return <FlutterPlayer />
@@ -141,8 +193,12 @@ function CoursePlayerSwitch() {
   if (courseId === 'temple') return <TemplePlayer />
   if (courseId === 'upralli') return <UpralliPlayer />
   if (courseId === 'genaifast') return <GenAIFastPlayer />
+  if (courseId === 'git') return <GitPlayer />
   if (courseId === 'localinsta') return <LocalInstaPlayer />
   if (courseId === 'kalakaara') return <KalaKaaraPlayer />
+  if (courseId === 'docker') return <DockerPlayer />
+  if (courseId === 'auth') return <AuthPlayer />
+  if (courseId === 'aiagent') return <AIAgentPlayer />
   return <Navigate to="/courses" replace />
 }
 

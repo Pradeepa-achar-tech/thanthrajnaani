@@ -28,8 +28,11 @@ const curriculumLoaders = {
   temple: () => import('../features/temple/data/curriculum.js'),
   upralli: () => import('../features/upralli/data/curriculum.js'),
   genaifast: () => import('../features/genaifast/data/curriculum.js'),
+  git: () => import('../features/git/data/curriculum.js'),
   localinsta: () => import('../features/localinsta/data/curriculum.js'),
   kalakaara: () => import('../features/kalakaara/data/curriculum.js'),
+  docker: () => import('../features/docker/data/curriculum.js'),
+  auth: () => import('../features/auth/data/curriculum.js'),
 }
 
 export default function CourseDetailPage() {

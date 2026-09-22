@@ -1,0 +1,51 @@
+name: localinsta
+description: "LocalInsta — a hyperlocal Instagram-style photo & video sharing app. Flutter + Supabase, 100% free tier, no card required."
+publish_to: 'none'
+version: 1.0.0+1
+
+environment:
+  sdk: ^3.10.4
+
+dependencies:
+  flutter:
+    sdk: flutter
+  cupertino_icons: ^1.0.8
+
+  # Backend
+  supabase_flutter: ^2.8.0
+
+  # Media
+  image_picker: ^1.1.2
+  image_cropper: ^8.1.0
+  cached_network_image: ^3.4.1
+  shimmer: ^3.0.0
+
+  # State
+  provider: ^6.1.2
+
+  # UI / utility
+  google_fonts: ^6.2.1
+  timeago: ^3.7.0
+  uuid: ^4.5.1
+  share_plus: ^10.1.4
+  flutter_svg: ^2.0.17
+  connectivity_plus: ^6.1.2
+  shared_preferences: ^2.3.4
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^6.0.0
+  flutter_launcher_icons: ^0.14.3
+
+flutter:
+  uses-material-design: true
+  assets:
+    - assets/icon/
+
+flutter_launcher_icons:
+  android: true
+  ios: false
+  image_path: "assets/icon/logo-mark.png"
+  adaptive_icon_background: "#FFFFFF"
+  adaptive_icon_foreground: "assets/icon/logo-mark.png"

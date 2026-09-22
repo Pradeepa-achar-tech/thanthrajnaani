@@ -1,6 +1,19 @@
-﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText, Zap, Camera, Palette } from 'lucide-react'
+﻿import { Smartphone, Sparkles, ReceiptText, Hotel, Landmark, ScrollText, Zap, Camera, Palette, GitBranch, ShieldCheck, Container, Braces } from 'lucide-react'
 
 export const courses = [
+  {
+    id: 'aiagent',
+    title: 'AI Agent Visual Lab',
+    tagline: 'A senior .NET engineer\'s path to production AI agents',
+    description:
+      'Learn from first principles: Python for .NET developers, LLM fundamentals, tool calling, agents, RAG, LangGraph, MCP, and building a GitHub coding agent that integrates with Slack. See, play, understand, code, break, fix, challenge.',
+    level: 'Intermediate → Advanced',
+    durationHours: 120,
+    modulesCount: 12,
+    icon: Braces,
+    skills: ['Python', 'LLMs', 'Agents', 'RAG', 'LangGraph', 'MCP', 'GitHub API', 'Slack API'],
+    routePlay: '/courses/aiagent/learn',
+  },
   {
     id: 'flutter',
     title: 'Flutter & Dart',
@@ -117,6 +130,45 @@ export const courses = [
     icon: Palette,
     skills: ['React + Vite', 'Supabase & PostgreSQL', 'Row Level Security', 'Google OAuth', 'CSS Modules', 'Geo Search & Vercel'],
     routePlay: '/courses/kalakaara/learn',
+  },
+  {
+    id: 'docker',
+    title: 'Docker for MERN Developers',
+    tagline: 'Docker, taught the easiest way there is — one real MERN app, containerized module by module',
+    description:
+      'A 10-module, hands-on path through Docker that never stays abstract — every concept lands inside one real running example: Kundapura Notice Board, a MERN (MongoDB, Express, React, Node) community noticeboard app. You will go from "works on my machine" to your first Dockerfile, named volumes and bind mounts for persistent + fast local dev, a proper user-defined network replacing fragile container linking, multi-stage builds serving a React app through nginx, a full docker-compose.yml wiring the whole stack together, a dev workflow with Compose overrides and .env files, hardened non-root images with health checks, and finally shipping to Docker Hub with a GitHub Actions pipeline and a real cloud deploy.',
+    level: 'Beginner → Intermediate',
+    durationHours: 69,
+    modulesCount: 10,
+    icon: Container,
+    skills: ['Docker & Dockerfiles', 'Volumes & Networking', 'Multi-stage Builds', 'Docker Compose', 'MERN Stack', 'CI/CD Deployment'],
+    routePlay: '/courses/docker/learn',
+  },
+  {
+    id: 'git',
+    title: 'Git Mastery',
+    tagline: 'Master version control end to end — from your first commit to rewriting history like a pro',
+    description:
+      'A 10-module deep dive covering everything a working engineer actually needs from Git: the daily add/commit/log loop, branching and merging, safely undoing and rewriting history, interactive rebase, remotes and GitHub pull-request workflows, the object-database internals that make it all click, and the branching strategies, code review, and release practices real teams run on. Every module grows one running practice repository — Tide Board, a Kundapura harbor tide-and-ferry-times site — from a solo project into a small team\'s shared, reviewed codebase.',
+    level: 'Beginner → Advanced',
+    durationHours: 72,
+    modulesCount: 10,
+    icon: GitBranch,
+    skills: ['Git Fundamentals', 'Branching & Merging', 'Rebase & History', 'GitHub Workflows', 'Git Internals', 'Team Workflows'],
+    routePlay: '/courses/git/learn',
+  },
+  {
+    id: 'auth',
+    title: 'Build KaavalID: Authentication & SSO from Scratch',
+    tagline: 'A real ASP.NET Core identity & SSO service, taught the coastal Karnataka way',
+    description:
+      'A 10-module deep dive that builds KaavalID, a production identity & SSO service, from scratch with ASP.NET Core and C# — password hashing with ASP.NET Core Identity, JWT structure and signing, refresh-token rotation, OAuth 2.0 with PKCE, your own OpenID Connect authorization server with OpenIddict, Google and Microsoft (Entra ID) single sign-on, validating hosted providers like Clerk and Auth.js, multi-factor authentication, and production key rotation and deployment. Every topic ships with a coastal Karnataka analogy and real ASP.NET Core code.',
+    level: 'Intermediate → Advanced',
+    durationHours: 87,
+    modulesCount: 10,
+    icon: ShieldCheck,
+    skills: ['C# / .NET', 'JWT & OAuth 2.0', 'OpenID Connect', 'Google & Microsoft SSO', 'Clerk & Auth.js', 'EF Core + PostgreSQL'],
+    routePlay: '/courses/auth/learn',
   },
 ]
 

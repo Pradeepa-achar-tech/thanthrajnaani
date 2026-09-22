@@ -1,0 +1,75 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap');
+
+:root {
+  --accent-400: #fb923c;
+  --accent-500: #f97316;
+  --accent-600: #ea580c;
+}
+
+body {
+  font-family: 'Inter', sans-serif;
+}
+
+@keyframes fade-in {
+  from {
+    opacity: 0;
+    transform: translateY(8px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.3s ease-out forwards;
+}
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Syntax highlighting for code blocks */
+code {
+  font-family: 'Courier New', Courier, monospace;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+::-webkit-scrollbar-thumb {
+  background: rgba(118, 118, 118, 0.5);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(118, 118, 118, 0.8);
+}
+
+/* Card utility */
+.card {
+  border-radius: 0.75rem;
+  border: 1px solid rgb(228, 228, 231 / 1);
+  background-color: rgb(255, 255, 255 / 1);
+}
+
+/* Accent color utilities */
+.text-accent-400 { color: var(--accent-400); }
+.text-accent-500 { color: var(--accent-500); }
+.text-accent-600 { color: var(--accent-600); }
+.bg-accent-400 { background-color: var(--accent-400); }
+.bg-accent-500 { background-color: var(--accent-500); }
+.bg-accent-600 { background-color: var(--accent-600); }
+.bg-accent-50 { background-color: rgb(255 247 237 / 1); }
+.border-accent-200 { border-color: rgb(254, 215, 170 / 1); }
+.border-accent-500 { border-color: var(--accent-500); }
+.hover\:border-accent-500:hover { border-color: var(--accent-500); }
+.hover\:border-accent-200:hover { border-color: rgb(254, 215, 170 / 1); }
