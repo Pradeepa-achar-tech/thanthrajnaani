@@ -1,0 +1,55 @@
+import { ArrowRight, Mail } from 'lucide-react'
+import { Link } from 'react-router-dom'
+
+export default function HeroSection() {
+  return (
+    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-20 md:pt-32 pb-16 md:pb-24">
+      <div className="space-y-8">
+        {/* Eyebrow */}
+        <div className="flex items-center gap-2">
+          <span className="eyebrow text-zinc-500">
+            KUNDAPURA, INDIA · PRODUCT OWNER · SOFTWARE ARCHITECT · FULL-STACK ENGINEER
+          </span>
+        </div>
+
+        {/* Main Headline */}
+        <h1 className="text-5xl md:text-7xl font-bold leading-[1.1] tracking-tight text-zinc-900 max-w-4xl">
+          I architect, build, and ship{' '}
+          <span className="text-accent-600">products across web, mobile, desktop,</span> and{' '}
+          <span className="text-accent-600">AI</span>.
+        </h1>
+
+        {/* Supporting Copy */}
+        <div className="max-w-2xl space-y-4 text-zinc-600">
+          <p className="text-lg leading-relaxed">
+            I'm Thanthrajnani — a product-focused software engineer building production-ready applications across multiple platforms.
+          </p>
+
+          <p className="text-base leading-relaxed">
+            <strong className="text-zinc-900">Full-stack experience:</strong> ASP.NET Core, C#, React, JavaScript, jQuery, HTML, CSS, MS SQL Server, PostgreSQL, Flutter, Electron, and Node.js.
+          </p>
+
+          <p className="text-base leading-relaxed">
+            <strong className="text-zinc-900">Current direction:</strong> Exploring AI agents and LLM-powered applications — RAG, tool calling, MCP, vector search, agentic workflows, and AI-driven automation.
+          </p>
+        </div>
+
+        {/* CTAs */}
+        <div className="flex flex-wrap gap-3 pt-6">
+          <Link to="/courses" className="pf-btn-primary group px-6 py-3 text-base">
+            <span>Explore my work</span>
+            <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <Link to="/courses" className="pf-btn-secondary group px-6 py-3 text-base">
+            <span>View courses</span>
+            <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+          </Link>
+          <a href="mailto:thanthrajnaani@gmail.com" className="pf-btn-secondary px-6 py-3 text-base">
+            <Mail className="w-4 h-4" />
+            Get in touch
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
