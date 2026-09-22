@@ -6,10 +6,10 @@ export default function CoursesSection() {
   const latestCourses = courses.slice(0, 3)
 
   return (
-    <section className="border-t border-zinc-200 bg-zinc-50/40">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+    <section className="border-t border-zinc-200 bg-zinc-50/50">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
         {/* Header */}
-        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-14">
+        <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8 mb-10">
           <div>
             <div className="flex items-center gap-2 mb-3">
               <BookOpen className="w-5 h-5 text-accent-600" />

@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { Mail, Youtube, Instagram } from 'lucide-react'
+import Reveal from '../components/Reveal.jsx'
 import HeroSection from '../components/HeroSection.jsx'
 import TechStackStrip from '../components/TechStackStrip.jsx'
 import CapabilitiesSection from '../components/CapabilitiesSection.jsx'
@@ -13,28 +14,44 @@ export default function HomePage() {
   return (
     <div>
       {/* Hero */}
-      <HeroSection />
+      <Reveal>
+        <HeroSection />
+      </Reveal>
 
       {/* Tech Stack */}
-      <TechStackStrip />
+      <Reveal delay={100}>
+        <TechStackStrip />
+      </Reveal>
 
       {/* What I Build */}
-      <CapabilitiesSection />
+      <Reveal delay={150}>
+        <CapabilitiesSection />
+      </Reveal>
 
       {/* From Idea to Production */}
-      <ProcessSection />
+      <Reveal delay={150}>
+        <ProcessSection />
+      </Reveal>
 
       {/* About */}
-      <AboutSection />
+      <Reveal delay={150}>
+        <AboutSection />
+      </Reveal>
 
       {/* AI & Agents */}
-      <AISection />
+      <Reveal delay={150}>
+        <AISection />
+      </Reveal>
 
       {/* Courses */}
-      <CoursesSection />
+      <Reveal delay={150}>
+        <CoursesSection />
+      </Reveal>
 
       {/* Final CTA */}
-      <FinalCTASection />
+      <Reveal delay={150}>
+        <FinalCTASection />
+      </Reveal>
 
       {/* Social Links Footer */}
       <footer className="border-t border-zinc-200 bg-zinc-50/40">

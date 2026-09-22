@@ -30,10 +30,10 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="border-t border-zinc-200 bg-zinc-50/40">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+    <section className="border-t border-zinc-200 bg-gradient-to-b from-accent-50/40 to-transparent">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
         {/* Header */}
-        <div className="mb-16">
+        <div className="mb-12">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
             From idea to production
           </h2>

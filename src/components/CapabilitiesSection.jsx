@@ -34,10 +34,10 @@ const capabilities = [
 
 export default function CapabilitiesSection() {
   return (
-    <section className="border-t border-zinc-200">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+    <section className="border-t border-zinc-200 bg-zinc-50/50">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
         {/* Header */}
-        <div className="mb-14">
+        <div className="mb-10">
           <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-4">
             What I build
           </h2>

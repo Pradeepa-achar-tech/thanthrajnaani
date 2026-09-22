@@ -14,10 +14,10 @@ const aiConcepts = [
 
 export default function AISection() {
   return (
-    <section className="border-t border-zinc-200 bg-gradient-to-b from-accent-50/30 to-transparent">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+    <section className="border-t border-zinc-200 bg-gradient-to-b from-accent-50/50 to-transparent">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
         {/* Header */}
-        <div className="mb-16 max-w-3xl">
+        <div className="mb-10 max-w-3xl">
           <div className="flex items-center gap-2 mb-4">
             <Brain className="w-5 h-5 text-accent-600" />
             <span className="eyebrow text-accent-600">AI & Agents</span>

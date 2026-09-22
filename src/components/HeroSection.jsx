@@ -3,8 +3,8 @@ import { Link } from 'react-router-dom'
 
 export default function HeroSection() {
   return (
-    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-20 md:pt-32 pb-16 md:pb-24">
-      <div className="space-y-8">
+    <section className="max-w-6xl mx-auto px-4 md:px-6 pt-16 md:pt-24 pb-12 md:pb-16">
+      <div className="space-y-6">
         {/* Eyebrow */}
         <div className="flex items-center gap-2">
           <span className="eyebrow text-zinc-500">

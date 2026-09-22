@@ -4,9 +4,9 @@ import { Link } from 'react-router-dom'
 export default function AboutSection() {
   return (
     <section className="border-t border-zinc-200">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-20 md:py-24">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
         <div className="max-w-3xl">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-8">
+          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900 mb-6">
             Building software. Solving problems. Sharing what I learn.
           </h2>
 
