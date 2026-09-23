@@ -180,7 +180,7 @@ export default function ModulePage({
                     </h3>
                   </div>
                   <span className="text-xs text-zinc-400 flex-shrink-0">
-                    {sectionDone} / {section.topics.length}
+                    {sectionDone} / {(section.topics?.length || 0)}
                   </span>
                 </button>
                 {isOpen && (

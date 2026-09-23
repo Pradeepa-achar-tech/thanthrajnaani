@@ -124,7 +124,7 @@ export default function ModulePage({
                   <h3 className="text-sm font-bold text-zinc-900 flex items-center justify-between">
                     <span>{section.title}</span>
                     <span className="text-xs font-semibold text-zinc-500">
-                      {sectionDone} / {section.topics.length}
+                      {sectionDone} / {(section.topics?.length || 0)}
                     </span>
                   </h3>
                 </div>

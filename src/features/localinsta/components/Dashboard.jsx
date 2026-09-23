@@ -78,7 +78,7 @@ export default function Dashboard({ moduleProgress, overall, onOpenModule }) {
             const prog = moduleProgress(m)
             const dotColor = accentBar[m.accent] || 'bg-zinc-400'
             const copy = getModuleCopy(m, isKannada)
-            const topicCount = m.sections.reduce((acc, s) => acc + s.topics.length, 0)
+            const topicCount = m.sections.reduce((acc, s) => acc + (s.topics?.length || 0), 0)
             return (
               <button
                 key={m.id}

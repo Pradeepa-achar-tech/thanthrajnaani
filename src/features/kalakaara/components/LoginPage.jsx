@@ -26,7 +26,7 @@ export default function LoginPage() {
     () =>
       curriculum.modules.reduce(
         (sum, m) =>
-          sum + m.sections.reduce((s, sec) => s + sec.topics.length, 0),
+          sum + m.sections.reduce((s, sec) => s + (sec.topics?.length || 0), 0),
         0
       ),
     []

@@ -87,7 +87,7 @@ export default function Dashboard({ moduleProgress, overall, onOpenModule }) {
           {curriculum.modules.map((m, idx) => {
             const prog = moduleProgress(m)
             const dotColor = accentBar[m.accent] || 'bg-slate-500'
-            const topicCount = m.sections.reduce((acc, s) => acc + s.topics.length, 0)
+            const topicCount = m.sections.reduce((acc, s) => acc + (s.topics?.length || 0), 0)
             const isLocked = false
             const isPhase1 = idx === 0
 
