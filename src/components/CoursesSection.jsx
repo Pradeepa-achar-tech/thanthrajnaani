@@ -40,13 +40,13 @@ export default function CoursesSection() {
               <Link
                 key={course.id}
                 to={`/courses/${course.id}/learn`}
-                className="pf-card pf-card-hover p-6 flex flex-col group"
+                className="group relative p-6 rounded-xl border border-zinc-200 bg-gradient-to-br from-white to-accent-50/20 flex flex-col shadow-sm transition-all duration-300 hover:shadow-md hover:-translate-y-1"
               >
-                <div className="w-10 h-10 rounded-lg bg-accent-50 flex items-center justify-center text-accent-600 mb-5 group-hover:bg-accent-100 transition-colors">
+                <div className="w-10 h-10 rounded-lg bg-accent-100 text-accent-600 flex items-center justify-center mb-5 group-hover:bg-accent-600 group-hover:text-white transition-all duration-300 group-hover:scale-110">
                   <BookOpen className="w-5 h-5" />
                 </div>
 
-                <h3 className="text-lg font-semibold text-zinc-900 mb-2">{titleShort}</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 mb-2 group-hover:text-accent-600 transition-colors">{titleShort}</h3>
 
                 <p className="text-sm text-zinc-600 leading-relaxed mb-5 flex-1">
                   {course.description}
@@ -59,7 +59,7 @@ export default function CoursesSection() {
 
                 <span className="text-sm font-medium inline-flex items-center gap-1.5 text-zinc-900 mt-4 group-hover:text-accent-600 transition-colors">
                   Start learning
-                  <ArrowRight className="w-4 h-4" />
+                  <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
                 </span>
               </Link>
             )

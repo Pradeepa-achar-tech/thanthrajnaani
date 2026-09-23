@@ -36,15 +36,15 @@ export default function HeroSection() {
 
         {/* CTAs */}
         <div className="flex flex-wrap gap-3 pt-6">
-          <Link to="/courses" className="pf-btn-primary group px-6 py-3 text-base">
+          <Link to="/courses" className="group inline-flex items-center gap-2 px-6 py-3 text-base font-medium text-white bg-zinc-900 rounded-lg hover:bg-zinc-800 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
             <span>Explore my work</span>
-            <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
-          <Link to="/courses" className="pf-btn-secondary group px-6 py-3 text-base">
+          <Link to="/courses" className="group inline-flex items-center gap-2 px-6 py-3 text-base font-medium text-zinc-900 bg-zinc-100 rounded-lg hover:bg-accent-100 hover:text-accent-600 transition-all duration-300 hover:shadow-sm hover:-translate-y-0.5">
             <span>View courses</span>
-            <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+            <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
           </Link>
-          <a href="mailto:thanthrajnaani@gmail.com" className="pf-btn-secondary px-6 py-3 text-base">
+          <a href="mailto:thanthrajnaani@gmail.com" className="group inline-flex items-center gap-2 px-6 py-3 text-base font-medium text-zinc-900 bg-zinc-100 rounded-lg hover:bg-accent-100 hover:text-accent-600 transition-all duration-300 hover:shadow-sm hover:-translate-y-0.5">
             <Mail className="w-4 h-4" />
             Get in touch
           </a>

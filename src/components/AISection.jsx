@@ -37,16 +37,16 @@ export default function AISection() {
           {aiConcepts.map((concept) => (
             <div
               key={concept.title}
-              className="p-4 rounded-lg border border-zinc-200 bg-white hover:border-accent-300 hover:bg-accent-50/50 transition-colors"
+              className="group p-4 rounded-lg border border-zinc-200 bg-white shadow-sm hover:shadow-md hover:-translate-y-0.5 hover:border-accent-300 hover:bg-gradient-to-br hover:from-accent-50 hover:to-accent-100/20 transition-all duration-300"
             >
-              <h3 className="font-semibold text-zinc-900 mb-1">{concept.title}</h3>
+              <h3 className="font-semibold text-zinc-900 mb-1 group-hover:text-accent-600 transition-colors">{concept.title}</h3>
               <p className="text-xs text-zinc-600">{concept.description}</p>
             </div>
           ))}
         </div>
 
         {/* Tech Stack */}
-        <div className="p-8 rounded-lg border border-zinc-200 bg-white mb-12">
+        <div className="p-8 rounded-xl border border-zinc-200 bg-gradient-to-br from-white to-accent-50/20 shadow-sm mb-12">
           <div className="flex items-center gap-2 mb-4">
             <Code2 className="w-5 h-5 text-accent-600" />
             <h3 className="font-semibold text-zinc-900">Core Technologies</h3>
@@ -77,9 +77,9 @@ export default function AISection() {
         </div>
 
         {/* CTA */}
-        <Link to="/courses/genaifast/learn" className="inline-flex items-center gap-2 pf-btn-primary px-6 py-3">
+        <Link to="/courses/genaifast/learn" className="group inline-flex items-center gap-2 px-6 py-3 font-medium text-white bg-zinc-900 rounded-lg hover:bg-accent-600 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
           <span>Explore my AI work</span>
-          <ArrowRight className="w-4 h-4" />
+          <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
         </Link>
       </div>
     </section>

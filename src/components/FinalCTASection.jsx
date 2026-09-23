@@ -15,14 +15,14 @@ export default function FinalCTASection() {
           </p>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <a href="mailto:thanthrajnaani@gmail.com" className="pf-btn-primary group px-6 py-3 text-base justify-center sm:justify-start">
+            <a href="mailto:thanthrajnaani@gmail.com" className="group inline-flex items-center justify-center sm:justify-start gap-2 px-6 py-3 text-base font-medium text-zinc-900 bg-white rounded-lg hover:bg-accent-100 hover:text-accent-600 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
               <Mail className="w-4 h-4" />
               <span>Get in touch</span>
             </a>
 
-            <Link to="/courses" className="pf-btn-secondary group px-6 py-3 text-base justify-center sm:justify-start">
+            <Link to="/courses" className="group inline-flex items-center justify-center sm:justify-start gap-2 px-6 py-3 text-base font-medium text-white bg-accent-600 rounded-lg hover:bg-accent-700 transition-all duration-300 hover:shadow-md hover:-translate-y-0.5">
               <span>Explore my work</span>
-              <ArrowRight className="w-4 h-4 opacity-70 group-hover:translate-x-0.5 transition-transform" />
+              <ArrowRight className="w-4 h-4 group-hover:translate-x-0.5 transition-transform" />
             </Link>
           </div>
         </div>

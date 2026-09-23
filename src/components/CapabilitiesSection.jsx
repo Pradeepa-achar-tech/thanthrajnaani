@@ -7,6 +7,8 @@ const capabilities = [
     description:
       'Business applications, dashboards, platforms, and SaaS products built with modern frontend and backend architecture.',
     technologies: 'ASP.NET Core · C# · React · JavaScript · SQL Server · PostgreSQL',
+    gradient: 'from-blue-50/50 to-transparent',
+    iconBg: 'bg-blue-100 text-blue-600',
   },
   {
     icon: Smartphone,
@@ -14,6 +16,8 @@ const capabilities = [
     description:
       'Cross-platform mobile applications backed by scalable APIs and real-world business logic.',
     technologies: 'Flutter · Dart · ASP.NET Core · REST APIs',
+    gradient: 'from-purple-50/50 to-transparent',
+    iconBg: 'bg-purple-100 text-purple-600',
   },
   {
     icon: Box,
@@ -21,6 +25,8 @@ const capabilities = [
     description:
       'Cross-platform desktop applications that combine modern React interfaces with native desktop capabilities.',
     technologies: 'React · Electron · Node.js',
+    gradient: 'from-amber-50/50 to-transparent',
+    iconBg: 'bg-amber-100 text-amber-600',
   },
   {
     icon: Zap,
@@ -29,6 +35,8 @@ const capabilities = [
       'Exploring intelligent applications where LLMs can reason over context, use tools, retrieve information, and automate multi-step workflows.',
     technologies: 'LLMs · RAG · Tool Calling · MCP · Vector Search · LangGraph · Python',
     badge: 'Current Focus',
+    gradient: 'from-accent-50/80 to-orange-100/20',
+    iconBg: 'bg-accent-600 text-white',
   },
 ]
 
@@ -51,22 +59,25 @@ export default function CapabilitiesSection() {
           {capabilities.map((cap) => {
             const Icon = cap.icon
             return (
-              <div key={cap.title} className="pf-card p-8 flex flex-col">
+              <div
+                key={cap.title}
+                className={`group relative p-8 rounded-xl border border-zinc-200 bg-gradient-to-br ${cap.gradient} flex flex-col shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1`}
+              >
                 <div className="flex items-start justify-between mb-5">
-                  <div className="w-12 h-12 rounded-lg bg-accent-50 flex items-center justify-center text-accent-600">
+                  <div className={`w-12 h-12 rounded-lg ${cap.iconBg} flex items-center justify-center transition-transform duration-300 group-hover:scale-110`}>
                     <Icon className="w-6 h-6" />
                   </div>
                   {cap.badge && (
-                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-accent-50 text-accent-700">
+                    <span className="text-xs font-semibold px-2.5 py-1 rounded-full bg-accent-600 text-white">
                       {cap.badge}
                     </span>
                   )}
                 </div>
 
-                <h3 className="text-xl font-semibold text-zinc-900 mb-2">{cap.title}</h3>
+                <h3 className="text-xl font-semibold text-zinc-900 mb-2 group-hover:text-accent-600 transition-colors">{cap.title}</h3>
                 <p className="text-zinc-600 mb-5 flex-1 leading-relaxed">{cap.description}</p>
 
-                <div className="pt-5 border-t border-zinc-100">
+                <div className="pt-5 border-t border-zinc-200">
                   <p className="text-xs font-medium text-zinc-500 uppercase tracking-[0.08em]">
                     Technologies
                   </p>

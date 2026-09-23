@@ -45,17 +45,17 @@ export default function ProcessSection() {
         {/* Steps */}
         <div className="grid md:grid-cols-5 gap-6 md:gap-4">
           {steps.map((step, i) => (
-            <div key={step.number} className="flex flex-col">
+            <div key={step.number} className="group flex flex-col">
               {/* Number & Title */}
               <div className="mb-4">
-                <div className="text-3xl md:text-4xl font-bold text-accent-600 mb-2">
+                <div className="text-3xl md:text-4xl font-bold text-accent-600 mb-2 inline-flex items-center justify-center w-12 h-12 rounded-lg bg-accent-100 group-hover:bg-accent-600 group-hover:text-white transition-all duration-300">
                   {step.number}
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900">{step.title}</h3>
+                <h3 className="text-lg font-semibold text-zinc-900 group-hover:text-accent-600 transition-colors mt-4">{step.title}</h3>
               </div>
 
               {/* Description */}
-              <p className="text-sm text-zinc-600 leading-relaxed mb-4 flex-1">
+              <p className="text-sm text-zinc-600 leading-relaxed mb-4 flex-1 group-hover:text-zinc-700 transition-colors">
                 {step.description}
               </p>
 
