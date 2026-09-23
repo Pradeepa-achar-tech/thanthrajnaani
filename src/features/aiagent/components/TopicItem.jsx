@@ -1,5 +1,10 @@
 import { useState } from 'react'
 import { CheckCircle2, Circle, Copy, Check } from 'lucide-react'
+import PythonPlayground from './PythonPlayground'
+
+const componentMap = {
+  PythonPlayground,
+}
 
 export default function TopicItem({
   topic,
@@ -49,6 +54,15 @@ export default function TopicItem({
 
       {expanded && (
         <div className="px-4 py-3 bg-accent-50 border-t border-accent-100 space-y-3 text-sm">
+          {topic.interactive && topic.component && componentMap[topic.component] && (
+            <div className="py-3">
+              {(() => {
+                const Component = componentMap[topic.component]
+                return <Component />
+              })()}
+            </div>
+          )}
+
           {topic.analogy && (
             <div>
               <h4 className="font-semibold text-zinc-900 mb-1">📝 Analogy</h4>
