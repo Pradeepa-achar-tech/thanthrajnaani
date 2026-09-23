@@ -115,6 +115,12 @@ pre { max-width: 100%; }
   transform: translateY(-3px);
 }
 
+/* Page load animations */
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
 /* Scroll reveal — subtle fade + rise */
 .reveal {
   opacity: 0;
@@ -129,4 +135,5 @@ pre { max-width: 100%; }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .reveal { opacity: 1 !important; transform: none !important; }
+  * { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

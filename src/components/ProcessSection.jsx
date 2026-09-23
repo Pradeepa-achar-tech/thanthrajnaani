@@ -30,48 +30,43 @@ const steps = [
 
 export default function ProcessSection() {
   return (
-    <section className="border-t border-zinc-200 bg-gradient-to-b from-accent-50/40 to-transparent">
-      <div className="max-w-6xl mx-auto px-4 md:px-6 py-14 md:py-16">
+    <section className="border-t border-zinc-200 bg-gradient-to-b from-accent-50/30 to-transparent">
+      <div className="max-w-6xl mx-auto px-4 md:px-6 py-12 md:py-14">
         {/* Header */}
-        <div className="mb-12">
-          <h2 className="text-4xl md:text-5xl font-bold tracking-tight text-zinc-900">
+        <div className="mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold tracking-tight text-zinc-900 mb-3">
             From idea to production
           </h2>
-          <p className="text-lg text-zinc-600 mt-4 max-w-2xl">
-            This is how I approach every project — understanding the problem, designing the solution, shipping it, and improving it.
+          <p className="text-sm md:text-base text-zinc-600 max-w-2xl">
+            Understanding → Architecting → Building → Shipping → Iterating
           </p>
         </div>
 
         {/* Steps */}
-        <div className="grid md:grid-cols-5 gap-6 md:gap-4">
-          {steps.map((step, i) => (
+        <div className="grid md:grid-cols-5 gap-5 md:gap-3">
+          {steps.map((step) => (
             <div key={step.number} className="group flex flex-col">
               {/* Number & Title */}
-              <div className="mb-4">
-                <div className="text-3xl md:text-4xl font-bold text-accent-600 mb-2 inline-flex items-center justify-center w-12 h-12 rounded-lg bg-accent-100 group-hover:bg-accent-600 group-hover:text-white transition-all duration-300">
+              <div className="mb-3">
+                <div className="w-10 h-10 rounded-md bg-accent-100 text-accent-600 text-sm font-bold flex items-center justify-center group-hover:bg-accent-600 group-hover:text-white transition-all duration-300 mb-2">
                   {step.number}
                 </div>
-                <h3 className="text-lg font-semibold text-zinc-900 group-hover:text-accent-600 transition-colors mt-4">{step.title}</h3>
+                <h3 className="text-base font-semibold text-zinc-900 group-hover:text-accent-600 transition-colors">{step.title}</h3>
               </div>
 
               {/* Description */}
-              <p className="text-sm text-zinc-600 leading-relaxed mb-4 flex-1 group-hover:text-zinc-700 transition-colors">
+              <p className="text-xs text-zinc-600 leading-relaxed flex-1 group-hover:text-zinc-700 transition-colors">
                 {step.description}
               </p>
-
-              {/* Connector (hidden on last) */}
-              {i < steps.length - 1 && (
-                <div className="hidden md:block absolute h-0.5 w-4 bg-zinc-200 transform translate-x-20 translate-y-8" />
-              )}
             </div>
           ))}
         </div>
 
         {/* Bottom note */}
-        <div className="mt-12 pt-8 border-t border-zinc-200">
-          <p className="text-sm text-zinc-600 flex items-start gap-2">
-            <CheckCircle2 className="w-4 h-4 text-accent-600 flex-shrink-0 mt-0.5" />
-            This mindset — understanding, designing, building, shipping, and iterating — is what I bring to every project, whether it's a web application, mobile app, desktop software, or AI system.
+        <div className="mt-10 pt-6 border-t border-zinc-200">
+          <p className="text-xs text-zinc-600 flex items-start gap-2">
+            <CheckCircle2 className="w-3.5 h-3.5 text-accent-600 flex-shrink-0 mt-0.5" />
+            <span>This mindset is what I bring to every project — web, mobile, desktop, AI.</span>
           </p>
         </div>
       </div>
