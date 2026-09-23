@@ -8,7 +8,7 @@ export default function HeroSection() {
         {/* Eyebrow */}
         <div className="inline-block">
           <span className="eyebrow text-zinc-500 text-xs tracking-wider opacity-0 animate-[fadeIn_0.6s_ease-out_0.1s_forwards]">
-            KUNDAPURA, INDIA · PRODUCT OWNER · SOFTWARE ARCHITECT · FULL-STACK ENGINEER
+            PRODUCT OWNER · SOFTWARE ARCHITECT · FULL-STACK ENGINEER
           </span>
         </div>
 
