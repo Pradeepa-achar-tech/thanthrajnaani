@@ -12,6 +12,8 @@ export default function TechStackStrip() {
     'Python',
     'AI Agents',
     'LLMs',
+    'Azure',
+    'Render',
   ]
 
   return (
