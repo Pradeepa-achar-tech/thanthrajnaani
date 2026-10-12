@@ -2,6 +2,14 @@
 
 export const courses = [
   {
+    id: 'python', title: 'Python Visual Classroom',
+    tagline: 'Your first Python program, explained one animated step at a time',
+    description: 'A beginner-friendly classroom with 24 guided visual lessons across 8 modules. Predict outputs, replay code traces, watch values change, check your understanding, and build a cafe receipt program. Includes practice tasks, teacher explanations, notes, quizzes, and synced progress.',
+    level: 'Beginner to Intermediate', durationHours: 24, modulesCount: 8,
+    icon: Braces, skills: ['Python', 'Animated code traces', 'Loops & functions', 'Files & errors', 'Testing', 'Caf? project'],
+    routePlay: '/courses/python/learn',
+  },
+  {
     id: 'aiagent',
     title: 'AI Agent Visual Lab',
     tagline: 'A senior .NET engineer\'s path to production AI agents',

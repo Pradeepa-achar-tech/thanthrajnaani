@@ -21,6 +21,7 @@ import { useAuth } from '../contexts/AuthContext.jsx'
 import { useStudyList } from '../contexts/StudyListContext.jsx'
 
 const curriculumLoaders = {
+  python: () => import('../features/python/data/curriculum.js'),
   flutter: () => import('../features/flutter/data/curriculum.js'),
   genai: () => import('../features/genai/data/curriculum.js'),
   billing: () => import('../features/billing/data/curriculum.js'),

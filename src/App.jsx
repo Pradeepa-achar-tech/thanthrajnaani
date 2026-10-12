@@ -184,8 +184,11 @@ const AIAgentPlayer = lazy(async () => {
   return { default: Wrapped }
 })
 
+const PythonPlayer = lazy(() => import('./features/python/App.jsx'))
+
 function CoursePlayerSwitch() {
   const { courseId } = useParams()
+  if (courseId === 'python') return <PythonPlayer />
   if (courseId === 'flutter') return <FlutterPlayer />
   if (courseId === 'genai') return <GenAIPlayer />
   if (courseId === 'billing') return <BillingPlayer />
